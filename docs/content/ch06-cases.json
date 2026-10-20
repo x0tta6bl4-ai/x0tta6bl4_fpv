@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "status": "proposed_engine_contract_not_integrated",
+  "schema_version": 2,
+  "status": "integrated_pilot_under_review",
   "source_ids": [
     "book6",
     "bf-battery",
@@ -81,22 +81,13 @@
           "При том же заряде, токе и соединениях в допустимых контрольных условиях просадка меньше; температурный эффект подтверждён."
         ]
       },
-      "example": {
-        "cells_actual": 6,
-        "cells_configured": 6,
-        "rest_V": 25.2,
-        "current_A": 40,
-        "cold_load_V": 20.4,
-        "control_load_V": 23.4,
-        "profile_warning_cell_V": 3.5,
-        "kind": "example"
-      },
       "postfix_checks": [
         "Повторно сопоставлены показания приборов и S.",
         "В допустимом контрольном состоянии нет прежнего провала при сравнимой нагрузке.",
         "Не изменены порог, калибровка и физическое число элементов ради зачёта."
       ],
-      "phase": "landed_record_review"
+      "phase": "landed_record_review",
+      "example_scenario_id": "worked_temperature_A"
     },
     "cell_count": {
       "at": "cells",
@@ -137,20 +128,13 @@
           "Температурный контроль в этом варианте не выполнен. Причина S подтверждается своей проверкой."
         ]
       },
-      "example": {
-        "cells_actual": 6,
-        "cells_configured": 7,
-        "measured_total_V": 24,
-        "fc_total_V": 24,
-        "profile_warning_cell_V": 3.5,
-        "kind": "example"
-      },
       "postfix_checks": [
         "После повторной проверки настройка соответствует 6S.",
         "Общее показание осталось 24,0 В и согласовано с независимым.",
         "Вычисленное среднее стало 4,0 В; контроль выполнен, а не только выбрано слово «S»."
       ],
-      "phase": "landed_record_review"
+      "phase": "landed_record_review",
+      "example_scenario_id": "transfer_cell_count_C"
     }
   },
   "rendering_contract": [
@@ -411,5 +395,10 @@
       "selection": "Любая из двух причин с новым набором данных; причина может совпасть с предыдущей.",
       "requires_new_seed": true
     }
+  },
+  "number_sources": {
+    "scenario_examples": "SCENARIOS[].example — исходные числовые поля каждого случая.",
+    "cause_examples": "CAUSES[].example_scenario_id — ссылка на соответствующий SCENARIOS[].id, отдельного набора example у причины нет.",
+    "later_examples": "src/figs/lowv.mjs: laterScenario (сверка в ch06-number-review.md). Числа не заменены; перенос в JSON этой редакцией не выполнен."
   }
 }
