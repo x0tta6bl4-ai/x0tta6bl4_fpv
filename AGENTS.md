@@ -1,6 +1,6 @@
-# Правила для всех ИИ-ассистентов (Claude, GPT/Codex, Gemini/Antigravity)
+# Правила для всех ИИ-ассистентов (Claude, GPT/Codex, Gemini/Antigravity, Grok/Cursor)
 
-Этот файл — общий договор. Его читают все трое. Роли и зоны ответственности — в `docs/ROLES.md`,
+Этот файл — общий договор. Его читают все четверо. Роли и зоны ответственности — в `docs/ROLES.md`,
 порядок работы с git — в `docs/WORKFLOW.md`, устройство проекта — в `docs/ARCHITECTURE.md`.
 
 ## Что это за проект

@@ -23,12 +23,14 @@ for (const [W, H] of sizes) {
   const knobs = () => p.$$eval('.ctl-sticks .st-knob', (ks) => ks.map((k) => { const r = k.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; }));
   const pads = () => p.$$eval('.ctl-sticks .lab-stick svg', (ks) => ks.map((k) => { const r = k.getBoundingClientRect(); return [r.x, r.y, r.width, r.height]; }));
   // 1. Ширина
-  const wide = await p.evaluate(() => {
-    const vw = innerWidth, out = [];
+  // Ширина экрана — заданная W, а не innerWidth: в эмуляции телефона innerWidth растёт вслед за вылезающим
+  // содержимым, и проверка сама себя оправдывала (в CI было 370 при экране 360, касания мимо ручек стиков).
+  const wide = await p.evaluate((W) => {
+    const vw = W, out = [];
     const scrollable = (el) => { for (let a = el.parentElement; a; a = a.parentElement) { const s = getComputedStyle(a); if (/(auto|scroll|hidden|clip)/.test(s.overflowX)) return a !== document.documentElement && a !== document.body; } return false; };
     for (const el of document.querySelectorAll('#main *')) { const r = el.getBoundingClientRect(); if (r.width && (r.right > vw + 1 || r.left < -1) && !scrollable(el)) out.push(el.tagName + '.' + (el.className.baseVal ?? el.className)); }
-    return { sw: document.documentElement.scrollWidth, vw, out: out.slice(0, 5), n: out.length };
-  });
+    return { sw: Math.max(document.documentElement.scrollWidth, innerWidth), vw, out: out.slice(0, 5), n: out.length };
+  }, W);
   rep(W, 'нет горизонтальной прокрутки страницы', wide.sw <= wide.vw, `scrollWidth ${wide.sw} / ${wide.vw}`);
   rep(W, 'нет вылезающих за край элементов (вне прокручиваемых строк)', wide.n === 0, wide.n ? wide.out.join(', ') : '');
   // 2. Оглавление

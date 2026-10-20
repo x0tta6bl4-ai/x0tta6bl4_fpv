@@ -25,9 +25,9 @@ jobs:
       - name: Тесты
         shell: bash
         run: npm test 2>&1 | tee tests-output.txt
-      # Временно: раскладка телефона 360 px в CI (что под пальцем на месте стика).
+      # Если тесты упали: раскладка телефона 360 px в CI (ширина, смещение видимой области, что под пальцем у стиков).
       - name: Диагностика телефона 360
-        if: always()
+        if: failure()
         shell: bash
         run: |
           node tests/diag-phone.mjs > diag.txt 2>&1 || true
