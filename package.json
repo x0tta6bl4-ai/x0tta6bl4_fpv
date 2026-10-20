@@ -10,7 +10,8 @@
     "build:artifact": "node build.mjs --artifact",
     "test": "npm run build:dev && node tests/run-all.mjs",
     "test:missions": "node tests/run-all.mjs missions",
-    "test:phone": "node tests/run-all.mjs phone"
+    "test:phone": "node tests/run-all.mjs phone",
+    "zones": "node .github/scripts/zones.mjs"
   },
   "devDependencies": {
     "esbuild": "0.24.2",

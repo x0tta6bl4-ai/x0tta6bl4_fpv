@@ -1,9 +1,14 @@
-# Автотесты на каждый Pull Request и на каждое изменение main.
+# Автотесты на каждый push в любую ветку (claude/ gpt/ gemini/ и main) и вручную (Actions → tests → Run workflow).
+# Статус привязан к коммиту, поэтому он же — обязательная проверка PR.
 name: tests
 on:
-  pull_request:
   push:
-    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -16,7 +21,27 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm test
+      # shell: bash включает pipefail: упавший npm test роняет шаг, а не маскируется кодом tee.
+      - name: Тесты
+        shell: bash
+        run: npm test 2>&1 | tee tests-output.txt
+      # Если тесты упали: раскладка телефона 360 px в CI (ширина, смещение видимой области, что под пальцем у стиков).
+      - name: Диагностика телефона 360
+        if: failure()
+        shell: bash
+        run: |
+          node tests/diag-phone.mjs > diag.txt 2>&1 || true
+          node -e 'const o=require("fs").readFileSync("diag.txt","utf8");console.log("::warning title=diag 360::"+o.replace(/%/g,"%25").replace(/\n/g,"%0A"))'
+      # Итог тестов — в аннотации запуска: видно на странице PR без открытия журнала.
+      - name: Итог тестов
+        if: always()
+        run: |
+          node -e '
+            const o = require("fs").existsSync("tests-output.txt") ? require("fs").readFileSync("tests-output.txt", "utf8") : "";
+            const lines = o.split("\n").filter((l) => /^(PASS|FAIL) |^      |Всё прошло|Не прошло/.test(l)).slice(0, 60);
+            const esc = (s) => s.replace(/%/g, "%25").replace(/\r/g, "").replace(/\n/g, "%0A");
+            console.log((/Всё прошло/.test(o) ? "::notice title=npm test::" : "::error title=npm test::") + esc(lines.join("\n") || "нет вывода"));
+          '
       - name: Скриншоты телефона (если тест упал)
         if: failure()
         uses: actions/upload-artifact@v4

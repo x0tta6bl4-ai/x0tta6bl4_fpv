@@ -33,7 +33,10 @@ await go('3'); await p.evaluate(()=>document.querySelector('[data-act=explode]')
   console.log('ch3 подсказка', await p.evaluate(()=>(document.querySelector('#quest .q-wrong')||{}).textContent||'нет')); await q('[data-conf="0"]'); await W(300); }
 await set('select','antenna'); await W(300); await seg('frame','TRUEX'); await W(300); console.log('ch3 truex', await ok()); await seg('frame','DEADCAT'); await W(500); console.log('ch3', await ok()); await seg('fov','150'); await W(500); console.log('ch3 wide', await ok());
 await go('4'); await seg('mode','ACRO'); await set('stick',0.5); await W(800); await set('stick',0); await W(600); await seg('mode','ANGLE'); await set('stick',0.8); await W(1500); await set('stick',0); await W(2500); await set('acc',true); await W(2500); await set('acc',false); await set('wind',true); await set('ki',0); await W(3500); console.log('ch4', await ok());
-await go('5'); await set('throttle',1); await W(9000); await set('cold',true); await W(800); await set('cold',false); await set('throttle',0.2); await W(1500); console.log('ch5', await ok());
+await go('5'); await set('throttle',1); await W(9000); await set('cold',true); await W(800); await set('cold',false); await set('throttle',0.2); await W(1500);
+// eco — как в подсказке: на винте 5″ больше ≈7,4 г/Вт не выйти, нужен 7×4×3 на ~15 % газа (≈184 г, ≈10 г/Вт). Раньше звезда
+// ловилась только всплеском показаний при сбросе газа и в CI не ловилась.
+await set('prop','7x4x3'); await W(800); await set('throttle',0.15); await W(1500); console.log('ch5', await ok());
 await go('6');
 { const q6 = (sel) => p.evaluate((sel)=>{const e=document.querySelector('#quest '+sel); if(e) e.click(); return !!e;}, sel);
   const waitConf = async () => { for (let k = 0; k < 60 && !(await p.evaluate(()=>!!document.querySelector('#quest [data-conf]'))); k++) await W(250); };

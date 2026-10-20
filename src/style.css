@@ -22,7 +22,7 @@ code{font-family:var(--anatomy-mono);font-size:.92em;background:var(--anatomy-ca
 
 /* шапка */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;gap:12px;align-items:center;padding-block:10px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));background:color-mix(in srgb,var(--anatomy-page) 92%,transparent);backdrop-filter:blur(8px);box-shadow:0 1px 0 var(--anatomy-faint)}
-.brand{font:700 13px/1 var(--anatomy-mono);letter-spacing:.12em;color:var(--anatomy-strong);white-space:nowrap}
+.brand{font:700 13px/1 var(--anatomy-mono);letter-spacing:.12em;color:var(--anatomy-strong);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .brand span{font-weight:400;color:var(--anatomy-muted)}
 .top .grow{flex:1}
 .top select{max-width:360px}
