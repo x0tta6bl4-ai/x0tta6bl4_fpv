@@ -1,9 +1,9 @@
 # 008. Тексты гл. 6 по пилоту и реестр вопросов
 
 - Исполнитель: gpt
-- Статус: готово
-- Ветка: gpt/ch06-texts
-- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/12
+- Статус: на ревью
+- Ветка: gpt/ch06-osd-answer
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/18 (продолжение после PR #12)
 - Основание: `docs/discussions/001-learning-design.md` (сводка)
 
 ## Цель
