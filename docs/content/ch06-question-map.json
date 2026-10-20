@@ -27,15 +27,22 @@
     },
     {
       "id": "tickets",
-      "status": "not_reconciled_in_this_pilot"
+      "status": "separate_numbered_tickets_not_located_in_accessible_library"
     },
     {
       "id": "52_questions",
-      "status": "not_reconciled_in_this_pilot"
+      "status": "separate_52_question_document_not_located_in_accessible_library"
     },
     {
       "id": "variant_2",
       "status": "not_reconciled_in_this_pilot"
+    },
+    {
+      "id": "provided_exam83",
+      "status": "full_extracted_text_read_chapter6_subset_reconciled",
+      "count": 83,
+      "chapter6_direct_items": 4,
+      "source_id": "provided-exam83-20260930"
     }
   ],
   "questions": [
@@ -79,6 +86,15 @@
           "source_id": "provided-srez-20261018",
           "item_n": 44,
           "match_type": "topic_match"
+        }
+      ],
+      "provided_exam83_refs": [
+        {
+          "source_id": "provided-exam83-20260930",
+          "question_number": 10,
+          "pdf_page": 2,
+          "match_type": "related_only",
+          "note": "Есть значения номинала, но нет вопроса о его назначении или хранении."
         }
       ]
     },
@@ -129,6 +145,15 @@
           "item_n": 42,
           "match_type": "topic_match"
         }
+      ],
+      "provided_exam83_refs": [
+        {
+          "source_id": "provided-exam83-20260930",
+          "question_number": 10,
+          "pdf_page": 2,
+          "match_type": "partial",
+          "note": "В исходнике требуются минимум, номинал и максимум для трёх групп. Вопрос приложения спрашивает только максимум и добавляет UHV, отсутствующий в этом PDF."
+        }
       ]
     },
     {
@@ -172,7 +197,8 @@
           "item_n": 46,
           "match_type": "topic_match"
         }
-      ]
+      ],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q04",
@@ -214,7 +240,8 @@
           "item_n": 68,
           "match_type": "topic_match"
         }
-      ]
+      ],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q05",
@@ -267,6 +294,15 @@
           "item_n": 67,
           "match_type": "topic_match"
         }
+      ],
+      "provided_exam83_refs": [
+        {
+          "source_id": "provided-exam83-20260930",
+          "question_number": 21,
+          "pdf_page": 3,
+          "match_type": "partial",
+          "note": "В исходнике C/S/V/mAh, в вопросе приложения S/P/C. V и mAh раскрыты в разборе наклейки, P — дополнительная тема."
+        }
       ]
     },
     {
@@ -302,7 +338,16 @@
         "question_index": 5
       },
       "exam_key_status": "original_not_reconciled",
-      "provided_questionnaire_refs": []
+      "provided_questionnaire_refs": [],
+      "provided_exam83_refs": [
+        {
+          "source_id": "provided-exam83-20260930",
+          "question_number": 21,
+          "pdf_page": 3,
+          "match_type": "applied_example",
+          "note": "Пример интерпретации наклейки покрывает V и mAh; заданных чисел примера в исходном вопросе нет."
+        }
+      ]
     },
     {
       "id": "ch06-q07",
@@ -344,7 +389,8 @@
           "item_n": 43,
           "match_type": "topic_match"
         }
-      ]
+      ],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q08",
@@ -379,7 +425,8 @@
         "question_index": 7
       },
       "exam_key_status": "original_not_reconciled",
-      "provided_questionnaire_refs": []
+      "provided_questionnaire_refs": [],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q09",
@@ -415,7 +462,8 @@
         "question_index": 8
       },
       "exam_key_status": "original_not_reconciled",
-      "provided_questionnaire_refs": []
+      "provided_questionnaire_refs": [],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q10",
@@ -451,7 +499,8 @@
         "question_index": 9
       },
       "exam_key_status": "original_not_reconciled",
-      "provided_questionnaire_refs": []
+      "provided_questionnaire_refs": [],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q11",
@@ -493,7 +542,8 @@
           "item_n": 69,
           "match_type": "topic_match"
         }
-      ]
+      ],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q12",
@@ -535,6 +585,15 @@
           "source_id": "provided-srez-20261018",
           "item_n": 86,
           "match_type": "topic_match"
+        }
+      ],
+      "provided_exam83_refs": [
+        {
+          "source_id": "provided-exam83-20260930",
+          "question_number": 10,
+          "pdf_page": 2,
+          "match_type": "related_only",
+          "note": "В исходнике указан минимум 3,3 В, но поведение при нём не описано."
         }
       ]
     },
@@ -580,7 +639,8 @@
           "item_n": "С32",
           "match_type": "topic_match"
         }
-      ]
+      ],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q14",
@@ -617,7 +677,8 @@
         "question_index": 13
       },
       "exam_key_status": "original_not_reconciled",
-      "provided_questionnaire_refs": []
+      "provided_questionnaire_refs": [],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q15",
@@ -660,7 +721,8 @@
           "item_n": "С33",
           "match_type": "topic_match"
         }
-      ]
+      ],
+      "provided_exam83_refs": []
     },
     {
       "id": "ch06-q16",
@@ -703,6 +765,15 @@
           "item_n": 86,
           "match_type": "related_topic"
         }
+      ],
+      "provided_exam83_refs": [
+        {
+          "source_id": "provided-exam83-20260930",
+          "question_number": 10,
+          "pdf_page": 2,
+          "match_type": "related_only",
+          "note": "В исходнике указан минимум 3,3 В; посадочного ориентира 3,5 В нет."
+        }
       ]
     },
     {
@@ -738,7 +809,8 @@
         "question_index": 16
       },
       "exam_key_status": "original_not_reconciled",
-      "provided_questionnaire_refs": []
+      "provided_questionnaire_refs": [],
+      "provided_exam83_refs": []
     }
   ],
   "review_date": "2026-10-20",
@@ -807,6 +879,20 @@
       "total_cards": 143,
       "table_cards": 84,
       "scope": "Прочитан список DATA в предоставленном HTML. Это вторичный опросник, не фотографии исходной таблицы; unsure и own сохраняются. Другие экзаменационные сборники не сверены."
+    },
+    {
+      "id": "provided-exam83-20260930",
+      "kind": "provided_exam_answer_document",
+      "title": "ВОПРОСЫ И ОТВЕТЫ ЭКЗАМЕНА",
+      "filename": "Sch (1) (3)(1).pdf",
+      "duplicate_filename": "Sch (1) (3).pdf",
+      "provided_date": "2026-09-30",
+      "pdf_pages": 10,
+      "last_numbered_question": 83,
+      "read_scope": "Прочитан весь извлечённый текст двух PDF; сверены четыре прямых вопроса по батарее с главой 6. Остальные темы не объявляются проверенными.",
+      "duplicate_check": "Размеры и извлечённый текст совпадают; побайтовое равенство не проверялось.",
+      "authority": "Предоставленный документ с ответами; актуальность как официального ключа аттестации не подтверждена.",
+      "page_numbering": "Номер страницы файла PDF, не страницы книги."
     }
   ],
   "book_self_check_map": [
@@ -1147,6 +1233,84 @@
         "other_chapter": "7",
         "review_status": "outside_chapter6_not_reviewed"
       }
+    ]
+  },
+  "original_exam_reconciliation": {
+    "review_date": "2026-10-20",
+    "report": "ch06-exam-source-audit.md",
+    "scope": "Сопоставление главы 6 с доступным документом из 83 номерных пунктов. Отдельные билеты и сборник на 52 вопроса не найдены; полного охвата экзамена не заявляем.",
+    "original_source_id": "provided-exam83-20260930",
+    "full_pdf_text_read": true,
+    "matched_direct_battery_items": [
+      {
+        "question_number": 10,
+        "pdf_page": 2,
+        "topic": "Минимум, номинал и максимум напряжения",
+        "chapter_question_ids": [
+          "ch06-q02"
+        ],
+        "coverage": "partial",
+        "course_answer_data": [
+          {
+            "group": "LiPo/Li-ion",
+            "min_V": 3.3,
+            "nominal_V": [
+              3.65,
+              3.7
+            ],
+            "max_V": 4.2
+          },
+          {
+            "group": "LiPo HV",
+            "min_V": 3.3,
+            "nominal_V": [
+              3.7,
+              3.8
+            ],
+            "max_V": 4.35
+          }
+        ],
+        "limitations": "Числа предоставленного ответа, не универсальные пределы. UHV в нём отдельно не указан. Полного отдельного ответа на все три напряжения в самопроверке главы нет."
+      },
+      {
+        "question_number": 20,
+        "pdf_page": 3,
+        "topic": "Типоразмеры Li-ion",
+        "chapter_question_ids": [],
+        "chapter_section_index": 1,
+        "coverage": "body_only",
+        "course_answer_data": [
+          "18650",
+          "21700"
+        ],
+        "limitations": "В тексте главы перечислены, отдельного вопроса из 17 нет. Размер не доказывает химию или режим заряда."
+      },
+      {
+        "question_number": 21,
+        "pdf_page": 3,
+        "topic": "Обозначения C/S/V/mAh",
+        "chapter_question_ids": [
+          "ch06-q05",
+          "ch06-q06"
+        ],
+        "coverage": "distributed",
+        "limitations": "В исходнике mAh ошибочно названо миллиампером в час. Правильная единица — миллиампер-час; не отождествлять заряд с энергией."
+      },
+      {
+        "question_number": 54,
+        "pdf_page": 7,
+        "topic": "Индикатор заряда в OSD",
+        "chapter_question_ids": [],
+        "coverage": "missing_explicit_answer_in_chapter6",
+        "course_answer_data": "Среднее напряжение секции батареи",
+        "limitations": "В главе 6 нет явного ответа про OSD. Среднее обычно получается из общего напряжения и S; это не индивидуальное измерение каждой ячейки и не точный процент оставшегося заряда."
+      }
+    ],
+    "exam_key_policy": "Поля exam_key_answer/exam_origin у 17 вопросов не заполнены: ни один из четырёх исходных запросов не совпадает целиком с формулировкой вопроса приложения; частичные соответствия хранятся отдельно. Наличие предоставленного ответа не подтверждает официальный статус ключа.",
+    "missing_sources": [
+      "Отдельные экзаменационные билеты",
+      "Отдельный сборник из 52 вопросов",
+      "Вариант 2"
     ]
   }
 }
