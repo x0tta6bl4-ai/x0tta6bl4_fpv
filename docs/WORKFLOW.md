@@ -16,12 +16,36 @@
 ## Каждая задача
 
 1. Взять свежий `main`: `git checkout main && git pull`
-2. Своя ветка: `git checkout -b gpt/hints-ch12` (префикс — свой: `claude/`, `gpt/`, `gemini/`).
+2. Своя ветка: `git checkout -b gpt/hints-ch12` (префикс — свой: `claude/`, `gpt/`, `gemini/`, `grok/`).
+   В карточке задачи (`docs/tasks/`) — статус «в работе».
 3. Сделать **одну** задачу. Маленькие PR проверяются быстрее и реже ломают чужое.
-4. Проверить: `npm test` (или облегчённо для текстов — см. `AGENTS.md`).
+4. Проверить: `npm run zones` и `npm test` (или облегчённо для текстов — см. `AGENTS.md`).
 5. Коммит по-русски, по делу: `гл. 12: подсказки к заданию «ночная камера»`.
-6. `git push -u origin <ветка>` и открыть Pull Request по шаблону.
+6. `git push -u origin <ветка>` и открыть Pull Request по шаблону. В карточке — «на ревью» и ссылка на PR.
 7. Ревью второго ассистента → правки → слияние делает Claude (или владелец).
+
+## Если ассистенты работают одновременно на одном ПК
+
+Каждому — своя папка (git worktree), иначе они переключают ветки друг у друга под ногами:
+
+```powershell
+git config core.longpaths true
+git worktree add ..\fpv-gpt    -b gpt/<задача>
+git worktree add ..\fpv-gemini -b gemini/<задача>
+```
+
+В каждой папке один раз `npm install`. Полный `npm test` (~15 мин) тяжёлый — на одном ПК гоняйте его по очереди.
+Убрать папку после слияния: `git worktree remove ..\fpv-gpt`.
+
+## Метки PR (ставит владелец)
+
+- `tests-reviewed` — изменения существующих тестов проверены вторым ассистентом или владельцем.
+- `cross-zone` — правка чужой зоны согласована.
+
+## Защита main (настраивает владелец один раз)
+
+GitHub → Settings → Branches → Add rule для `main`: «Require a pull request before merging» (одобрений: 0),
+«Require status checks to pass»: `test` и `zones`.
 
 ## Правила для main
 
