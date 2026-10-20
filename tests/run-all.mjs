@@ -31,7 +31,7 @@ for (const [file, what, ok] of T) {
   const pass = r.status === 0 && ok(out);
   if (!pass) failed++;
   console.log(`${pass ? "PASS" : "FAIL"}  ${file.padEnd(15)} ${what}  (${Math.round((Date.now() - t0) / 1000)} с)`);
-  if (!pass) console.log(out.split("\n").filter((l) => /FAIL|ERR|☆|error|Error|too wide|OK \d/.test(l)).slice(0, 15).map((l) => "      " + l).join("\n"));
+  if (!pass) console.log(out.split("\n").filter((l) => /FAIL|ERR|☆|error|Error|too wide|OK \d| → /.test(l)).slice(0, 25).map((l) => "      " + l).join("\n"));
 }
 console.log(failed ? `\nНе прошло: ${failed}` : "\nВсё прошло.");
 process.exit(failed ? 1 : 0);
