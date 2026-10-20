@@ -1,0 +1,12 @@
+import { mountFigure } from "./stage.mjs";
+import * as thrust from "./figs/thrust.mjs";
+import * as path from "./figs/path.mjs";
+import * as battery from "./figs/battery.mjs";
+import * as radio from "./figs/radio.mjs";
+import * as pid from "./figs/pid.mjs";
+import * as failsafe from "./figs/failsafe.mjs";
+import * as quad from "./figs/quad.mjs";
+const FIGS = { thrust, path, battery, radio, pid, failsafe, quad };
+const name = new URLSearchParams(location.search).get("fig") || "thrust";
+const fig = FIGS[name] || thrust;
+window.__ctl = mountFigure(document.getElementById("fig"), fig, { number: 1, sidebar: document.getElementById("side"), metricsEl: document.getElementById("metrics"), note: document.getElementById("note") });

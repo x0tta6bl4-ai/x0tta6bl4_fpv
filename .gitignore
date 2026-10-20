@@ -1,0 +1,11 @@
+node_modules/
+dist/
+tests/out/
+preview/
+*.log
+.DS_Store
+Thumbs.db
+
+# Текст и сканы книги — не в публичный репозиторий (передаются отдельно, см. README)
+data/book-pages.json
+data/book-images.json

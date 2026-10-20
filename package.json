@@ -1,0 +1,19 @@
+{
+  "name": "fpv-anatomy",
+  "version": "4.64.0",
+  "private": true,
+  "description": "Интерактивный учебник по книге «FPV-дрон: понять, а не зазубрить» (ред. 7): главы, стенды, задания.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:dev": "node build.mjs --no-images --out=dist/dev.html",
+    "build:artifact": "node build.mjs --artifact",
+    "test": "npm run build:dev && node tests/run-all.mjs",
+    "test:missions": "node tests/run-all.mjs missions",
+    "test:phone": "node tests/run-all.mjs phone"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.2",
+    "playwright": "1.56.1"
+  }
+}
