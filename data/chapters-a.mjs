@@ -321,6 +321,17 @@ export const CHAPTERS_A = [
    "id": "quad",
    "preset": {}
   },
+  "figs": [
+   {
+    "id": "quad",
+    "preset": {},
+    "tab": "Схема: состав дрона"
+   },
+   {
+    "lab": "drone3d",
+    "tab": "3D: дрон целиком"
+   }
+  ],
   "sections": [
    {
     "title": "Состав дрона",
