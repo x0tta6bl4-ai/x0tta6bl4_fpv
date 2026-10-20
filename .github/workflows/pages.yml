@@ -1,0 +1,48 @@
+# Публикация учебника на GitHub Pages: после каждого зелёного прогона тестов на main (и вручную).
+# Адрес: https://x0tta6bl4-ai.github.io/x0tta6bl4_fpv/ — публичный. Текста и сканов книги в репозитории нет,
+# поэтому и на сайте нет раздела «Материал книги». Поисковикам сайт не показываем (noindex).
+name: pages
+on:
+  workflow_run:
+    workflows: [tests]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    # Только зелёный main: красный прогон тестов сайт не обновляет.
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Сборка сайта
+        shell: bash
+        run: |
+          mkdir -p site
+          node build.mjs --out=site/index.html
+          sed -i 's#<meta charset="utf-8">#<meta charset="utf-8"><meta name="robots" content="noindex,nofollow">#' site/index.html
+          grep -q 'name="robots"' site/index.html
+          echo "Версия: $(git rev-parse --short HEAD)" > site/version.txt
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
