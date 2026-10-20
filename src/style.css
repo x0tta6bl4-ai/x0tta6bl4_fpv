@@ -1293,3 +1293,15 @@ table.t{max-width:100%;-webkit-overflow-scrolling:touch}
 .d3-parts button{flex:0 0 auto;font-size:13px;padding:6px 10px;min-height:36px}
 .d3-parts button[aria-pressed="true"],.d3-bar button[aria-pressed="true"]{background:var(--accent);color:var(--anatomy-page);border-color:var(--accent)}
 @media (max-width:700px){.d3-canvas{height:min(52vh,420px)}}
+/* Урок LOW V (src/figs/lowv.mjs): этапы урока словами, приборы на сцене, формула, самопроверка */
+.proc-steps.lv-lesson{grid-template-columns:repeat(auto-fit,minmax(64px,1fr))}
+.proc-steps.lv-lesson li{font:600 12px/1.15 var(--anatomy-sans,inherit);height:auto;min-height:34px;padding:4px 2px;text-align:center}
+.lv-formula{font-family:var(--anatomy-mono);background:var(--anatomy-page);border-radius:8px;padding:8px 10px;box-shadow:inset 0 0 0 1px var(--anatomy-faint)}
+.lv-checks{margin:4px 0 10px;padding-left:4px;list-style:none}.lv-checks li{margin:3px 0;color:var(--anatomy-strong)}
+.lv-recall{width:100%;box-sizing:border-box;min-height:72px;margin:6px 0 10px;padding:8px 10px;border-radius:8px;border:1px solid var(--anatomy-mid);background:var(--anatomy-page);color:var(--anatomy-strong);font:inherit;font-size:16px}
+.lv-osd{font:700 5.2px var(--anatomy-mono);letter-spacing:.08em}.lv-osd.bad{fill:#ff6b6b}.lv-osd.good{fill:#7fe0a0}
+.lv-dig{font:700 9px var(--anatomy-mono);fill:#bff3c8;letter-spacing:.06em}.lv-dig.sm{font-size:5px}
+.lv-bat{font:700 10px var(--anatomy-mono);fill:var(--anatomy-strong);paint-order:stroke;stroke:var(--anatomy-page);stroke-width:2.5px}
+.lv-th{font:600 10px var(--anatomy-mono);fill:var(--anatomy-strong);paint-order:stroke;stroke:var(--anatomy-page);stroke-width:2.5px}
+.lv-warn{stroke:var(--warn);stroke-width:.5;stroke-dasharray:1.6 1.2;fill:none}
+.lv-cold{stroke:var(--bad);stroke-width:1;fill:none}.lv-ctl{stroke:var(--ok);stroke-width:1;fill:none}
