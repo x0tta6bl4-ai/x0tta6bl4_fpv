@@ -503,10 +503,7 @@
       "source_text_sha256": "d2138a78f389d9fc41304dc93c15df09fc21566175024be06a82c70d548758a4",
       "course_note_tagged": false,
       "learning_unit": "voltage",
-      "pilot_step": [
-        "recall",
-        "transfer"
-      ],
+      "pilot_step": null,
       "coverage_status": "mapped_current_chapter_only",
       "exam_key_answer": null,
       "exam_origin": null,
@@ -550,8 +547,7 @@
       "course_note_tagged": false,
       "learning_unit": "load",
       "pilot_step": [
-        "recall",
-        "transfer"
+        "recall"
       ],
       "coverage_status": "mapped_current_chapter_only",
       "exam_key_answer": null,
@@ -674,10 +670,7 @@
       "source_text_sha256": "70cc3c6c495d504f1a8592d1b710a194d12ec47f16676ccc49f884dcb5db5f34",
       "course_note_tagged": true,
       "learning_unit": "voltage",
-      "pilot_step": [
-        "recall",
-        "transfer"
-      ],
+      "pilot_step": null,
       "coverage_status": "mapped_current_chapter_only",
       "exam_key_answer": null,
       "exam_origin": null,
