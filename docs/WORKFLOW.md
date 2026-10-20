@@ -50,7 +50,14 @@ GitHub → Settings → Branches → Add rule для `main`: «Require a pull re
 ## Правила для main
 
 - В `main` только через PR, с зелёными тестами.
-- После слияния Claude собирает и публикует новую версию учебника, ставит метку `v4.<номер>`.
+- **Сайт** https://x0tta6bl4-ai.github.io/x0tta6bl4_fpv/ обновляется сам: после слияния в `main` проходят тесты
+  (`tests`), затем `pages` собирает учебник и выкладывает его (~20 мин от слияния до сайта). Красный прогон сайт не трогает.
+  Какая версия на сайте — `…/x0tta6bl4_fpv/version.txt`. Перезапуск вручную: Actions → pages → Run workflow.
+- Приватную версию со сканами книги на claude.ai публикует Claude.
+
+### Включить сайт (владелец, один раз)
+
+GitHub → Settings → Pages → Build and deployment → Source: **GitHub Actions**. Затем Actions → pages → Run workflow.
 
 ## Если два PR поменяли один файл
 
