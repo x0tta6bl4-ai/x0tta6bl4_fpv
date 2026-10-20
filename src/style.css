@@ -1265,3 +1265,14 @@ table.t{max-width:100%;-webkit-overflow-scrolling:touch}
 /* Стенд-разбор: колонка панели шире, таблица показателей не дублирует панель */
 @media (min-width:1101px){.workspace:has(.fig-proc){grid-template-columns:minmax(0,1fr) 360px}}
 .workspace:has(.fig-proc) #metrics{display:none}
+/* 3D-модель (src/labs/drone3d.mjs): палец на модели крутит её, страница при этом не прокручивается — поэтому
+   высота сцены ограничена, чтобы рядом всегда оставалось место для прокрутки. */
+.d3-stage{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px var(--anatomy-faint);background:var(--anatomy-page)}
+.d3-canvas{display:block;width:100%;height:min(62vh,480px);touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab}
+.d3-canvas:active{cursor:grabbing}
+.d3-hint{position:absolute;left:10px;bottom:8px;margin:0;font:12px/1.3 var(--anatomy-mono);color:var(--anatomy-muted);pointer-events:none}
+.d3-bar{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 8px}
+.d3-parts{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px;scrollbar-width:thin}
+.d3-parts button{flex:0 0 auto;font-size:13px;padding:6px 10px;min-height:36px}
+.d3-parts button[aria-pressed="true"],.d3-bar button[aria-pressed="true"]{background:var(--accent);color:var(--anatomy-page);border-color:var(--accent)}
+@media (max-width:700px){.d3-canvas{height:min(52vh,420px)}}

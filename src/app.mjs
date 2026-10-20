@@ -277,24 +277,28 @@ function sourceHtml(id, pages) {
 // ── Лаборатории и миссии ──
 // У главы может быть несколько стендов (ch.figs, вкладки в шапке лаборатории); ch.fig — первый из них.
 // Выбранная вкладка запоминается (S.figTab). Ключи заданий у стендов одной главы не должны совпадать.
+// Вкладкой может быть и лаборатория ({ lab: "drone3d", tab: "…" }) — например, 3D-модель рядом со схемой главы.
+const tabKey = (f) => f.id || `lab:${f.lab}`;
+const tabMod = (f) => (f.lab ? LABS[f.lab] : FIGS[f.id]);
 function figsOf(ch) {
-  return (ch.figs && ch.figs.length ? ch.figs : ch.fig ? [ch.fig] : []).filter((f) => FIGS[f.id]);
+  return (ch.figs && ch.figs.length ? ch.figs : ch.fig ? [ch.fig] : []).filter((f) => (f.lab ? LABS[f.lab] : FIGS[f.id]));
 }
 function activeFig(ch) {
   const all = figsOf(ch);
   const want = S.figTab && S.figTab[ch.id];
-  return all.find((f) => f.id === want) || all[0] || null;
+  return all.find((f) => tabKey(f) === want) || all[0] || null;
 }
 function interactiveOf(ch) {
   if (ch.lab && LABS[ch.lab]) return { kind: "lab", mod: LABS[ch.lab], missions: LABS[ch.lab].meta.missions, title: LABS[ch.lab].meta.title };
   const f = activeFig(ch);
+  if (f && f.lab) return { kind: "lab", mod: LABS[f.lab], missions: LABS[f.lab].meta.missions, title: LABS[f.lab].meta.title };
   if (f) return { kind: "fig", mod: FIGS[f.id], missions: FIGS[f.id].meta.missions || [], title: FIGS[f.id].meta.title };
   return null;
 }
 // Все задания главы — со всех её стендов (для звёзд и оглавления лабораторий).
 function allMissionsOf(ch) {
   if (ch.lab && LABS[ch.lab]) return LABS[ch.lab].meta.missions;
-  return figsOf(ch).flatMap((f) => FIGS[f.id].meta.missions || []);
+  return figsOf(ch).flatMap((f) => tabMod(f).meta.missions || []);
 }
 const missKey = (ch, id) => `${ch.id}:${id}`;
 function starsTotal() {
@@ -325,7 +329,7 @@ function interactiveHtml(ch) {
   const done = it.missions.filter((m) => S.miss[missKey(ch, m.id)]).length;
   const body = it.kind === "lab" ? `<div id="labroot" class="labroot"></div>` : `<section class="workspace"><div class="ws-fig"><div id="fig"></div><div class="metrics" id="metrics"></div><p class="fig-note" id="fignote"></p><div class="fig-info" id="figinfo"></div></div><aside class="ws-side" id="side"></aside></section>`;
   return `<section class="labcard" id="labcard" data-kind="${it.kind}">
-    ${figsOf(ch).length > 1 ? `<div class="lab-tabs" role="tablist" aria-label="Стенды главы">${figsOf(ch).map((f) => { const ms = FIGS[f.id].meta.missions || []; const got = ms.filter((m) => S.miss[missKey(ch, m.id)]).length; const on = f.id === activeFig(ch).id; return `<button type="button" role="tab" aria-selected="${on}" data-figtab="${f.id}">${esc(f.tab || FIGS[f.id].meta.title)} <small>${got}/${ms.length}★</small></button>`; }).join("")}</div>` : ""}
+    ${figsOf(ch).length > 1 ? `<div class="lab-tabs" role="tablist" aria-label="Стенды главы">${figsOf(ch).map((f) => { const ms = tabMod(f).meta.missions || []; const got = ms.filter((m) => S.miss[missKey(ch, m.id)]).length; const on = tabKey(f) === tabKey(activeFig(ch)); return `<button type="button" role="tab" aria-selected="${on}" data-figtab="${tabKey(f)}">${esc(f.tab || tabMod(f).meta.title)} <small>${got}/${ms.length}★</small></button>`; }).join("")}</div>` : ""}
     <div class="lab-head"><div><div class="eyebrow">Лаборатория главы ${ch.num}</div><h2>${esc(it.title)}</h2></div><div class="lab-tools"><span class="lab-score" id="labscore">${done} / ${it.missions.length} ★</span><button type="button" id="full" aria-pressed="false">На весь экран</button></div></div>
     ${introHtml(it)}
     ${body}
@@ -527,7 +531,7 @@ function startView() {
   <p>Метки у чисел: <span class="tag" data-tag="закон">закон</span> верно всегда · <span class="tag" data-tag="оценка">оценка</span> прикидка по паспортным числам или упрощённой модели · <span class="tag" data-tag="версия">зависит от версии</span> сверяй со своей прошивкой · <span class="tag" data-tag="пример">пример</span> условные числа.</p></section>
   <section class="sec"><div class="sec-h"><h3>Как учиться по книге</h3></div><p>Прочитал главу — закрой её, ответь на «Проверь себя» и оцени себя (2 — объяснил почему, 1 — верно без объяснения, 0 — неверно). Повтори через 1 день, через 3–4 дня и за неделю до экзамена; укажи дату экзамена слева — график посчитается сам. Глава 20 — всё вперемешку. Самопроверка и интервальное повторение — самые надёжные из изученных техник учёбы [19].</p></section>
   <aside class="blk" data-type="safety"><div class="blk-h">Граница книги</div><p>Книга даёт понимание. Она не заменяет инструктора, документацию оборудования и правила курса. Практику (пайку, подключение батареи, первые включения, полёты) начинай только под контролем преподавателя. Остановить занятие при неисправности — правильное решение, а не слабость.</p></aside>
-  <section class="sec"><div class="sec-h"><h3>Лаборатории глав</h3></div><div class="fig-index">${CHAPTERS.map((c) => { const it = interactiveOf(c); if (!it) return ""; const ms = allMissionsOf(c); const got = ms.filter((m) => S.miss[missKey(c, m.id)]).length; const title = figsOf(c).length > 1 ? figsOf(c).map((f) => FIGS[f.id].meta.title).join(" · ") : it.title; return `<a class="lab-link" href="#${c.id}"><b>${c.num}. ${esc(title)}</b><span>${got} / ${ms.length} ★</span></a>`; }).join("")}</div></section>
+  <section class="sec"><div class="sec-h"><h3>Лаборатории глав</h3></div><div class="fig-index">${CHAPTERS.map((c) => { const it = interactiveOf(c); if (!it) return ""; const ms = allMissionsOf(c); const got = ms.filter((m) => S.miss[missKey(c, m.id)]).length; const title = figsOf(c).length > 1 ? figsOf(c).map((f) => tabMod(f).meta.title).join(" · ") : it.title; return `<a class="lab-link" href="#${c.id}"><b>${c.num}. ${esc(title)}</b><span>${got} / ${ms.length} ★</span></a>`; }).join("")}</div></section>
   <nav class="pager"><span></span><a href="#0">0. Азбука: слова и единицы →</a></nav>
   </article>`;
 }
@@ -762,7 +766,7 @@ function bindOnce() {
     // Вкладка стенда главы: перерисовываем главу и остаёмся у лаборатории.
     const ft = e.target.closest("[data-figtab]");
     if (ft && ch) {
-      if (activeFig(ch) && activeFig(ch).id === ft.dataset.figtab) return;
+      if (activeFig(ch) && tabKey(activeFig(ch)) === ft.dataset.figtab) return;
       S.figTab = { ...(S.figTab || {}), [ch.id]: ft.dataset.figtab };
       QUEST.ch = "";
       render.keepLab = true;

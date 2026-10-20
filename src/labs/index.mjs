@@ -13,5 +13,6 @@ import * as detective from "./detective.mjs";
 import * as gonogo from "./gonogo.mjs";
 import * as map from "./map.mjs";
 import * as quiz from "./quiz.mjs";
+import * as drone3d from "./drone3d.mjs";
 
-export const LABS = { water, fly, energy, waves, bind, lq, video, jam, solder, bf, detective, gonogo, map, quiz };
+export const LABS = { water, fly, energy, waves, bind, lq, video, jam, solder, bf, detective, gonogo, map, quiz, drone3d };
