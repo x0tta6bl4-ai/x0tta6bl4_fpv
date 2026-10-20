@@ -23,7 +23,7 @@
     },
     {
       "id": "srez",
-      "status": "not_reconciled_in_this_pilot"
+      "status": "provided_html_DATA_read_original_photos_not_reconciled"
     },
     {
       "id": "tickets",
@@ -73,7 +73,14 @@
         "section_title": "Банка: какие напряжения запомнить",
         "question_index": 0
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 44,
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q02",
@@ -110,7 +117,19 @@
         "section_title": "Четыре типа батарей",
         "question_index": 1
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 41,
+          "match_type": "topic_match"
+        },
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 42,
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q03",
@@ -146,7 +165,14 @@
         "section_title": "Четыре типа батарей",
         "question_index": 2
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 46,
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q04",
@@ -181,7 +207,14 @@
         "section_title": "Четыре типа батарей",
         "question_index": 3
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 68,
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q05",
@@ -217,7 +250,24 @@
         "section_title": "S, P, C: читаем наклейку",
         "question_index": 4
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 45,
+          "match_type": "topic_match"
+        },
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 66,
+          "match_type": "topic_match"
+        },
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 67,
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q06",
@@ -251,7 +301,8 @@
         "section_title": "S, P, C: читаем наклейку",
         "question_index": 5
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "original_not_reconciled",
+      "provided_questionnaire_refs": []
     },
     {
       "id": "ch06-q07",
@@ -286,7 +337,14 @@
         "section_title": "Зарядка",
         "question_index": 6
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 43,
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q08",
@@ -320,7 +378,8 @@
         "section_title": "Балансир, число банок, разъёмы",
         "question_index": 7
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "original_not_reconciled",
+      "provided_questionnaire_refs": []
     },
     {
       "id": "ch06-q09",
@@ -355,7 +414,8 @@
         "section_title": "S, P, C: читаем наклейку",
         "question_index": 8
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "original_not_reconciled",
+      "provided_questionnaire_refs": []
     },
     {
       "id": "ch06-q10",
@@ -390,7 +450,8 @@
         "section_title": "Балансир, число банок, разъёмы",
         "question_index": 9
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "original_not_reconciled",
+      "provided_questionnaire_refs": []
     },
     {
       "id": "ch06-q11",
@@ -425,7 +486,14 @@
         "section_title": "Зарядка",
         "question_index": 10
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 69,
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q12",
@@ -464,7 +532,14 @@
         "section_title": "Банка: какие напряжения запомнить",
         "question_index": 11
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 86,
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q13",
@@ -502,7 +577,14 @@
         "section_title": "Хранение, холод и износ",
         "question_index": 12
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": "С32",
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q14",
@@ -538,7 +620,8 @@
         "section_title": "Зарядка",
         "question_index": 13
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "original_not_reconciled",
+      "provided_questionnaire_refs": []
     },
     {
       "id": "ch06-q15",
@@ -574,7 +657,14 @@
         "section_title": "Хранение, холод и износ",
         "question_index": 14
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": "С33",
+          "match_type": "topic_match"
+        }
+      ]
     },
     {
       "id": "ch06-q16",
@@ -613,7 +703,14 @@
         "section_title": "Банка: какие напряжения запомнить",
         "question_index": 15
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "matched_secondary_questionnaire_original_not_reconciled",
+      "provided_questionnaire_refs": [
+        {
+          "source_id": "provided-srez-20261018",
+          "item_n": 86,
+          "match_type": "related_topic"
+        }
+      ]
     },
     {
       "id": "ch06-q17",
@@ -647,7 +744,8 @@
         "section_title": "Балансир, число банок, разъёмы",
         "question_index": 16
       },
-      "exam_key_status": "original_not_reconciled"
+      "exam_key_status": "original_not_reconciled",
+      "provided_questionnaire_refs": []
     }
   ],
   "review_date": "2026-10-20",
@@ -707,6 +805,15 @@
       "url": "https://betaflight.com/docs/wiki/guides/current/Battery",
       "section": "Battery monitoring",
       "scope": "Общее напряжение не даёт индивидуального контроля элементов; старые CLI-примеры не переносить."
+    },
+    {
+      "id": "provided-srez-20261018",
+      "kind": "provided_secondary_questionnaire",
+      "title": "Срез FPV · опросник (1)(1).html",
+      "provided_date": "2026-10-18",
+      "total_cards": 143,
+      "table_cards": 84,
+      "scope": "Прочитан список DATA в предоставленном HTML. Это вторичный опросник, не фотографии исходной таблицы; unsure и own сохраняются. Другие экзаменационные сборники не сверены."
     }
   ],
   "book_self_check_map": [
@@ -779,5 +886,274 @@
       "full_section_title": "Хранение, холод и износ",
       "review_status": "author_compared_needs_independent_review"
     }
-  ]
+  ],
+  "provided_questionnaire_subset": {
+    "source_id": "provided-srez-20261018",
+    "subset_definition": "Категория bat и дополнительные ситуации С31, С32, С33, С38; это не утверждение о всех вопросах про питание во всём файле.",
+    "items": [
+      {
+        "n": 41,
+        "question": "Виды АКБ",
+        "reported_answer": [
+          "Li-ion",
+          "LiPo",
+          "LiPo HV",
+          "LiPo UHV"
+        ],
+        "note": null,
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q02"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 42,
+        "question": "Максимальное напряжение на ячейку у всех видов АКБ",
+        "reported_answer": [
+          "Li-ion — 4,2 В",
+          "LiPo — 4,2 В",
+          "LiPo HV — 4,35 В",
+          "LiPo UHV — 4,45 В"
+        ],
+        "note": null,
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q02"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 43,
+        "question": "Формула заряда АКБ",
+        "reported_answer": "Ток заряда = ёмкость (мА·ч) / 2000 → 0,5C; ёмкость / 1000 → 1C.",
+        "note": "Пример: 1500 мА·ч → 0,75 А при 0,5C, 1,5 А при 1C.",
+        "unsure": "На фото читается «(mAh/2000) — 1(0,5)A», сверь с оригиналом.",
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q07"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 44,
+        "question": "Зачем номинальное напряжение",
+        "reported_answer": [
+          "для хранения",
+          "для транспортировки",
+          "для определения типа АКБ"
+        ],
+        "note": "Для хранения LiPo держат 3,80–3,85 В на банку (режим Storage на зарядке); номинал 3,7 В чуть ниже.",
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q01"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 45,
+        "question": "Что такое C, зачем нужно",
+        "reported_answer": "C-рейтинг: какой ток батарея может отдать в моменте (А).",
+        "note": "Ток = C × ёмкость в А·ч. Пример: 1500 мА·ч и 100C → 150 А по паспорту.",
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q05"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 46,
+        "question": "Как узнать вид АКБ, если он не указан",
+        "reported_answer": "По номинальному напряжению и внешнему виду.",
+        "note": null,
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q03"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 66,
+        "question": "Что такое P, S и C в батарее",
+        "reported_answer": [
+          "S — количество последовательно соединённых ячеек",
+          "P — количество параллельно соединённых ячеек",
+          "C — коэффициент токоотдачи"
+        ],
+        "note": null,
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q05"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 67,
+        "question": "В каких соединениях какие значения повышаются (АКБ)",
+        "reported_answer": [
+          "S (последовательно) — суммируется напряжение",
+          "P (параллельно) — суммируется ёмкость"
+        ],
+        "note": null,
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q05"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 68,
+        "question": "Как отличить HV от UHV",
+        "reported_answer": "По номинальному напряжению: на батарее прописывается его максимальное значение.",
+        "note": "Максимум на банку: HV — 4,35 В, UHV — 4,45 В.",
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q04"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 69,
+        "question": "Что делать с новым АКБ",
+        "reported_answer": "Три раза зарядить и разрядить до номинального напряжения; для скорости зарядку можно питать тоже от АКБ.",
+        "note": "Современным LiPo такая «раскачка» не обязательна: обычно советуют сделать первые полёты мягкими и не перегревать банки. На срезе отвечай по таблице.",
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q11"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": 84,
+        "question": "Для чего нужен конденсатор",
+        "reported_answer": "Работает как буфер: сглаживает резкие скачки тока в питании и фильтрует электрические помехи.",
+        "note": null,
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [],
+        "other_chapter": "5",
+        "review_status": "outside_chapter6_not_reviewed"
+      },
+      {
+        "n": 85,
+        "question": "Какие бывают конденсаторы",
+        "reported_answer": [
+          "алюминиевые",
+          "полимерные",
+          "танталовые",
+          "керамические",
+          "по напряжению: 25, 35, 50 В"
+        ],
+        "note": null,
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [],
+        "other_chapter": "5",
+        "review_status": "outside_chapter6_not_reviewed"
+      },
+      {
+        "n": 86,
+        "question": "Как будет вести себя батарея при напряжении 3,3 В",
+        "reported_answer": "Плохо, дрон будет нестабилен.",
+        "note": "3,3 В на банку — батарея почти пустая: под газом напряжение проседает, растёт риск переразряда и падения.",
+        "unsure": null,
+        "own": false,
+        "chapter_question_ids": [
+          "ch06-q12",
+          "ch06-q16"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": "С31",
+        "question": "При подключении батареи пошёл дым. Что делать?",
+        "reported_answer": "Сразу отключить батарею. Причина — короткое замыкание или переполюсовка.",
+        "note": null,
+        "unsure": null,
+        "own": true,
+        "chapter_question_ids": [],
+        "other_chapter": "18",
+        "review_status": "outside_chapter6_not_reviewed"
+      },
+      {
+        "n": "С32",
+        "question": "На морозе тревога LOW BATTERY приходит почти сразу. Почему?",
+        "reported_answer": "На холоде растёт внутреннее сопротивление батареи — под током напряжение проседает сильнее.",
+        "note": null,
+        "unsure": null,
+        "own": true,
+        "chapter_question_ids": [
+          "ch06-q13"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": "С33",
+        "question": "После полёта батарея вздулась. Что делать?",
+        "reported_answer": "Больше не использовать, сказать преподавателю, сдать на утилизацию.",
+        "note": null,
+        "unsure": null,
+        "own": true,
+        "chapter_question_ids": [
+          "ch06-q15"
+        ],
+        "other_chapter": null,
+        "review_status": "linked_practical_answer_reviewed_original_key_unconfirmed"
+      },
+      {
+        "n": "С38",
+        "question": "Батарея задымила на зарядке. Что делать?",
+        "reported_answer": "Если безопасно — отключить зарядку от сети, отойти, тушить по правилам места.",
+        "note": null,
+        "unsure": null,
+        "own": true,
+        "chapter_question_ids": [],
+        "other_chapter": "18",
+        "review_status": "outside_chapter6_not_reviewed"
+      },
+      {
+        "n": "Т12",
+        "question": "Как найти мощность?",
+        "reported_answer": "P = U × I. Пример: 22,2 В × 20 А ≈ 444 Вт.",
+        "note": null,
+        "unsure": null,
+        "own": true,
+        "chapter_question_ids": [],
+        "other_chapter": "0",
+        "review_status": "outside_chapter6_not_reviewed"
+      },
+      {
+        "n": "Т13",
+        "question": "Как прикинуть время полёта?",
+        "reported_answer": "Ёмкость (мА·ч) / средний ток (мА) × 60 = минуты; реально около 80 %. Пример: 6000 / 30 000 × 60 = 12 мин → около 9–10 мин.",
+        "note": null,
+        "unsure": null,
+        "own": true,
+        "chapter_question_ids": [],
+        "other_chapter": "7",
+        "review_status": "outside_chapter6_not_reviewed"
+      }
+    ]
+  }
 }
