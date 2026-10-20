@@ -685,14 +685,17 @@ export function mountFigure(host, fig, { number = 1, preset = {}, sidebar, metri
       const n = el && el.closest && el.closest(".it[data-g], [data-pick]");
       return n && layer.contains(n) ? n.dataset.c || n.dataset.pick || `g:${n.dataset.g}` : "";
     };
-    // near — группы прямо под пальцем и в 8 px от него, far — в кольце 16 px.
-    const near = new Set(), far = new Set();
+    // exact — группы прямо под пальцем (главнее всего: палец на корпусе дрона — значит дрон, а не соседняя камера),
+    // near — в 8 px от него, far — в кольце 16 px.
+    const exact = new Set(), near = new Set(), far = new Set();
     const collect = (x, y, set) => {
       for (const el of document.elementsFromPoint(x, y)) {
         const key = keyOf(el);
         if (key) set.add(key);
       }
     };
+    // Под пальцем — только верхняя деталь (та, по которой попали), а не всё, что лежит под ней слоями.
+    for (const el of document.elementsFromPoint(px, py)) { const key = keyOf(el); if (key) { exact.add(key); near.add(key); break; } }
     collect(px, py, near);
     for (const [rr, set] of [[8, near], [16, far]]) for (let j = 0; j < 8; j++) collect(px + Math.cos((j / 8) * Math.PI * 2) * rr, py + Math.sin((j / 8) * Math.PI * 2) * rr, set);
     let best = -1, bs = Infinity;
@@ -702,7 +705,7 @@ export function mountFigure(host, fig, { number = 1, preset = {}, sidebar, metri
       let key = t.l.pick || "";
       if (!key) for (const el of document.elementsFromPoint(a[0], a[1])) if ((key = keyOf(el))) break;
       const d = Math.hypot(a[0] - px, a[1] - py);
-      const sc = key && near.has(key) ? d : key && far.has(key) ? d + 15 : d < 28 ? d + 10 : Infinity;
+      const sc = key && exact.has(key) ? d : key && near.has(key) ? d + 8 : key && far.has(key) ? d + 15 : d < 28 ? d + 10 : Infinity;
       if (sc < bs) { bs = sc; best = t.i; }
     }
     return best;
