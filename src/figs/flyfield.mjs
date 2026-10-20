@@ -263,7 +263,16 @@ export function controller(root, built, state) {
       return { air: s.air, yawTurned: s.yawTurned, atFlag: s.atFlag, flipped: s.flipped };
     },
     readout() {
-      return `высота ${fmt(s.h / 10, 1)} м · газ ${Math.round((state.throttle || 0) * 100)} %`;
+      // Прогресс разворота — прямо в строке над сценой: отпустил стик раньше — дрон затормозил, и видно, сколько осталось.
+      const turned = s.yaw0 === null ? 0 : Math.round((Math.abs(s.yaw - s.yaw0) * 180) / Math.PI);
+      const goal = Math.round((YAW_GOAL * 180) / Math.PI);
+      const yawChip = s.yawTurned ? " · ✓ развернулся" : s.air && turned >= 10 ? ` · разворот ${Math.min(turned, goal)}° из ${goal}°` : "";
+      return `высота ${fmt(s.h / 10, 1)} м · газ ${Math.round((state.throttle || 0) * 100)} %${yawChip}`;
+    },
+    explain(chip) {
+      if (/^разворот/.test(chip)) return "Держи левый стик вбок, пока не дойдёт до цели: отпустишь — винты выровняются, дрон затормозит и остановится. Тогда просто доверни.";
+      if (/развернулся/.test(chip)) return "Нос смотрит в другую сторону: одна диагональ винтов крутилась быстрее, и корпус развернуло.";
+      return "";
     },
     metrics() {
       const head = Math.round(((((s.yaw + Math.PI / 2) * 180) / Math.PI) % 360 + 360) % 360);
