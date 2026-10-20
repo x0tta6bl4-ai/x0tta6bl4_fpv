@@ -26,7 +26,18 @@ for (const n of ns) {
       let k = l.pick; if (!k) for (const el of document.elementsFromPoint(l.a[0], l.a[1])) if ((k = key(el))) break;
       if (!k) return { x: l.a[0], y: l.a[1], k: '-', vv: visualViewport.offsetTop };
       const sr = st.getBoundingClientRect();
-      for (let r = 10; r <= 30; r += 4) for (let j = 0; j < 12; j++) { const x = l.a[0] + Math.cos(j / 12 * 6.283) * r, y = l.a[1] + Math.sin(j / 12 * 6.283) * r; if (x < sr.left + 4 || x > sr.right - 4 || y < sr.top + 4 || y > sr.bottom - 4) continue; const top = document.elementFromPoint(x, y); if (top && key(top) === k) return { x, y, k, r, vv: visualViewport.offsetTop }; }
+      const others = st.__anchors().filter((o, j) => j !== i && o.a).map((o) => o.a);
+      // Из точек, где сверху лежит эта же деталь, берём самую однозначную: подпись соседней детали дальше всего
+      // относительно своей. Точка на границе двух деталей (в 2 px от чужой подписи) ничего не проверяет.
+      let best = null;
+      for (let r = 10; r <= 30; r += 4) for (let j = 0; j < 12; j++) {
+        const x = l.a[0] + Math.cos(j / 12 * 6.283) * r, y = l.a[1] + Math.sin(j / 12 * 6.283) * r;
+        if (x < sr.left + 4 || x > sr.right - 4 || y < sr.top + 4 || y > sr.bottom - 4) continue;
+        const top = document.elementFromPoint(x, y); if (!top || key(top) !== k) continue;
+        const margin = Math.min(99, ...others.map((o) => Math.hypot(o[0] - x, o[1] - y))) - r;
+        if (!best || margin > best.margin + 0.5) best = { x, y, k, r, margin, vv: visualViewport.offsetTop };
+      }
+      if (best) return best;
       return { x: l.a[0], y: l.a[1], k, r: 0, vv: visualViewport.offsetTop };
     }, i);
     if (!pt) continue;
