@@ -1,0 +1,28 @@
+# Зоны ассистентов: ветка claude/ gpt/ gemini/ меняет только свои файлы (docs/ROLES.md).
+# Отдельно от тестов, чтобы метки cross-zone / tests-reviewed перепроверялись за секунды.
+name: zones
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+permissions:
+  contents: read
+concurrency:
+  group: zones-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  zones:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Проверка зон
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: node .github/scripts/zones.mjs "$HEAD_REF" "origin/$BASE_REF" "$LABELS"
