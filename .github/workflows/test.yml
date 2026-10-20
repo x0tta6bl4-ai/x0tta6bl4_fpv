@@ -8,7 +8,8 @@ permissions:
   contents: read
 concurrency:
   group: tests-${{ github.ref }}
-  cancel-in-progress: true
+  # На main прогоны не отменяют друг друга: каждый зелёный коммит main публикует сайт (pages ждёт успешный tests).
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 jobs:
   test:
     runs-on: ubuntu-latest
