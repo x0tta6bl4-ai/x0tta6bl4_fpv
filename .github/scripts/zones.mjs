@@ -3,8 +3,8 @@
 // Локально перед push: npm run zones   (текущая ветка против origin/main)
 import { execFileSync } from "node:child_process";
 
-// Зоны — как в docs/ROLES.md. docs/tasks/ — общая доска: каждый правит только карточки своих задач.
-const COMMON = [/^docs\/tasks\//];
+// Зоны — как в docs/ROLES.md. docs/tasks/ (доска) и docs/discussions/ (обсуждения) — общие: каждый правит только своё.
+const COMMON = [/^docs\/tasks\//, /^docs\/discussions\//];
 const ZONES = {
   gpt: [/^data\/(chapters-[^/]+|hints|intros|kids|appendix)\.mjs$/, /^docs\/content\//],
   gemini: [/^src\/style\.css$/, /^docs\/qa\//],
