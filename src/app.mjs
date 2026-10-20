@@ -21,6 +21,7 @@ import * as preflight from "./figs/preflight.mjs";
 import * as workshop from "./figs/workshop.mjs";
 import * as navdesk from "./figs/navdesk.mjs";
 import * as armcase from "./figs/armcase.mjs";
+import * as lowv from "./figs/lowv.mjs";
 import { CHAPTERS_A } from "../data/chapters-a.mjs";
 import { CHAPTERS_B } from "../data/chapters-b.mjs";
 import { CHAPTERS_C } from "../data/chapters-c.mjs";
@@ -34,8 +35,8 @@ import { mountExperiment, STATUS } from "./methods/kit.mjs";
 import { attachZoom } from "./zoom.mjs";
 import { mountNotes } from "./notes.mjs";
 
-const FIGS = { quad, path, thrust, battery, pid, radio, failsafe, link, pair, goggles, antenna, jamfield, flighttime, bench, bfdesk, flyfield, waterworks, preflight, workshop, navdesk, armcase };
-const FIG_ORDER = ["quad", "path", "pid", "thrust", "battery", "radio", "failsafe", "link", "pair", "goggles", "antenna", "jamfield", "flighttime", "bench", "bfdesk", "flyfield", "waterworks", "preflight", "workshop", "navdesk", "armcase"];
+const FIGS = { quad, path, thrust, battery, pid, radio, failsafe, link, pair, goggles, antenna, jamfield, flighttime, bench, bfdesk, flyfield, waterworks, preflight, workshop, navdesk, armcase, lowv };
+const FIG_ORDER = ["quad", "path", "pid", "thrust", "battery", "radio", "failsafe", "link", "pair", "goggles", "antenna", "jamfield", "flighttime", "bench", "bfdesk", "flyfield", "waterworks", "preflight", "workshop", "navdesk", "armcase", "lowv"];
 const CHAPTERS = [...CHAPTERS_A, ...CHAPTERS_B, ...CHAPTERS_C];
 const HERE = ["Тяга", "Питание", "Мозг", "Управление", "Видео", "Практика"];
 const APPX = [

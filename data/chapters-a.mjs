@@ -693,6 +693,20 @@ export const CHAPTERS_A = [
     "config": "6S"
    }
   },
+  "figs": [
+   {
+    "id": "battery",
+    "preset": {
+     "config": "6S"
+    },
+    "tab": "Стенд: батарея"
+   },
+   {
+    "id": "lowv",
+    "preset": {},
+    "tab": "Урок: LOW V"
+   }
+  ],
   "sections": [
    {
     "title": "Банка: какие напряжения запомнить",

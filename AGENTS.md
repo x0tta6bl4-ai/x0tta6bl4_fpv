@@ -59,7 +59,7 @@ FPV Anatomy — интерактивный учебник по книге «FPV-
 ```bash
 npm install                  # один раз
 npx playwright install chromium   # один раз (на Windows тоже)
-npm test                     # сборка + 8 автотестов, ~15 мин
+npm test                     # сборка + 9 автотестов, ~15 мин
 ```
 
 Если меняешь стенд — добавь или обнови его блок в `tests/missions.mjs`.
