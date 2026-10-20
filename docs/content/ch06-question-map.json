@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "status": "proposal_not_runtime_data",
+  "schema_version": 2,
+  "status": "content_review_complete_exam_keys_unreconciled",
   "chapter": 6,
   "baseline_commit": "312478f71765719916114a5906d5a68bcb8d24e6",
   "source_file": "data/chapters-a.mjs",
@@ -15,7 +15,7 @@
     },
     {
       "id": "book_revision_7",
-      "status": "not_reconciled_in_this_pilot"
+      "status": "chapter_6_pages_26_30_read"
     },
     {
       "id": "instructor_notes",
@@ -43,8 +43,8 @@
       "id": "ch06-q01",
       "source_key": "6:0",
       "question": "Зачем нужно номинальное напряжение?",
-      "current_answer": "На экзамене: для хранения, транспортировки и определения типа АКБ. Точнее: 3,7 В — среднее при разряде, по нему можно предположить тип; хранят при 3,80–3,85 В.",
-      "source_text_sha256": "1c98698aa9a515d4ff80f12959232a2484c51adde19465c2ab783a8ed11fd05c",
+      "current_answer": "Номинал — среднее рабочее напряжение, а не напряжение хранения. Для обычной LiPo в курсе: 3,7 В номинал, 3,80–3,85 В Storage. В имеющемся опроснике ответ связывает номинал с хранением, перевозкой и типом; эту формулировку нельзя применять как инструкцию по хранению.",
+      "source_text_sha256": "0b4a92e6de9e16770194422ce1fb8d83a8580660ddb32f10413e34ea96a7ba50",
       "course_note_tagged": false,
       "learning_unit": "voltage",
       "pilot_step": null,
@@ -52,16 +52,35 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Разделить формулировку ключа и условия хранения; оригинал ключа ещё не сверён."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          27,
+          28
+        ],
+        "source_ids": [
+          "book6",
+          "tattu-faq"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Разделить формулировку ключа и условия хранения; оригинал ключа ещё не сверён."
+      },
+      "baseline_question": "Зачем нужно номинальное напряжение?",
+      "baseline_answer": "На экзамене: для хранения, транспортировки и определения типа АКБ. Точнее: 3,7 В — среднее при разряде, по нему можно предположить тип; хранят при 3,80–3,85 В.",
+      "baseline_text_sha256": "1c98698aa9a515d4ff80f12959232a2484c51adde19465c2ab783a8ed11fd05c",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 0,
+        "section_title": "Банка: какие напряжения запомнить",
+        "question_index": 0
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q02",
       "source_key": "6:1",
       "question": "Какие бывают батареи и какое у них максимальное напряжение на банку?",
-      "current_answer": "Li-ion — 4,2 В, LiPo — 4,2 В, LiHV — 4,35 В, LiUHV — 4,45 В.",
-      "source_text_sha256": "b22785974e1f0f6e7c8f3f6e1a4ecc7194d114484cf3af3701e9b30dd19d414e",
+      "current_answer": "В таблице курса: обычные LiPo и Li-ion — 4,20 В; HV — 4,35 В; UHV — 4,45 В на элемент. Это примеры обозначений курса; точный предел и режим заряда конкретной батареи — по паспорту.",
+      "source_text_sha256": "ce082381131b58fa369574bf9bfb4d43ef8eaa39f00704255d6cfd27445da3eb",
       "course_note_tagged": false,
       "learning_unit": "chemistry",
       "pilot_step": null,
@@ -69,16 +88,36 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Перечень относится к выбранным типам; предел заряда конкретного элемента сверить с паспортом."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          27
+        ],
+        "source_ids": [
+          "book6",
+          "grepow-hv",
+          "molicel-p45b",
+          "tattu-charge"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Перечень относится к выбранным типам; предел заряда конкретного элемента сверить с паспортом."
+      },
+      "baseline_question": "Какие бывают батареи и какое у них максимальное напряжение на банку?",
+      "baseline_answer": "Li-ion — 4,2 В, LiPo — 4,2 В, LiHV — 4,35 В, LiUHV — 4,45 В.",
+      "baseline_text_sha256": "b22785974e1f0f6e7c8f3f6e1a4ecc7194d114484cf3af3701e9b30dd19d414e",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 1,
+        "section_title": "Четыре типа батарей",
+        "question_index": 1
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q03",
       "source_key": "6:2",
       "question": "Как узнать тип батареи, если он не указан?",
-      "current_answer": "На срезе: по номинальному напряжению и внешнему виду. Точнее: так тип можно только предположить — номинал 3,7 В бывает и у LiPo, и у Li-ion, в том числе плоских. Перед зарядкой тип проверяют по маркировке, модели и допустимому напряжению заряда.",
-      "source_text_sha256": "0432ab81b6b782aafe71d8346c1a0581eb71720cc1639a990246b15734ae1a5b",
+      "current_answer": "По форме и номиналу можно только предположить тип. Перед зарядкой проверь маркировку, модель и допустимое напряжение заряда. Если подтвердить тип нельзя, не выбирай режим наугад.",
+      "source_text_sha256": "57fab02d7ab374e0d562ebaa533dd3fa732e33d9a7c01a59cf721a90acd99f29",
       "course_note_tagged": false,
       "learning_unit": "chemistry",
       "pilot_step": null,
@@ -86,16 +125,35 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Предположение по форме не разрешает выбор режима зарядки без проверки маркировки."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          27
+        ],
+        "source_ids": [
+          "book6",
+          "grepow-hv",
+          "molicel-p45b"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Предположение по форме не разрешает выбор режима зарядки без проверки маркировки."
+      },
+      "baseline_question": "Как узнать тип батареи, если он не указан?",
+      "baseline_answer": "На срезе: по номинальному напряжению и внешнему виду. Точнее: так тип можно только предположить — номинал 3,7 В бывает и у LiPo, и у Li-ion, в том числе плоских. Перед зарядкой тип проверяют по маркировке, модели и допустимому напряжению заряда.",
+      "baseline_text_sha256": "0432ab81b6b782aafe71d8346c1a0581eb71720cc1639a990246b15734ae1a5b",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 1,
+        "section_title": "Четыре типа батарей",
+        "question_index": 2
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q04",
       "source_key": "6:3",
       "question": "Как отличить HV от UHV?",
-      "current_answer": "По напряжению на наклейке: максимум на банку 4,35 В у HV и 4,45 В у UHV.",
-      "source_text_sha256": "8b0ebc084ab97ab12e6d7c24d5a39a874eab0e4575795a8626f869c9ef1363a7",
+      "current_answer": "В таблице курса полный заряд HV — 4,35 В, UHV — 4,45 В. Это максимум заряда, не номинал. Надписи HV/UHV недостаточно для настройки любой батареи — нужен её паспорт.",
+      "source_text_sha256": "2946012081ba7cea4912ff9abfa46382d7e380bb52c571eab0b42ea3b7de4938",
       "course_note_tagged": false,
       "learning_unit": "chemistry",
       "pilot_step": null,
@@ -103,16 +161,34 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Различить номинал на этикетке и максимальное напряжение заряда; исходный ключ не проверен."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          27
+        ],
+        "source_ids": [
+          "book6",
+          "grepow-hv"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Различить номинал на этикетке и максимальное напряжение заряда; исходный ключ не проверен."
+      },
+      "baseline_question": "Как отличить HV от UHV?",
+      "baseline_answer": "По напряжению на наклейке: максимум на банку 4,35 В у HV и 4,45 В у UHV.",
+      "baseline_text_sha256": "8b0ebc084ab97ab12e6d7c24d5a39a874eab0e4575795a8626f869c9ef1363a7",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 1,
+        "section_title": "Четыре типа батарей",
+        "question_index": 3
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q05",
       "source_key": "6:4",
       "question": "Что такое S, P и C?",
-      "current_answer": "S — число банок последовательно (растёт напряжение), P — параллельно (растёт ёмкость), C — коэффициент токоотдачи: максимальный ток = А·ч × C.",
-      "source_text_sha256": "a096375328e36cb57f82d10caa713e7780d2814650a2b1b9fdb32dfe027f6751",
+      "current_answer": "S — последовательные звенья: складывается напряжение. P — параллельные элементы: складывается ёмкость одинаковых элементов. А·ч × C даёт заявленный допустимый ток, не результат измерения.",
+      "source_text_sha256": "2d64f92833f33823f736b98856760714576b6d2e6b4e2bbc7de7172686460d5e",
       "course_note_tagged": false,
       "learning_unit": "label",
       "pilot_step": null,
@@ -120,16 +196,35 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          26,
+          27,
+          28
+        ],
+        "source_ids": [
+          "book6"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
+      },
+      "baseline_question": "Что такое S, P и C?",
+      "baseline_answer": "S — число банок последовательно (растёт напряжение), P — параллельно (растёт ёмкость), C — коэффициент токоотдачи: максимальный ток = А·ч × C.",
+      "baseline_text_sha256": "a096375328e36cb57f82d10caa713e7780d2814650a2b1b9fdb32dfe027f6751",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 2,
+        "section_title": "S, P, C: читаем наклейку",
+        "question_index": 4
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q06",
       "source_key": "6:5",
       "question": "Расскажи про АКБ по наклейке 6S 22,2 В 1300 мА·ч 100C.",
-      "current_answer": "6 банок последовательно, номинал 22,2 В (6 × 3,7), ёмкость 1300 мА·ч, ток до 1,3 × 100 = 130 А, энергия ≈ 29 Вт·ч.",
-      "source_text_sha256": "4b0a73377bb8413be35df3eac6ebb97d2e05af44a45196e546c85c17450d70ea",
+      "current_answer": "Пример: 6S — шесть последовательных звеньев; 22,2 В — номинал; 1300 мА·ч = 1,3 А·ч. По наклейке 1,3 × 100 = 130 А, энергия около 28,9 Вт·ч. Реальную токоотдачу одной этикеткой не подтверждают.",
+      "source_text_sha256": "0b2dfb2f33ba3b70f9e5d1c7a2c309a08041b09c23ee2b73dc5ac8158b35f4a8",
       "course_note_tagged": false,
       "learning_unit": "label",
       "pilot_step": null,
@@ -137,16 +232,33 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Расчёт 130 А — по заявленному C, не измерение реальной токоотдачи."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          28
+        ],
+        "source_ids": [
+          "book6"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Расчёт 130 А — по заявленному C, не измерение реальной токоотдачи."
+      },
+      "baseline_question": "Расскажи про АКБ по наклейке 6S 22,2 В 1300 мА·ч 100C.",
+      "baseline_answer": "6 банок последовательно, номинал 22,2 В (6 × 3,7), ёмкость 1300 мА·ч, ток до 1,3 × 100 = 130 А, энергия ≈ 29 Вт·ч.",
+      "baseline_text_sha256": "4b0a73377bb8413be35df3eac6ebb97d2e05af44a45196e546c85c17450d70ea",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 2,
+        "section_title": "S, P, C: читаем наклейку",
+        "question_index": 5
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q07",
       "source_key": "6:6",
       "question": "Формула тока заряда?",
-      "current_answer": "Ток = мА·ч / 2000 (0,5C): 6000 мА·ч → 3 А, 2000 → 1 А. Больше 1C (мА·ч / 1000) — только если наклейка разрешает отдельным зарядным C.",
-      "source_text_sha256": "20859346a02b9d539ceb8abbce97258627cb63106854ddac84d140af4c901d2f",
+      "current_answer": "Формула курса: ток в А = мА·ч / 2000, то есть 0,5C; 6000 мА·ч → 3 А. Разрешённый предел и режим — по инструкции батареи и зарядника. Типовые 1C для обычной LiPo не являются универсальным пределом всех батарей.",
+      "source_text_sha256": "0e99836c2f3d7c40f601960324db0c3c2215c09f1b504b8be739b008449a2b3b",
       "course_note_tagged": false,
       "learning_unit": "charging",
       "pilot_step": null,
@@ -154,16 +266,34 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "0,5C — правило курса; универсальный физический предел 1C не установлен."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          29
+        ],
+        "source_ids": [
+          "book6",
+          "tattu-charge"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "0,5C — правило курса; универсальный физический предел 1C не установлен."
+      },
+      "baseline_question": "Формула тока заряда?",
+      "baseline_answer": "Ток = мА·ч / 2000 (0,5C): 6000 мА·ч → 3 А, 2000 → 1 А. Больше 1C (мА·ч / 1000) — только если наклейка разрешает отдельным зарядным C.",
+      "baseline_text_sha256": "20859346a02b9d539ceb8abbce97258627cb63106854ddac84d140af4c901d2f",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 4,
+        "section_title": "Зарядка",
+        "question_index": 6
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q08",
       "source_key": "6:7",
       "question": "Как определить число банок?",
-      "current_answer": "По наклейке (цифра перед S), по балансиру (проводов на один больше), по напряжению полной батареи (делить на 4,2), тестером банок.",
-      "source_text_sha256": "d9e6d41903c32e400e4b5b058b6bb6122d6a71a4267d527342e8dc6e5b709883",
+      "current_answer": "По маркировке S и тестеру элементов; у обычного отдельного балансира число последовательных звеньев равно числу проводов минус один. Делить напряжение полной батареи на 4,2 можно только для соответствующего известного типа, например обычной LiPo.",
+      "source_text_sha256": "8c790358f44f3bb410fd812f5c195327487726982b6c8cd1214f0416c93a6a48",
       "course_note_tagged": false,
       "learning_unit": "pack",
       "pilot_step": null,
@@ -171,16 +301,33 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Деление на 4,2 относится к полной батарее соответствующего типа, не универсально."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          28
+        ],
+        "source_ids": [
+          "book6"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Деление на 4,2 относится к полной батарее соответствующего типа, не универсально."
+      },
+      "baseline_question": "Как определить число банок?",
+      "baseline_answer": "По наклейке (цифра перед S), по балансиру (проводов на один больше), по напряжению полной батареи (делить на 4,2), тестером банок.",
+      "baseline_text_sha256": "d9e6d41903c32e400e4b5b058b6bb6122d6a71a4267d527342e8dc6e5b709883",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 3,
+        "section_title": "Балансир, число банок, разъёмы",
+        "question_index": 7
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q09",
       "source_key": "6:8",
       "question": "Из шести банок по 3,7 В и 1000 мА·ч собрали 3S2P. Напряжение и ёмкость?",
-      "current_answer": "11,1 В (три банки последовательно) и 2000 мА·ч (две группы параллельно).",
-      "source_text_sha256": "d977dbf2fd24650022e8b064799e8ff56e363665270295ec96cfd901277b14a2",
+      "current_answer": "Пример для одинаковых элементов: 3 × 3,7 = 11,1 В и 2 × 1000 = 2000 мА·ч. Всего 3 × 2 = 6 элементов.",
+      "source_text_sha256": "815e57f15f1928a4e6c1e0dd1f5da9ac92a1e410c71394471fe8371453ae2ea2",
       "course_note_tagged": false,
       "learning_unit": "pack",
       "pilot_step": null,
@@ -188,16 +335,34 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          27,
+          30
+        ],
+        "source_ids": [
+          "book6"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
+      },
+      "baseline_question": "Из шести банок по 3,7 В и 1000 мА·ч собрали 3S2P. Напряжение и ёмкость?",
+      "baseline_answer": "11,1 В (три банки последовательно) и 2000 мА·ч (две группы параллельно).",
+      "baseline_text_sha256": "d977dbf2fd24650022e8b064799e8ff56e363665270295ec96cfd901277b14a2",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 2,
+        "section_title": "S, P, C: читаем наклейку",
+        "question_index": 8
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q10",
       "source_key": "6:9",
       "question": "На балансире 5 проводов. Сколько банок и какое напряжение у полной LiPo?",
-      "current_answer": "4S, 4 × 4,2 = 16,8 В.",
-      "source_text_sha256": "40efb705e3795a83229cd555f1fe34f38b64b48b75b13a98f643367801c63e77",
+      "current_answer": "Для обычного отдельного балансира это 4S. Полная обычная LiPo: 4 × 4,2 = 16,8 В.",
+      "source_text_sha256": "56805cf4d44e36468c4ce2d3b2383f5b4428903a690789d80ade5b8a46a45214",
       "course_note_tagged": false,
       "learning_unit": "pack",
       "pilot_step": null,
@@ -205,16 +370,34 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          28,
+          30
+        ],
+        "source_ids": [
+          "book6"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
+      },
+      "baseline_question": "На балансире 5 проводов. Сколько банок и какое напряжение у полной LiPo?",
+      "baseline_answer": "4S, 4 × 4,2 = 16,8 В.",
+      "baseline_text_sha256": "40efb705e3795a83229cd555f1fe34f38b64b48b75b13a98f643367801c63e77",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 3,
+        "section_title": "Балансир, число банок, разъёмы",
+        "question_index": 9
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q11",
       "source_key": "6:10",
       "question": "Что делать с новой батареей?",
-      "current_answer": "На срезе: три раза зарядить и разрядить до номинального напряжения. На практике: спокойные первые полёты и проверка, что банки держат одинаковое напряжение.",
-      "source_text_sha256": "26df1896123ae7671406b588963e5ca8df107b96ac2fd3ed9407debe0efec7ca",
+      "current_answer": "В имеющемся опроснике: три раза зарядить и разрядить до номинала. На практике следуй инструкции выбранной батареи: LiPo не требует разряда как старый никелевый аккумулятор ради устранения эффекта памяти. Дополнительные циклы без требования изготовителя не назначают.",
+      "source_text_sha256": "8af26fb1e6c20db50891f21a8668caea0da65fe34ecf3f1ad3167b5e73e778dc",
       "course_note_tagged": false,
       "learning_unit": "charging",
       "pilot_step": null,
@@ -222,16 +405,34 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Не превращать ключ про три цикла в обязательную процедуру без инструкции производителя."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          29
+        ],
+        "source_ids": [
+          "book6",
+          "tattu-faq"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Не превращать ключ про три цикла в обязательную процедуру без инструкции производителя."
+      },
+      "baseline_question": "Что делать с новой батареей?",
+      "baseline_answer": "На срезе: три раза зарядить и разрядить до номинального напряжения. На практике: спокойные первые полёты и проверка, что банки держат одинаковое напряжение.",
+      "baseline_text_sha256": "26df1896123ae7671406b588963e5ca8df107b96ac2fd3ed9407debe0efec7ca",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 4,
+        "section_title": "Зарядка",
+        "question_index": 10
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q12",
       "source_key": "6:11",
       "question": "Как ведёт себя батарея при 3,3 В на банку?",
-      "current_answer": "Плохо, дрон нестабилен: батарея почти пустая, под газом проседает, моторам не хватает мощности, банка уходит в переразряд.",
-      "source_text_sha256": "aa85cd13ce7f651c856ef77564aa6b41caab94f38960e24079c37f2bc8157caf",
+      "current_answer": "Ответ курса — «плохо, дрон нестабилен». Для его LiPo-профиля 3,3 В — низкое напряжение; дальнейшая просадка может уменьшить запас мощности. По одному значению нельзя доказать конкретный отказ или одинаковое поведение всех типов батарей.",
+      "source_text_sha256": "d2138a78f389d9fc41304dc93c15df09fc21566175024be06a82c70d548758a4",
       "course_note_tagged": false,
       "learning_unit": "voltage",
       "pilot_step": [
@@ -242,16 +443,35 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Формулировку курса отделить от диагноза реального борта по одному напряжению."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          27,
+          28
+        ],
+        "source_ids": [
+          "book6",
+          "bf-power"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Формулировку курса отделить от диагноза реального борта по одному напряжению."
+      },
+      "baseline_question": "Как ведёт себя батарея при 3,3 В на банку?",
+      "baseline_answer": "Плохо, дрон нестабилен: батарея почти пустая, под газом проседает, моторам не хватает мощности, банка уходит в переразряд.",
+      "baseline_text_sha256": "aa85cd13ce7f651c856ef77564aa6b41caab94f38960e24079c37f2bc8157caf",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 0,
+        "section_title": "Банка: какие напряжения запомнить",
+        "question_index": 11
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q13",
       "source_key": "6:12",
       "question": "Почему на морозе тревога LOW BATTERY приходит раньше?",
-      "current_answer": "Растёт внутреннее сопротивление — просадка I × r под нагрузкой больше, хотя заряд ещё есть.",
-      "source_text_sha256": "55da4ca3022339cbcbe7c3cfc9a19bc906b267067feaf517bc1a69d0e43e6876",
+      "current_answer": "На холоде внутреннее сопротивление может увеличиваться, и просадка под тем же током становится больше. Температура — улика; причину подтверждают сравнимыми измерениями, а не одним фактом мороза.",
+      "source_text_sha256": "b8b741aa6c67905421b729cd0e1bd477524c31e21e675704da0faccaf054951b",
       "course_note_tagged": false,
       "learning_unit": "load",
       "pilot_step": [
@@ -262,16 +482,34 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          26,
+          29
+        ],
+        "source_ids": [
+          "book6"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
+      },
+      "baseline_question": "Почему на морозе тревога LOW BATTERY приходит раньше?",
+      "baseline_answer": "Растёт внутреннее сопротивление — просадка I × r под нагрузкой больше, хотя заряд ещё есть.",
+      "baseline_text_sha256": "55da4ca3022339cbcbe7c3cfc9a19bc906b267067feaf517bc1a69d0e43e6876",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 5,
+        "section_title": "Хранение, холод и износ",
+        "question_index": 12
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q14",
       "source_key": "6:13",
       "question": "Что будет, если зарядить LiPo в режиме LiHV?",
-      "current_answer": "Перезаряд до 4,35 В: деградация, вздутие, риск возгорания.",
-      "source_text_sha256": "bcc33aa629351038a098913d1e767edbf3e86cd7d87e8ef2ae1897cfb270eb5f",
+      "current_answer": "Обычная LiPo рассчитана на предел заряда 4,20 В на элемент; режим до 4,35 В её перезаряжает, с риском повреждения и возгорания. Режим выбирают по паспорту батареи.",
+      "source_text_sha256": "614f1ad94c08481467f6f11ec81987e9a700717e3825926b8d618cce6e4668d6",
       "course_note_tagged": false,
       "learning_unit": "charging",
       "pilot_step": null,
@@ -279,16 +517,35 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          29,
+          30
+        ],
+        "source_ids": [
+          "book6",
+          "tattu-charge"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
+      },
+      "baseline_question": "Что будет, если зарядить LiPo в режиме LiHV?",
+      "baseline_answer": "Перезаряд до 4,35 В: деградация, вздутие, риск возгорания.",
+      "baseline_text_sha256": "bcc33aa629351038a098913d1e767edbf3e86cd7d87e8ef2ae1897cfb270eb5f",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 4,
+        "section_title": "Зарядка",
+        "question_index": 13
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q15",
       "source_key": "6:14",
       "question": "Батарея вздулась. Что делать?",
-      "current_answer": "Не использовать, сообщить преподавателю, убрать в безопасное место и сдать на утилизацию.",
-      "source_text_sha256": "465914430ee9114f588fa1e2aaa6d66aae8d8f51dbc0ebd3a450ed995300b423",
+      "current_answer": "Прекратить использование и зарядку, сообщить преподавателю, действовать по инструкции производителя по безопасному обращению и утилизации. Не прокалывать и не пытаться восстановить прогревом.",
+      "source_text_sha256": "48795c394f8a510a836d4672dbacce42aa7621cd1a384b3801bf017a304eac17",
       "course_note_tagged": false,
       "learning_unit": "condition",
       "pilot_step": null,
@@ -296,16 +553,35 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          29,
+          30
+        ],
+        "source_ids": [
+          "book6",
+          "tattu-charge"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Сверить ответ с первичным источником и оригиналом экзаменационного вопроса."
+      },
+      "baseline_question": "Батарея вздулась. Что делать?",
+      "baseline_answer": "Не использовать, сообщить преподавателю, убрать в безопасное место и сдать на утилизацию.",
+      "baseline_text_sha256": "465914430ee9114f588fa1e2aaa6d66aae8d8f51dbc0ebd3a450ed995300b423",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 5,
+        "section_title": "Хранение, холод и износ",
+        "question_index": 14
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q16",
       "source_key": "6:15",
       "question": "Среднее на банку 3,5 В под газом. Что делать? А при 3,3 В?",
-      "current_answer": "3,5 В — идти на посадку. Ниже 3,3 В разряжать нельзя.",
-      "source_text_sha256": "4ae57dc8cfc2f962213b154042a24b153a49804598bdf1dd7748eaaffe708fab",
+      "current_answer": "В LiPo-профиле курса около 3,5 В под нагрузкой — начинать безопасную посадку, 3,3 В — нижний ориентир настройки. Это не одинаковые паспортные пределы всех химий; предупреждение не отключают ради продолжения полёта.",
+      "source_text_sha256": "70cc3c6c495d504f1a8592d1b710a194d12ec47f16676ccc49f884dcb5db5f34",
       "course_note_tagged": true,
       "learning_unit": "voltage",
       "pilot_step": [
@@ -316,16 +592,35 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Порог курса не объявлять универсальным для всех химий и нагрузок."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          27,
+          28
+        ],
+        "source_ids": [
+          "book6",
+          "bf-power"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Порог курса не объявлять универсальным для всех химий и нагрузок."
+      },
+      "baseline_question": "Среднее на банку 3,5 В под газом. Что делать? А при 3,3 В?",
+      "baseline_answer": "3,5 В — идти на посадку. Ниже 3,3 В разряжать нельзя.",
+      "baseline_text_sha256": "4ae57dc8cfc2f962213b154042a24b153a49804598bdf1dd7748eaaffe708fab",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 0,
+        "section_title": "Банка: какие напряжения запомнить",
+        "question_index": 15
+      },
+      "exam_key_status": "original_not_reconciled"
     },
     {
       "id": "ch06-q17",
       "source_key": "6:16",
       "question": "Чем отличаются XT30, XT60 и XT90?",
-      "current_answer": "Допустимым током: чем больше число, тем больший ток держит разъём.",
-      "source_text_sha256": "3bc2c008afdbf689e6c7a57309fde356b0c25466a4875f53ae69daedcc47610a",
+      "current_answer": "Это разные семейства и размеры силовых разъёмов. Допустимый ток конкретного изделия и всей проводки проверяют по паспорту и условиям работы; одно число XT30/60/90 его не гарантирует.",
+      "source_text_sha256": "aa1a91b3b8cf1869ca638d51feaade4492591ff9bafb3ffddb8c90aee2a7a8df",
       "course_note_tagged": true,
       "learning_unit": "connectors",
       "pilot_step": null,
@@ -333,9 +628,156 @@
       "exam_key_answer": null,
       "exam_origin": null,
       "primary_review": {
-        "status": "pending",
-        "note": "Тип разъёма не заменяет паспортный ток контактов, проводов и условия охлаждения."
-      }
+        "status": "reviewed_with_limits",
+        "book_pages": [
+          28
+        ],
+        "source_ids": [
+          "book6"
+        ],
+        "note": "Практическая часть сверена в пределах указанных страниц и источников; оригинальный экзаменационный ключ не подтверждён.",
+        "open_follow_up": "Тип разъёма не заменяет паспортный ток контактов, проводов и условия охлаждения."
+      },
+      "baseline_question": "Чем отличаются XT30, XT60 и XT90?",
+      "baseline_answer": "Допустимым током: чем больше число, тем больший ток держит разъём.",
+      "baseline_text_sha256": "3bc2c008afdbf689e6c7a57309fde356b0c25466a4875f53ae69daedcc47610a",
+      "location": {
+        "chapter_hash": "#6",
+        "section_index": 3,
+        "section_title": "Балансир, число банок, разъёмы",
+        "question_index": 16
+      },
+      "exam_key_status": "original_not_reconciled"
+    }
+  ],
+  "review_date": "2026-10-20",
+  "reviewed_source_blob": "380e6794d3f3b62452581b8313b395caeb50b98d",
+  "sources": [
+    {
+      "id": "book6",
+      "kind": "provided_book",
+      "title": "Книга, редакция 7, глава 6",
+      "pages": [
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "scope": "Прочитаны эти пять страниц, не все исходные экзаменационные сборники."
+    },
+    {
+      "id": "tattu-charge",
+      "kind": "manufacturer",
+      "url": "https://genstattu.com/blog/how-to-charge-lipo-batteries",
+      "section": "Charging",
+      "scope": "Обычная LiPo; ограничения производителя и исключения для другого разрешённого C."
+    },
+    {
+      "id": "tattu-faq",
+      "kind": "manufacturer",
+      "url": "https://genstattu.com/blog/faq-about-lipo-batteries-by-genstattu",
+      "section": "storage / discharge like Ni-Cads",
+      "scope": "Пример рекомендаций производителя, не паспорт любой батареи."
+    },
+    {
+      "id": "grepow-hv",
+      "kind": "manufacturer",
+      "url": "https://www.grepow.com/lihv-battery/lihv-battery-4-45-v.html",
+      "section": "3.95V/4.45V High Voltage Cells",
+      "scope": "Контрпример единственному номиналу для UHV/HV; не предписание для неназванного изделия."
+    },
+    {
+      "id": "molicel-p45b",
+      "kind": "manufacturer_datasheet",
+      "url": "https://www.molicel.com/wp-content/uploads/INR21700P45B_1.2_Product-Data-Sheet-of-INR-21700-P45B-80109.pdf",
+      "page": 1,
+      "scope": "Пример Li-ion с собственными допусками. Его пределы не переносятся на LiPo."
+    },
+    {
+      "id": "bf-power",
+      "kind": "firmware_documentation",
+      "url": "https://betaflight.com/docs/wiki/app/power-tab",
+      "section": "Battery / Voltage Meter",
+      "scope": "Источники измерения, S и пороги; интерфейс зависит от версии."
+    },
+    {
+      "id": "bf-battery",
+      "kind": "firmware_documentation",
+      "url": "https://betaflight.com/docs/wiki/guides/current/Battery",
+      "section": "Battery monitoring",
+      "scope": "Общее напряжение не даёт индивидуального контроля элементов; старые CLI-примеры не переносить."
+    }
+  ],
+  "book_self_check_map": [
+    {
+      "page": 30,
+      "number": 1,
+      "question_id": "ch06-q01"
+    },
+    {
+      "page": 30,
+      "number": 2,
+      "question_id": "ch06-q10"
+    },
+    {
+      "page": 30,
+      "number": 3,
+      "question_id": "ch06-q14"
+    },
+    {
+      "page": 30,
+      "number": 4,
+      "question_id": "ch06-q15"
+    },
+    {
+      "page": 30,
+      "number": 5,
+      "question_id": "ch06-q09"
+    }
+  ],
+  "short_rule_pairs": [
+    {
+      "id": "ch06-rule-1",
+      "short_text": "Сравнивай напряжение в одинаковых условиях. Посадочные пороги курса относятся к его LiPo-профилю; номинал не является напряжением хранения.",
+      "full_section_index": 0,
+      "full_section_title": "Банка: какие напряжения запомнить",
+      "review_status": "author_compared_needs_independent_review"
+    },
+    {
+      "id": "ch06-rule-2",
+      "short_text": "Тип и режим заряда проверяй по маркировке и паспорту. Форма и номинал дают только предположение.",
+      "full_section_index": 1,
+      "full_section_title": "Четыре типа батарей",
+      "review_status": "author_compared_needs_independent_review"
+    },
+    {
+      "id": "ch06-rule-3",
+      "short_text": "S складывает напряжения, P — ёмкости одинаковых элементов. А·ч × C даёт заявленный ток, а не измеренную отдачу.",
+      "full_section_index": 2,
+      "full_section_title": "S, P, C: читаем наклейку",
+      "review_status": "author_compared_needs_independent_review"
+    },
+    {
+      "id": "ch06-rule-4",
+      "short_text": "Проверь S по маркировке и обычному балансиру S + 1. Распиновку сверяй с прибором, допустимый ток разъёма — с паспортом.",
+      "full_section_index": 3,
+      "full_section_title": "Балансир, число банок, разъёмы",
+      "review_status": "author_compared_needs_independent_review"
+    },
+    {
+      "id": "ch06-rule-5",
+      "short_text": "Сначала тип, S, режим и разрешённый ток. Формула курса 0,5C не отменяет инструкцию батареи и зарядника.",
+      "full_section_index": 4,
+      "full_section_title": "Зарядка",
+      "review_status": "author_compared_needs_independent_review"
+    },
+    {
+      "id": "ch06-rule-6",
+      "short_text": "LOW V — симптом, не диагноз. Проверь показания, S и условия; повреждённую батарею не используют для опыта.",
+      "full_section_index": 5,
+      "full_section_title": "Хранение, холод и износ",
+      "review_status": "author_compared_needs_independent_review"
     }
   ]
 }
