@@ -21,7 +21,17 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm test 2>&1 | tee tests-output.txt
+      # shell: bash включает pipefail: упавший npm test роняет шаг, а не маскируется кодом tee.
+      - name: Тесты
+        shell: bash
+        run: npm test 2>&1 | tee tests-output.txt
+      # Если тесты упали: раскладка телефона 360 px в CI (ширина, смещение видимой области, что под пальцем у стиков).
+      - name: Диагностика телефона 360
+        if: failure()
+        shell: bash
+        run: |
+          node tests/diag-phone.mjs > diag.txt 2>&1 || true
+          node -e 'const o=require("fs").readFileSync("diag.txt","utf8");console.log("::warning title=diag 360::"+o.replace(/%/g,"%25").replace(/\n/g,"%0A"))'
       # Итог тестов — в аннотации запуска: видно на странице PR без открытия журнала.
       - name: Итог тестов
         if: always()

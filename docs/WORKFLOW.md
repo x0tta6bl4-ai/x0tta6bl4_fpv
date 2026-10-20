@@ -16,7 +16,7 @@
 ## Каждая задача
 
 1. Взять свежий `main`: `git checkout main && git pull`
-2. Своя ветка: `git checkout -b gpt/hints-ch12` (префикс — свой: `claude/`, `gpt/`, `gemini/`).
+2. Своя ветка: `git checkout -b gpt/hints-ch12` (префикс — свой: `claude/`, `gpt/`, `gemini/`, `grok/`).
    В карточке задачи (`docs/tasks/`) — статус «в работе».
 3. Сделать **одну** задачу. Маленькие PR проверяются быстрее и реже ломают чужое.
 4. Проверить: `npm run zones` и `npm test` (или облегчённо для текстов — см. `AGENTS.md`).

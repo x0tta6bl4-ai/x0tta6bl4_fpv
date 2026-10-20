@@ -8,6 +8,7 @@ const COMMON = [/^docs\/tasks\//];
 const ZONES = {
   gpt: [/^data\/(chapters-[^/]+|hints|intros|kids|appendix)\.mjs$/, /^docs\/content\//],
   gemini: [/^src\/style\.css$/, /^docs\/qa\//],
+  grok: [/^docs\/reviews\//],
   claude: null, // ведущий инженер: весь репозиторий (кроме запретов ниже)
 };
 const FORBIDDEN = [/^data\/book-(pages|images)\.json$/];
