@@ -3,6 +3,7 @@ import { shuffle } from "../labkit.mjs";
 import { CHAPTERS_A } from "../../data/chapters-a.mjs";
 import { CHAPTERS_B } from "../../data/chapters-b.mjs";
 import { CHAPTERS_C } from "../../data/chapters-c.mjs";
+import SREZ from "../../docs/content/srez.json";
 
 export const meta = {
   id: "quiz",
@@ -20,10 +21,13 @@ export function mount(root, ctx) {
   const finalCh = ALL.find((c) => c.mixed);
   const cards = [];
   for (const c of ALL) (c.questions || []).forEach((q, i) => cards.push({ key: `${c.id}:${i}`, q: q.q, a: q.a, ch: q.ch || c.id, final: !!c.mixed, notes: !!q.k }));
+  // Колода «Срез» — все вопросы опросника курса (docs/content/srez.json), ответ как в таблице + уточнение.
+  const escH = (t) => String(t).replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
+  for (const it of SREZ.items) cards.push({ key: `srez:${it.n}`, q: escH(it.q), a: [].concat(it.a).map(escH).join("; ") + (it.note ? `<br><i>Уточнение: ${escH(it.note)}</i>` : ""), num: typeof it.n === "number" ? `№${it.n}` : it.n, srez: true });
   // Колода «Конспект» — вопросы глав, помеченные k: 1 (по конспекту инструктора).
-  const inPool = (c) => (s.pool === "notes" ? c.notes : s.pool === "all" || c.final);
+  const inPool = (c) => (s.pool === "srez" ? c.srez : c.srez ? false : s.pool === "notes" ? c.notes : s.pool === "all" || c.final);
   const s = { pool: "final", queue: [], seen: 0, streak: 0, known: new Set(), missed: new Set(), cur: null, open: false };
-  root.innerHTML = `<div class="fc-wrap"><div class="lab-choice"><b>Колода</b><div role="radiogroup"><button type="button" role="radio" data-pool="final" aria-checked="true">Итоговый тест (${cards.filter((c) => c.final).length})</button><button type="button" role="radio" data-pool="all" aria-checked="false">Вся книга (${cards.length})</button>${cards.some((c) => c.notes) ? `<button type="button" role="radio" data-pool="notes" aria-checked="false">Конспект (${cards.filter((c) => c.notes).length})</button>` : ""}</div></div>
+  root.innerHTML = `<div class="fc-wrap"><div class="lab-choice"><b>Колода</b><div role="radiogroup"><button type="button" role="radio" data-pool="final" aria-checked="true">Итоговый тест (${cards.filter((c) => c.final).length})</button><button type="button" role="radio" data-pool="all" aria-checked="false">Вся книга (${cards.filter((c) => !c.srez).length})</button>${cards.some((c) => c.notes) ? `<button type="button" role="radio" data-pool="notes" aria-checked="false">Конспект (${cards.filter((c) => c.notes).length})</button>` : ""}<button type="button" role="radio" data-pool="srez" aria-checked="false">Срез (${cards.filter((c) => c.srez).length})</button></div></div>
     <div class="fc" id="card" tabindex="0"></div><div class="lab-row fc-btns" id="btns"></div><div class="fc-prog" id="prog"></div></div>`;
   const $ = (q) => root.querySelector(q);
   const deal = () => {
@@ -39,7 +43,7 @@ export function mount(root, ctx) {
   const draw = () => {
     const c = s.cur;
     $("#card").className = `fc ${s.open ? "open" : ""}`;
-    $("#card").innerHTML = `<small>${c.notes ? "Конспект" : "Вопрос"} · глава ${c.ch}${s.missed.has(c.key) ? " · повтор" : ""}</small><p class="fc-q">${c.q}</p>${s.open ? `<p class="fc-a">${c.a}</p>` : `<p class="fc-hint">Ответь вслух или про себя, потом открой.</p>`}`;
+    $("#card").innerHTML = `<small>${c.srez ? `Срез · ${c.num}` : `${c.notes ? "Конспект" : "Вопрос"} · глава ${c.ch}`}${s.missed.has(c.key) ? " · повтор" : ""}</small><p class="fc-q">${c.q}</p>${s.open ? `<p class="fc-a">${c.a}</p>` : `<p class="fc-hint">Ответь вслух или про себя, потом открой.</p>`}`;
     $("#btns").innerHTML = s.open ? `<button type="button" class="lab-btn bad" data-k="0">✗ Не знал</button><button type="button" class="lab-btn good" data-k="1">✓ Знал</button>` : `<button type="button" class="lab-btn" data-flip>Показать ответ</button>`;
     const fin = cards.filter((x) => x.final);
     $("#prog").innerHTML = `Пройдено: ${s.seen} · серия «знал»: ${s.streak} · итоговый тест: ${fin.filter((x) => s.known.has(x.key)).length} из ${fin.length}`;

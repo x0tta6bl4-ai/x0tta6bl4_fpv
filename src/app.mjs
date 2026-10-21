@@ -34,6 +34,8 @@ import { EXPERIMENTS } from "./methods/index.mjs";
 import { mountExperiment, STATUS } from "./methods/kit.mjs";
 import { attachZoom } from "./zoom.mjs";
 import { mountNotes } from "./notes.mjs";
+import SREZ from "../docs/content/srez.json";
+import SREZ_COV from "../docs/content/srez-coverage.json";
 
 const FIGS = { quad, path, thrust, battery, pid, radio, failsafe, link, pair, goggles, antenna, jamfield, flighttime, bench, bfdesk, flyfield, waterworks, preflight, workshop, navdesk, armcase, lowv };
 const FIG_ORDER = ["quad", "path", "pid", "thrust", "battery", "radio", "failsafe", "link", "pair", "goggles", "antenna", "jamfield", "flighttime", "bench", "bfdesk", "flyfield", "waterworks", "preflight", "workshop", "navdesk", "armcase", "lowv"];
@@ -48,6 +50,7 @@ const APPX = [
   { id: "Е", title: "Ответы на вопросы", pages: [86, 87] },
   { id: "Ж", title: "Источники", pages: [88, 89] },
   { id: "З", title: "Версии и совместимость", pages: [90, 90] },
+  { id: "И", title: "Вопросы среза" },
 ];
 const PARTS = ["Перед стартом", "Часть I · Как дрон летает и чем питается", "Часть II · Радио", "Часть III · Собрать и настроить", "Часть IV · Полёт в реальном мире"];
 const BLOCK = {
@@ -550,10 +553,36 @@ function appendixView(a) {
   if (a.id === "Е") body = CHAPTERS.filter((c) => (c.questions || []).length).map((c) => `<section class="sec"><h3><a href="#${c.id}">Глава ${c.num}. ${esc(c.title)}</a></h3><ol>${c.questions.map((q) => `<li><p class="q-t">${q.q}</p><p class="muted">${q.a}</p></li>`).join("")}</ol></section>`).join("");
   if (a.id === "Ж") body = `<p>Номер в квадратных скобках в тексте ведёт сюда. Тип: П — первичный документ, В — вторичный обзор. Материалы курса использованы как исходный текст и формулировки ключа; их утверждения не считаются независимо подтверждёнными.</p><table class="t">${SOURCES.map(([n, t, s, w]) => `<tr><td>[${n}]</td><td>${t}</td><td>${esc(s)}</td><td class="muted">${esc(w)}</td></tr>`).join("")}</table>`;
   if (a.id === "З") body = `<p>Самые быстро меняющиеся вещи — прошивки. Перед любым обновлением запиши версии всего комплекта и сделай резервную копию.</p><table class="t"><tr><th>Что</th><th>Что изменилось</th><th>Что из этого следует</th></tr>${VERSIONS.map(([a1, b, c]) => `<tr><td>${esc(a1)}</td><td>${esc(b)}</td><td>${esc(c)}</td></tr>`).join("")}</table><section class="sec"><h3>Безопасное обновление прошивки</h3><ol><li>CLI → diff all → сохранить в файл. Записать версии: полётник, ESC, приёмник, передатчик, пульт, очки.</li><li>Обновлять по одной системе за раз, по инструкции этой версии.</li><li>После обновления — проверка на стенде без пропеллеров: каналы, режимы, моторы, Failsafe.</li><li>Что-то не так — откат: прежняя версия, сохранённый diff all, save, снова проверка.</li></ol></section>`;
+  if (a.id === "И") body = srezHtml();
   const ai = APPX.indexOf(a);
   const prev = ai > 0 ? APPX[ai - 1] : CHAPTERS[CHAPTERS.length - 1];
   const next = ai < APPX.length - 1 ? APPX[ai + 1] : null;
-  return `<article class="chapter appx"><div class="eyebrow">Приложение ${a.id} · с. ${a.pages[0]}–${a.pages[1]}</div><h1>${esc(a.title)}</h1>${body}${sourceHtml(a.id)}<nav class="pager"><a href="#${prev.id}">← ${prev.num !== undefined ? prev.num : prev.id}. ${esc(prev.title)}</a>${next ? `<a href="#${next.id}">${next.id}. ${esc(next.title)} →</a>` : "<span></span>"}</nav></article>`;
+  return `<article class="chapter appx"><div class="eyebrow">Приложение ${a.id} · ${a.pages ? `с. ${a.pages[0]}–${a.pages[1]}` : "опросник курса"}</div><h1>${esc(a.title)}</h1>${body}${sourceHtml(a.id)}<nav class="pager"><a href="#${prev.id}">← ${prev.num !== undefined ? prev.num : prev.id}. ${esc(prev.title)}</a>${next ? `<a href="#${next.id}">${next.id}. ${esc(next.title)} →</a>` : "<span></span>"}</nav></article>`;
+}
+
+// ── Вопросы среза (docs/content/srez.json) и где учебник их объясняет (srez-coverage.json) ──
+const srezList = (a) => (Array.isArray(a) ? `<ul>${a.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p>${esc(a)}</p>`);
+const srezBlk = (type, title, text) => (text ? `<aside class="blk" data-type="${type}"><div class="blk-h">${title}</div><p>${esc(text)}</p></aside>` : "");
+function srezGo(cv) {
+  const ch = cv && cv.ch != null ? CHAPTERS.find((c) => c.id === String(cv.ch)) : null;
+  if (!ch || !["full", "partial"].includes(cv.status)) return `<p class="muted small">В главах подробного разбора пока нет — ответ выше из опросника.</p>`;
+  const where = cv.sec === "#check" ? "«Проверь себя»" : cv.sec ? `«${esc(cv.sec)}»` : "";
+  return `<p class="small">${cv.status === "full" ? "Объяснение" : "Частично объяснено"}: <a href="#${ch.id}" data-srz-sec="${esc(cv.sec || "")}">глава ${ch.num}${where ? ` · ${where}` : ""}</a></p>`;
+}
+function srezHtml() {
+  const cov = new Map(SREZ_COV.items.map((c) => [String(c.n), c]));
+  const inCat = (it, c) => it.c === c || it.also === c;
+  const explained = SREZ.items.filter((it) => ["full", "partial"].includes(cov.get(String(it.n))?.status)).length;
+  const item = (it) => {
+    const cv = cov.get(String(it.n));
+    const num = typeof it.n === "number" ? `№${it.n}` : it.n;
+    return `<details class="srz" data-c="${esc([it.c, it.also].filter(Boolean).join(" "))}" data-s="${esc((num + " " + it.q + " " + [].concat(it.a).join(" ")).toLowerCase())}"><summary><span class="srz-n">${esc(num)}</span> ${esc(it.q)}</summary>
+    <div class="srz-a"><div class="eyebrow">${it.own ? "Ответ инструктора" : "Ответ как в таблице"}</div>${srezList(it.a)}${srezBlk("note", "Уточнение", it.note)}${it.unsure ? `<p class="muted small">${esc(it.unsure)}</p>` : ""}${srezBlk("analogy", "На пальцах", it.simple)}${srezBlk("remember", "Запомни", it.mem)}${srezBlk(inCat(it, "safe") ? "safety" : "follows", "Что делать", it.todo)}${srezGo(cv)}</div></details>`;
+  };
+  return `<p>Все вопросы опросника курса: ${SREZ.items.length} (номера из таблицы «вопросы для контроля», ситуации С и теория Т от инструктора). Сначала ответь сам, потом открой ответ. Ссылка под ответом ведёт в главу, где это объяснено подробно. Объяснено в главах: <b>${explained} из ${SREZ.items.length}</b>.</p>
+  <div class="filters" role="group" aria-label="Темы"><button type="button" data-srzc="" aria-pressed="true">Все</button>${SREZ.cats.map(([id, t]) => `<button type="button" data-srzc="${esc(id)}" aria-pressed="false">${esc(t)} · ${SREZ.items.filter((it) => inCat(it, id)).length}</button>`).join("")}</div>
+  <input type="search" id="srzq" placeholder="Поиск по вопросам…" aria-label="Поиск по вопросам среза">
+  <div id="srz">${SREZ.cats.map(([id, t]) => `<section class="sec" data-srzsec="${esc(id)}"><div class="sec-h"><h3>${esc(t)}</h3></div>${SREZ.items.filter((it) => it.c === id).map(item).join("")}</section>`).join("")}</div>`;
 }
 
 // ── Лаборатория методов: одна сцена — несколько способов посчитать ──
@@ -701,7 +730,11 @@ function render() {
   requestAnimationFrame(watchSticky);
   const title = ch ? `${ch.num}. ${ch.title}` : a ? `${a.id}. ${a.title}` : exp ? `Лаборатория методов · ${exp.title}` : isLab ? "Лаборатория методов" : "Как пользоваться книгой";
   document.title = `FPV Anatomy · ${title}`;
-  if (render.keepLab && document.getElementById("labcard")) document.getElementById("labcard").scrollIntoView({ block: "start" });
+  // Ссылка «Объяснение» из вопросов среза открывает главу сразу на нужном разделе.
+  const secEl = !ch || !render.sec ? null : render.sec === "#check" ? $("#check") : $$("#main section.sec").find((s) => s.querySelector("h3")?.textContent === render.sec);
+  render.sec = null;
+  if (secEl) secEl.scrollIntoView({ block: "start" });
+  else if (render.keepLab && document.getElementById("labcard")) document.getElementById("labcard").scrollIntoView({ block: "start" });
   else if (!render.first) window.scrollTo(0, 0);
   render.keepLab = false;
   render.first = false;
@@ -936,6 +969,24 @@ function bind(ch, a) {
       const q = e.target.value.trim().toLowerCase();
       $$("#gloss > div").forEach((d) => (d.hidden = q && !d.dataset.g.includes(q)));
     });
+  if (a && a.id === "И") {
+    let cat = "";
+    const apply = () => {
+      const q = ($("#srzq").value || "").trim().toLowerCase();
+      // С фильтром темы видны и вопросы, отнесённые к ней дополнительно (also), — они лежат в своём основном разделе.
+      $$("#srz details.srz").forEach((d) => (d.hidden = (cat && !d.dataset.c.split(" ").includes(cat)) || (q && !d.dataset.s.includes(q))));
+      $$("#srz section[data-srzsec]").forEach((s) => (s.hidden = !s.querySelector("details.srz:not([hidden])")));
+    };
+    $$("[data-srzc]").forEach((b) =>
+      b.addEventListener("click", () => {
+        cat = b.dataset.srzc;
+        $$("[data-srzc]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        apply();
+      }),
+    );
+    $("#srzq").addEventListener("input", apply);
+    $$("[data-srz-sec]").forEach((l) => l.addEventListener("click", () => (render.sec = l.dataset.srzSec || null)));
+  }
   if (a && a.id === "Д") {
     let vf = "Все";
     const apply = () => {
