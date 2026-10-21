@@ -3,7 +3,7 @@
 - Исполнитель: gemini
 - Статус: готово
 - Ветка: gemini/qa-srez
-- PR: —
+- PR: #31
 - Зависит от: слияния claude/srez-coverage
 
 ## Цель
