@@ -51,6 +51,7 @@ const VIEWS = { top: [0.0001, 1.3], side: [Math.PI / 2, 0.08], under: [0.7, -1.1
 
 export function mount(root, ctx) {
   root.innerHTML = `<div class="d3-stage"><canvas class="d3-canvas" tabindex="0" role="img" aria-label="Трёхмерная модель FPV-дрона: рама, стек FC и ESC, моторы, винты, камера, видеопередатчик, приёмник, антенны, аккумулятор"></canvas>
+    <svg class="d3-leaders" aria-hidden="true"><path/></svg>
     <button type="button" class="d3-marker" data-act="focus" hidden aria-label="Рассмотреть выбранную деталь"></button>
     <p class="d3-hint">Крути пальцем · щипок — масштаб · касание — деталь · с клавиатуры: стрелки, +/−</p></div>
     <div class="d3-bar" role="group" aria-label="Вид и разборка"><button type="button" class="lab-btn" data-act="explode" aria-pressed="false">Разобрать</button><button type="button" class="lab-btn" data-view="top">Сверху</button><button type="button" class="lab-btn" data-view="side">Сбоку</button><button type="button" class="lab-btn" data-view="under">Снизу</button><button type="button" class="lab-btn" data-view="home">Сброс</button><button type="button" class="lab-btn" data-act="focus" disabled aria-pressed="false">К детали</button></div>
@@ -82,6 +83,7 @@ export function mount(root, ctx) {
     return { destroy() { root.removeEventListener("click", fallbackClick); } };
   }
   viewer.view.radius = 18.5;
+  viewer.look.dimOthers = .18;
   const isDark = () => { const [r, g, b] = cssColor(root, "--anatomy-page", [1, 1, 1]); return r * 0.3 + g * 0.59 + b * 0.11 < 0.5; };
   let parts = [];
   const theme = () => {
@@ -121,19 +123,30 @@ export function mount(root, ctx) {
     const selected = parts.find(p => p.id === s.sel);
     const focusRadius = { frame: 18.5, battery: 5.7, motor: 3, camera: 2.8, ant_vtx: 3.1, ant_rx: 3.1 };
     const target = s.focus && selected ? selected.center.map((v, i) => v + selected.off[i] * ease(s.ex)) : [0, 1.5 + 4 * ease(s.ex), 0];
-    const radius = s.focus && selected ? (s.sel.startsWith("prop_") ? 7.2 : focusRadius[s.sel] || 3.7) : 18.5 + 3 * ease(s.ex);
+    const bounds = [];
+    for(const [x,z] of Object.values(MOTORS)) for(let i=0;i<16;i++) {
+      const a=i*Math.PI/8; bounds.push([x+6.45*Math.cos(a),2.6+3*ease(s.ex),z+6.45*Math.sin(a)]);
+    }
+    for(const [x,z] of Object.values(MOTORS)) bounds.push([x,0,z]);
+    for(const x of [-1.9,1.9]) for(const y of [3,6.6]) for(const z of [-4,3.6]) bounds.push([x,y+9*ease(s.ex),z]);
+    bounds.push([0,5.3+3.5*ease(s.ex),-7.4-2.5*ease(s.ex)],[0,2.3+.5*ease(s.ex),5.5+3.5*ease(s.ex)]);
+    const fit = viewer.fitRadius(bounds);
+    const radius = s.focus && selected ? (s.sel.startsWith("prop_") ? 7.2 : focusRadius[s.sel] || 3.7) : fit;
     const follow = 1 - Math.exp(-dt * 9);
     for (let i=0;i<3;i++) { if (Math.abs(viewer.view.target[i]-target[i]) > .005) anim=true; viewer.view.target[i] += (target[i]-viewer.view.target[i])*follow; }
     if (Math.abs(viewer.view.radius-radius) > .005) anim=true;
     viewer.view.radius += (radius-viewer.view.radius)*follow;
     const marker = $(".d3-marker");
-    marker.hidden = !selected;
+    const leader = $(".d3-leaders path");
+    marker.hidden = !selected; leader.setAttribute("d","");
     if (selected) {
       const point = selected.center.map((v,i) => v + selected.off[i] * ease(s.ex));
       const [x,y,visible] = viewer.project(point), rect = canvas.getBoundingClientRect();
       marker.hidden = !visible || x < 0 || x > rect.width || y < 0 || y > rect.height;
-      marker.style.left = `${Math.max(58,Math.min(rect.width-58,x))}px`;
-      marker.style.top = `${Math.max(44,Math.min(rect.height-40,y-16))}px`;
+      const lx=Math.max(58,Math.min(rect.width-58,x+(x>rect.width/2?-86:86)));
+      const ly=Math.max(44,Math.min(rect.height-40,y-26));
+      marker.style.left = `${lx}px`; marker.style.top = `${ly}px`;
+      if(!marker.hidden) leader.setAttribute("d",`M${x},${y}L${lx},${ly}`);
       marker.textContent = SHORT[s.sel];
     }
     if (camTo) {

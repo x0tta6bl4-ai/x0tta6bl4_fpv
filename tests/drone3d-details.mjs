@@ -45,16 +45,20 @@ try {
   assert(!/1\s*\/\s*4/.test(await page.locator('#labscore').innerText()),'частичная разборка не закрывает задание стека');
   await slider.focus();await slider.press('End');await page.waitForTimeout(1000);
   assert(/1\s*\/\s*4/.test(await page.locator('#labscore').innerText()),'полная разборка с выбранным FC закрывает задание');
+  await canvas.screenshot({path:resolve(ROOT,`tests/out/drone3d-detail-${width}-exploded.png`)});
   const radius=await page.evaluate(()=>document.querySelector('#labroot').__d3.viewer.view.radius);
   await page.locator('.d3-bar [data-act="focus"]').click();await page.waitForTimeout(900);
   const focused=await page.evaluate(()=>({r:document.querySelector('#labroot').__d3.viewer.view.radius,f:document.querySelector('#labroot').dataset.focused}));
   assert(focused.f==='true'&&focused.r<radius*.5,'приближение действительно меняет камеру');
   assert(await page.locator('.d3-marker').isVisible(),'подпись выбранной детали видима');
+  await canvas.screenshot({path:resolve(ROOT,`tests/out/drone3d-detail-${width}-focus.png`)});
   await page.locator('[data-view="home"]').click();await page.waitForTimeout(1000);
   for(const b of await page.locator('.d3-bar button,.d3-parts button').all()){
    const r=await b.boundingBox();if(r)assert(r.width>=43.5&&r.height>=43.5,'органы управления не меньше 44px');
   }
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'нет горизонтального переполнения');
+  await page.locator('[data-act="explode"]').click();await page.waitForTimeout(1000);
+  await canvas.press('Escape');await page.waitForTimeout(150);
   await canvas.screenshot({path:resolve(ROOT,`tests/out/drone3d-detail-${width}.png`)});
   console.log(`PASS ${width}: клавиатура, разборка, зачёт, фокус, подпись и размеры кнопок`);
   await context.close();

@@ -294,6 +294,19 @@ export function createViewer(canvas, { onPick, onView } = {}) {
     invalidate,
     pickAt,
     get parts() { return parts; },
+    // Радиус камеры для набора мировых точек при zoom=1: учитываем перспективу и пропорции canvas.
+    fitRadius(points, padding = 1.14) {
+      const sy=Math.sin(view.yaw),cy=Math.cos(view.yaw),sp=Math.sin(view.pitch),cp=Math.cos(view.pitch);
+      const forward=[cp*sy,sp,cp*cy],right=[cy,0,-sy],up=[-sp*sy,cp,-sp*cy];
+      const ty=Math.tan(view.fov/2),tx=ty*W/H;
+      let distance=1;
+      for(const p of points){
+        const q=p.map((v,i)=>v-view.target[i]);
+        const dot=a=>q[0]*a[0]+q[1]*a[1]+q[2]*a[2];
+        distance=Math.max(distance,dot(forward)+padding*Math.abs(dot(right))/tx,dot(forward)+padding*Math.abs(dot(up))/ty);
+      }
+      return distance*Math.sin(Math.min(view.fov,2*Math.atan(tx))/2);
+    },
     // Экранная точка (CSS-пиксели относительно canvas) для точки сцены — для подсказок и автотестов.
     project(p) {
       camera();
