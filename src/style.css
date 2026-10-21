@@ -1378,8 +1378,6 @@ table.t{max-width:100%;-webkit-overflow-scrolling:touch}
 
 /* У высокого бака не должно быть кнопки поверх его верхушки: сенсорный
    браузер может перенаправить касание близкого края к кнопке «Пауза». */
-@media (max-width:599px){
-  .workspace #fig .iso-figure[data-fig="flighttime"] .fig-tools{
-    position:static;justify-content:flex-end;margin-top:8px
-  }
+ .workspace #fig .iso-figure[data-fig="flighttime"] .fig-tools{
+  position:static;justify-content:flex-end;margin-top:8px
 }

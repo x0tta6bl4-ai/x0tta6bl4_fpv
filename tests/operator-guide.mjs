@@ -32,8 +32,8 @@ if(process.argv.includes('--static'))process.exit(0);
 const { chromium }=await import('playwright');const browser=await chromium.launch({args:['--no-sandbox']});
 try{
  fs.mkdirSync('tests/out',{recursive:true});
- for(const width of [360,390,412,1280]){
-  const page=await browser.newPage({viewport:{width,height:844},isMobile:width<500,hasTouch:width<500});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ for(const width of [360,390,412,599,600,650,700,701,1280]){
+  const page=await browser.newPage({viewport:{width,height:width>=599&&width<=700?390:844},isMobile:width<=700,hasTouch:width<=700});const errors=[];page.on('pageerror',e=>errors.push(e.message));
   for(const theme of ['light','dark']){
    await page.goto(pathToFileURL(resolve('dist/dev.html')).href+'#20');await page.waitForSelector('.operator-rules');
    await page.evaluate(t=>document.documentElement.setAttribute('data-theme',t),theme);
@@ -59,7 +59,7 @@ try{
   await physics.locator(':scope > summary').click();
   await page.waitForSelector('#extra .kid');
   assert.ok(await physics.locator('.law').count()>0,'physics retained in the shared chapter fold');
-  if(width<500){
+  {
    await page.goto(pathToFileURL(resolve('dist/dev.html')).href+'#7');
    await page.waitForSelector('[data-fig="flighttime"] .fig-tools');
    const overlaps=await page.evaluate(()=>{const s=document.querySelector('#fig .iso-stage').getBoundingClientRect(),t=document.querySelector('#fig .fig-tools').getBoundingClientRect();return t.left<s.right&&t.right>s.left&&t.top<s.bottom&&t.bottom>s.top;});
