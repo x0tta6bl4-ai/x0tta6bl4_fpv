@@ -7,6 +7,7 @@ import { CHAPTERS_A as A } from '../data/chapters-a.mjs';
 import { CHAPTERS_B as B } from '../data/chapters-b.mjs';
 import { CHAPTERS_C as C } from '../data/chapters-c.mjs';
 import { KIDS } from '../data/kids.mjs';
+import { HINTS } from '../data/hints.mjs';
 const chapters=[...A,...B,...C], guide=chapters.find(c=>c.id==='20');
 const calculations=chapters.flatMap(c=>c.sections.flatMap(s=>[...s.body.matchAll(/data-calc-id="([^"]+)"/g)].map(m=>({id:m[1],ch:c.id,section:s}))));
 assert.equal(calculations.length,11);assert.equal(new Set(calculations.map(x=>x.id)).size,11);
@@ -19,6 +20,9 @@ assert.match(JSON.stringify(KIDS['0']),/Закон Ома/);
 assert.equal(Object.values(KIDS).flatMap(k=>k.laws||[]).filter(l=>/^I = U ÷ R/.test(l.f)).length,0);
 const lostVideo=chapters.find(c=>c.id==='18').questions.find(q=>q.q.startsWith('Пропало видео'));
 assert.match(lostVideo.a,/только при подтверждённом свободном безопасном пространстве/);
+for(const [id,hint] of Object.entries(HINTS))if(id.endsWith(':emerg'))assert.match(hint.why,/только при подтверждённом свободном безопасном пространстве/,id);
+for(const file of ['../src/figs/preflight.mjs','../src/labs/gonogo.mjs'])assert.match(fs.readFileSync(new URL(file,import.meta.url),'utf8'),/высота — только при свободном безопасном пространстве/);
+
 for(const c of chapters)for(const s of c.sections)for(const b of s.blocks||[])if(['safety','trap'].includes(b.type))assert.match(b.text,/^Если /,`${c.id}: ${b.type}`);
 assert.equal((guide.sections[0].body.match(/<li><b>Если /g)||[]).length,12);
 const coverage=JSON.parse(fs.readFileSync(new URL('../docs/content/srez-coverage.json',import.meta.url)));
