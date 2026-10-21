@@ -26,12 +26,39 @@ export function mount(root, ctx) {
   for (const it of SREZ.items) cards.push({ key: `srez:${it.n}`, q: escH(it.q), a: [].concat(it.a).map(escH).join("; ") + (it.note ? `<br><i>Уточнение: ${escH(it.note)}</i>` : ""), num: typeof it.n === "number" ? `№${it.n}` : it.n, srez: true });
   // Колода «Конспект» — вопросы глав, помеченные k: 1 (по конспекту инструктора).
   const inPool = (c) => (s.pool === "srez" ? c.srez : c.srez ? false : s.pool === "notes" ? c.notes : s.pool === "all" || c.final);
+
+  // Интервальное расписание повтора для колоды «Срез»
+  const loadSched = () => {
+    try { return JSON.parse(localStorage.getItem("fpv_srez_sched") || "{}"); } catch { return {}; }
+  };
+  const saveSched = (sc) => {
+    try { localStorage.setItem("fpv_srez_sched", JSON.stringify(sc)); } catch {}
+  };
+  const sched = loadSched();
+  const DAY_MS = 86400000;
+  const INTERVALS = [1, 3, 7, 14, 30]; // дни между повторами
+
+  const isDue = (c) => {
+    if (!c.srez) return true;
+    const r = sched[c.key];
+    if (!r || !r.due) return true;
+    return r.due <= Date.now();
+  };
+
   const s = { pool: "final", queue: [], seen: 0, streak: 0, known: new Set(), missed: new Set(), cur: null, open: false };
-  root.innerHTML = `<div class="fc-wrap"><div class="lab-choice"><b>Колода</b><div role="radiogroup"><button type="button" role="radio" data-pool="final" aria-checked="true">Итоговый тест (${cards.filter((c) => c.final).length})</button><button type="button" role="radio" data-pool="all" aria-checked="false">Вся книга (${cards.filter((c) => !c.srez).length})</button>${cards.some((c) => c.notes) ? `<button type="button" role="radio" data-pool="notes" aria-checked="false">Конспект (${cards.filter((c) => c.notes).length})</button>` : ""}<button type="button" role="radio" data-pool="srez" aria-checked="false">Срез (${cards.filter((c) => c.srez).length})</button></div></div>
+  const srezDueInitial = cards.filter((c) => c.srez && isDue(c)).length;
+  root.innerHTML = `<div class="fc-wrap"><div class="lab-choice"><b>Колода</b><div role="radiogroup"><button type="button" role="radio" data-pool="final" aria-checked="true">Итоговый тест (${cards.filter((c) => c.final).length})</button><button type="button" role="radio" data-pool="all" aria-checked="false">Вся книга (${cards.filter((c) => !c.srez).length})</button>${cards.some((c) => c.notes) ? `<button type="button" role="radio" data-pool="notes" aria-checked="false">Конспект (${cards.filter((c) => c.notes).length})</button>` : ""}<button type="button" role="radio" data-pool="srez" aria-checked="false">Срез (${cards.filter((c) => c.srez).length}${srezDueInitial < cards.filter((c) => c.srez).length ? ` · к повтору: ${srezDueInitial}` : ""})</button></div></div>
     <div class="fc" id="card" tabindex="0"></div><div class="lab-row fc-btns" id="btns"></div><div class="fc-prog" id="prog"></div></div>`;
   const $ = (q) => root.querySelector(q);
   const deal = () => {
-    s.queue = shuffle(cards.filter(inPool), Date.now());
+    const poolCards = cards.filter(inPool);
+    if (s.pool === "srez") {
+      const dueCards = shuffle(poolCards.filter(isDue), Date.now());
+      const laterCards = shuffle(poolCards.filter((c) => !isDue(c)), Date.now());
+      s.queue = [...dueCards, ...laterCards];
+    } else {
+      s.queue = shuffle(poolCards, Date.now());
+    }
     next();
   };
   const next = () => {
@@ -42,11 +69,27 @@ export function mount(root, ctx) {
   };
   const draw = () => {
     const c = s.cur;
+    let repNote = "";
+    if (c.srez) {
+      const r = sched[c.key];
+      if (r && r.step > 0 && r.due > Date.now()) {
+        const dLeft = Math.ceil((r.due - Date.now()) / DAY_MS);
+        repNote = ` · повтор через ${dLeft} дн.`;
+      } else if (r && r.step > 0) {
+        repNote = ` · срок повтора`;
+      }
+    }
     $("#card").className = `fc ${s.open ? "open" : ""}`;
-    $("#card").innerHTML = `<small>${c.srez ? `Срез · ${c.num}` : `${c.notes ? "Конспект" : "Вопрос"} · глава ${c.ch}`}${s.missed.has(c.key) ? " · повтор" : ""}</small><p class="fc-q">${c.q}</p>${s.open ? `<p class="fc-a">${c.a}</p>` : `<p class="fc-hint">Ответь вслух или про себя, потом открой.</p>`}`;
+    $("#card").innerHTML = `<small>${c.srez ? `Срез · ${c.num}${repNote}` : `${c.notes ? "Конспект" : "Вопрос"} · глава ${c.ch}`}${s.missed.has(c.key) ? " · повтор" : ""}</small><p class="fc-q">${c.q}</p>${s.open ? `<p class="fc-a">${c.a}</p>` : `<p class="fc-hint">Ответь вслух или про себя, потом открой.</p>`}`;
     $("#btns").innerHTML = s.open ? `<button type="button" class="lab-btn bad" data-k="0">✗ Не знал</button><button type="button" class="lab-btn good" data-k="1">✓ Знал</button>` : `<button type="button" class="lab-btn" data-flip>Показать ответ</button>`;
     const fin = cards.filter((x) => x.final);
-    $("#prog").innerHTML = `Пройдено: ${s.seen} · серия «знал»: ${s.streak} · итоговый тест: ${fin.filter((x) => s.known.has(x.key)).length} из ${fin.length}`;
+    if (s.pool === "srez") {
+      const srezDue = cards.filter((x) => x.srez && isDue(x)).length;
+      const srezLearned = cards.filter((x) => x.srez && sched[x.key] && sched[x.key].step > 0).length;
+      $("#prog").innerHTML = `Пройдено за сессию: ${s.seen} · выучено: ${srezLearned} из 143 · на сегодня к повтору: ${srezDue}`;
+    } else {
+      $("#prog").innerHTML = `Пройдено: ${s.seen} · серия «знал»: ${s.streak} · итоговый тест: ${fin.filter((x) => s.known.has(x.key)).length} из ${fin.length}`;
+    }
   };
   root.addEventListener("click", (e) => {
     const p = e.target.closest("[data-pool]");
@@ -65,10 +108,21 @@ export function mount(root, ctx) {
       s.streak++;
       if (s.missed.has(c.key)) ctx.done("back");
       s.known.add(c.key);
+      if (c.srez) {
+        const r = sched[c.key] || { step: 0 };
+        const step = Math.min((r.step || 0) + 1, INTERVALS.length);
+        const days = INTERVALS[step - 1];
+        sched[c.key] = { step, interval: days, due: Date.now() + days * DAY_MS, last: Date.now() };
+        saveSched(sched);
+      }
     } else {
       s.streak = 0;
       s.missed.add(c.key);
       s.known.delete(c.key); // «Не знал» отменяет прежнее «Знал»
+      if (c.srez) {
+        sched[c.key] = { step: 0, interval: 0, due: Date.now(), last: Date.now() };
+        saveSched(sched);
+      }
       if (s.queue.length < 3) s.queue.push(...shuffle(cards.filter((x) => inPool(x) && x.key !== c.key), Date.now()));
       s.queue.splice(3, 0, c); // вернётся через 3 карточки
     }

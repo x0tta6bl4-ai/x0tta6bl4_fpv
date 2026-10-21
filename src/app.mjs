@@ -36,6 +36,7 @@ import { attachZoom } from "./zoom.mjs";
 import { mountNotes } from "./notes.mjs";
 import SREZ from "../docs/content/srez.json";
 import SREZ_COV from "../docs/content/srez-coverage.json";
+import { shuffle } from "./labkit.mjs";
 
 const FIGS = { quad, path, thrust, battery, pid, radio, failsafe, link, pair, goggles, antenna, jamfield, flighttime, bench, bfdesk, flyfield, waterworks, preflight, workshop, navdesk, armcase, lowv };
 const FIG_ORDER = ["quad", "path", "pid", "thrust", "battery", "radio", "failsafe", "link", "pair", "goggles", "antenna", "jamfield", "flighttime", "bench", "bfdesk", "flyfield", "waterworks", "preflight", "workshop", "navdesk", "armcase", "lowv"];
@@ -241,7 +242,8 @@ function glossaryOf(word) {
 }
 function blockHtml(b) {
   const head = b.title ? `${BLOCK[b.type]}: ${b.title}` : BLOCK[b.type];
-  return `<aside class="blk" data-type="${b.type}"><div class="blk-h">${tags(head)}</div><p>${tags(b.text)}</p>${b.breaks ? `<p class="breaks"><b>Где ломается:</b> ${tags(b.breaks)}</p>` : ""}</aside>`;
+  const open = b.type === "key" || b.open ? " open" : "";
+  return `<details class="blk" data-type="${b.type}"${open}><summary class="blk-h">${tags(head)}</summary><div class="blk-body"><p>${tags(b.text)}</p>${b.breaks ? `<p class="breaks"><b>Где ломается:</b> ${tags(b.breaks)}</p>` : ""}</div></details>`;
 }
 function sectionHtml(sec) {
   return `<section class="sec" data-prio="${sec.prio}"><div class="sec-h"><h3>${esc(sec.title)}</h3><span class="prio" data-prio="${sec.prio}">${PRIO[sec.prio]}</span></div>${tags(sec.body || "")}${sec.w ? `<div class="nw" data-w="${esc(sec.w)}"></div>` : ""}${(sec.blocks || []).map(blockHtml).join("")}</section>`;
@@ -497,10 +499,10 @@ function chapterView(ch) {
   ${ch.here && ch.here.length ? hereStrip(ch) : ""}
   ${ch.lead ? `<p class="lead">${tags(ch.lead)}</p>` : ""}
   ${ch.riddle ? `<section class="riddle"><div class="eyebrow">Загадка</div><p class="riddle-t">${esc(ch.riddle)}</p><p class="muted small">Ответь до чтения, даже наугад. Разгадка — в конце главы.</p><textarea rows="2" id="guess" placeholder="Моя догадка…">${esc(S.guess[ch.id] || "")}</textarea></section>` : ""}
+  ${ch.goals ? `<div class="goals"><div><div class="eyebrow">После главы ты сможешь</div><ul>${ch.goals.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div>${ch.words ? `<div><div class="eyebrow">Новые слова</div><p class="words">${ch.words.map((w) => `<span class="word" tabindex="0" title="${esc(glossaryOf(w))}">${esc(w)}</span>`).join("")}</p></div>` : ""}</div>` : ""}
   ${kidHtml(ch)}
   ${ch.standAfter === undefined ? interactiveHtml(ch) : ""}
   ${ch.methodsEnd ? "" : methodsInline(ch)}
-  ${ch.goals ? `<div class="goals"><div><div class="eyebrow">После главы ты сможешь</div><ul>${ch.goals.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div>${ch.words ? `<div><div class="eyebrow">Новые слова</div><p class="words">${ch.words.map((w) => `<span class="word" tabindex="0" title="${esc(glossaryOf(w))}">${esc(w)}</span>`).join("")}</p></div>` : ""}</div>` : ""}
   ${ch.calc === "scale" ? scaleCalc() : ""}
   ${(ch.sections || []).map((sec, i) => sectionHtml(sec) + (ch.standAfter === i ? interactiveHtml(ch) : "")).join("")}
   ${ch.methodsEnd ? ((m) => (m ? `<div class="eyebrow mx-extra">Дополнительно · сравнение моделей</div>${m}` : ""))(methodsInline(ch)) : ""}
@@ -580,10 +582,19 @@ function srezHtml() {
     return `<details class="srz" data-c="${esc([it.c, it.also].filter(Boolean).join(" "))}" data-s="${esc((num + " " + it.q + " " + [].concat(it.a).join(" ")).toLowerCase())}"><summary><span class="srz-n">${esc(num)}</span> ${esc(it.q)}</summary>
     <div class="srz-a"><div class="eyebrow">${it.own ? "Ответ инструктора" : "Ответ как в таблице"}</div>${srezList(it.a)}${srezBlk("note", "Уточнение", it.note)}${it.unsure ? `<p class="muted small">${esc(it.unsure)}</p>` : ""}${srezBlk("analogy", "На пальцах", it.simple)}${srezBlk("remember", "Запомни", it.mem)}${srezBlk(inCat(it, "safe") ? "safety" : "follows", "Что делать", it.todo)}${srezGo(cv)}</div></details>`;
   };
-  return `<p>Все вопросы опросника курса: ${SREZ.items.length} (номера из таблицы «вопросы для контроля», ситуации С и теория Т от инструктора). Сначала ответь сам, потом открой ответ. Ссылка под ответом ведёт в главу, где это объяснено подробно. Объяснено в главах: <b>${explained} из ${SREZ.items.length}</b>.</p>
-  <div class="filters" role="group" aria-label="Темы"><button type="button" data-srzc="" aria-pressed="true">Все</button>${SREZ.cats.map(([id, t]) => `<button type="button" data-srzc="${esc(id)}" aria-pressed="false">${esc(t)} · ${SREZ.items.filter((it) => inCat(it, id)).length}</button>`).join("")}</div>
-  <input type="search" id="srzq" placeholder="Поиск по вопросам…" aria-label="Поиск по вопросам среза">
-  <div id="srz">${SREZ.cats.map(([id, t]) => `<section class="sec" data-srzsec="${esc(id)}"><div class="sec-h"><h3>${esc(t)}</h3></div>${SREZ.items.filter((it) => it.c === id).map(item).join("")}</section>`).join("")}</div>`;
+  return `<div class="srz-modes" role="tablist" aria-label="Режимы страницы">
+    <button type="button" class="lab-btn" id="srz-mode-catalog" aria-pressed="true">📖 Каталог вопросов (${SREZ.items.length})</button>
+    <button type="button" class="lab-btn" id="srz-mode-exam" aria-pressed="false">🎯 Пробный срез (20 вопросов)</button>
+  </div>
+  <div id="srz-catalog-view">
+    <p>Все вопросы опросника курса: ${SREZ.items.length} (номера из таблицы «вопросы для контроля», ситуации С и теория Т от инструктора). Сначала ответь сам, потом открой ответ. Ссылка под ответом ведёт в главу, где это объяснено подробно. Объяснено в главах: <b>${explained} из ${SREZ.items.length}</b>.</p>
+    <div class="filters" role="group" aria-label="Темы"><button type="button" data-srzc="" aria-pressed="true">Все</button>${SREZ.cats.map(([id, t]) => `<button type="button" data-srzc="${esc(id)}" aria-pressed="false">${esc(t)} · ${SREZ.items.filter((it) => inCat(it, id)).length}</button>`).join("")}</div>
+    <input type="search" id="srzq" placeholder="Поиск по вопросам…" aria-label="Поиск по вопросам среза">
+    <div id="srz">${SREZ.cats.map(([id, t]) => `<section class="sec" data-srzsec="${esc(id)}"><div class="sec-h"><h3>${esc(t)}</h3></div>${SREZ.items.filter((it) => it.c === id).map(item).join("")}</section>`).join("")}</div>
+  </div>
+  <div id="srz-exam-view" hidden>
+    <div id="srz-exam-box"></div>
+  </div>`;
 }
 
 // ── Лаборатория методов: одна сцена — несколько способов посчитать ──
@@ -973,7 +984,7 @@ function bind(ch, a) {
   if (a && a.id === "И") {
     let cat = "";
     const apply = () => {
-      const q = ($("#srzq").value || "").trim().toLowerCase();
+      const q = ($("#srzq")?.value || "").trim().toLowerCase();
       // С фильтром темы видны и вопросы, отнесённые к ней дополнительно (also), — они лежат в своём основном разделе.
       $$("#srz details.srz").forEach((d) => (d.hidden = (cat && !d.dataset.c.split(" ").includes(cat)) || (q && !d.dataset.s.includes(q))));
       $$("#srz section[data-srzsec]").forEach((s) => (s.hidden = !s.querySelector("details.srz:not([hidden])")));
@@ -985,8 +996,102 @@ function bind(ch, a) {
         apply();
       }),
     );
-    $("#srzq").addEventListener("input", apply);
+    $("#srzq")?.addEventListener("input", apply);
     $$("[data-srz-sec]").forEach((l) => l.addEventListener("click", () => (render.sec = l.dataset.srzSec || null)));
+
+    // Пробный срез (20 случайных вопросов)
+    const cov = new Map(SREZ_COV.items.map((c) => [String(c.n), c]));
+    let exam = null;
+
+    const renderExamCard = () => {
+      const box = $("#srz-exam-box");
+      if (!box || !exam) return;
+      if (exam.done) {
+        const pct = Math.round((exam.score / exam.items.length) * 100);
+        const pass = pct >= 80;
+        box.innerHTML = `<div class="srz-exam-card">
+          <div class="eyebrow">Итог пробного экзамена</div>
+          <h2>Результат: ${exam.score} из ${exam.items.length} (${pct} %)</h2>
+          <p style="margin:12px 0">${pass ? `<span class="tag" data-tag="закон" style="font-size:14px;padding:4px 10px">✓ Зачёт (≥ 80 %)</span>` : `<span class="tag" style="color:var(--bad);box-shadow:0 0 0 1px currentColor;font-size:14px;padding:4px 10px">✗ Не сдал (< 80 %)</span>`}</p>
+          ${exam.missed.length ? `<div style="margin:20px 0"><div class="eyebrow">Вопросы для повторения (${exam.missed.length})</div>${exam.missed.map((m) => {
+            const num = typeof m.n === "number" ? `№${m.n}` : m.n;
+            const cv = cov.get(String(m.n));
+            return `<div class="srz-miss-item"><b>${esc(num)}. ${esc(m.q)}</b>${srezGo(cv)}</div>`;
+          }).join("")}</div>` : `<p class="muted">Отличный результат! Все вопросы пройдены без ошибок.</p>`}
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+            <button type="button" class="lab-btn" id="srz-exam-restart">Пройти заново (новые 20 вопросов)</button>
+            <button type="button" class="lab-btn" id="srz-exam-to-cat">Вернуться в каталог</button>
+          </div>
+        </div>`;
+        $("#srz-exam-restart")?.addEventListener("click", startExam);
+        $("#srz-exam-to-cat")?.addEventListener("click", () => switchMode("catalog"));
+        box.querySelectorAll("[data-srz-sec]").forEach((l) => l.addEventListener("click", () => (render.sec = l.dataset.srzSec || null)));
+        return;
+      }
+
+      const it = exam.items[exam.idx];
+      const num = typeof it.n === "number" ? `№${it.n}` : it.n;
+      box.innerHTML = `<div class="srz-exam-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span class="eyebrow">Вопрос ${exam.idx + 1} из ${exam.items.length} · ${esc(num)}</span>
+          <span class="fc-prog">Верно: ${exam.score}</span>
+        </div>
+        <p class="fc-q" style="margin:12px 0 16px">${esc(it.q)}</p>
+        ${exam.revealed
+          ? `<div class="srz-a" style="margin:14px 0;padding-top:10px;border-top:1px dashed var(--anatomy-faint)">
+              <div class="eyebrow">${it.own ? "Ответ инструктора" : "Ответ как в таблице"}</div>
+              ${srezList(it.a)}
+              ${srezBlk("note", "Уточнение", it.note)}
+            </div>
+            <div class="fc-btns">
+              <button type="button" class="lab-btn bad" id="exam-act-bad">✗ Не знал / Ошибся</button>
+              <button type="button" class="lab-btn good" id="exam-act-good">✓ Ответил точно</button>
+            </div>`
+          : `<button type="button" class="lab-btn" id="exam-act-reveal" style="width:100%;min-height:50px">Показать ответ</button>`
+        }
+      </div>`;
+
+      $("#exam-act-reveal")?.addEventListener("click", () => {
+        exam.revealed = true;
+        renderExamCard();
+      });
+      $("#exam-act-good")?.addEventListener("click", () => {
+        exam.score++;
+        nextExamCard();
+      });
+      $("#exam-act-bad")?.addEventListener("click", () => {
+        exam.missed.push(it);
+        nextExamCard();
+      });
+    };
+
+    const nextExamCard = () => {
+      if (exam.idx + 1 < exam.items.length) {
+        exam.idx++;
+        exam.revealed = false;
+      } else {
+        exam.done = true;
+      }
+      renderExamCard();
+    };
+
+    const startExam = () => {
+      const items = shuffle([...SREZ.items], Date.now()).slice(0, 20);
+      exam = { items, idx: 0, score: 0, revealed: false, missed: [], done: false };
+      renderExamCard();
+    };
+
+    const switchMode = (mode) => {
+      const isExam = mode === "exam";
+      $("#srz-mode-catalog")?.setAttribute("aria-pressed", String(!isExam));
+      $("#srz-mode-exam")?.setAttribute("aria-pressed", String(isExam));
+      if ($("#srz-catalog-view")) $("#srz-catalog-view").hidden = isExam;
+      if ($("#srz-exam-view")) $("#srz-exam-view").hidden = !isExam;
+      if (isExam && (!exam || exam.done)) startExam();
+    };
+
+    $("#srz-mode-catalog")?.addEventListener("click", () => switchMode("catalog"));
+    $("#srz-mode-exam")?.addEventListener("click", () => switchMode("exam"));
   }
   if (a && a.id === "Д") {
     let vf = "Все";

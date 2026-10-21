@@ -71,6 +71,11 @@ body[data-fast] .sec[data-prio="2"],body[data-fast] .sec[data-prio="3"]{display:
 .blk-h{font:600 12px/1.3 var(--sans);color:var(--c);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
 .blk p{margin:4px 0}
 .blk .breaks{color:var(--anatomy-muted);font-size:14px}
+details.blk{padding:0;overflow:hidden}
+details.blk summary.blk-h{cursor:pointer;min-height:44px;display:flex;align-items:center;padding:10px 14px;margin:0;list-style-position:outside;user-select:none}
+details.blk summary.blk-h::-webkit-details-marker{color:var(--c)}
+details.blk .blk-body{padding:0 14px 12px}
+details.blk[open] summary.blk-h{border-bottom:1px dashed var(--anatomy-faint);margin-bottom:8px}
 .legend-blocks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
 .legend-blocks .blk{margin:0}
 .tag{font:500 10.5px/1 var(--anatomy-mono);padding:2px 6px;border-radius:4px;vertical-align:1px;white-space:nowrap;box-shadow:0 0 0 1px currentColor}
@@ -168,6 +173,12 @@ ol.qs{padding-left:22px}
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
 .filters button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:8px 13px;font-size:13.5px;border-radius:8px}
 #srzq{min-height:44px;padding:9px 12px;font-size:14.5px;border-radius:8px;margin-bottom:12px}
+.srz-modes{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.srz-modes button{min-height:44px;padding:8px 14px;border-radius:10px;font-size:14px;font-weight:500}
+.srz-modes button[aria-pressed="true"]{background:var(--anatomy-card);box-shadow:0 0 0 2px var(--accent);color:var(--anatomy-strong)}
+.srz-exam-card{background:var(--anatomy-card);border:1px solid var(--anatomy-faint);border-radius:14px;padding:18px 20px;margin:16px 0}
+.srz-miss-item{padding:12px 0;border-bottom:1px solid var(--anatomy-faint)}
+.srz-miss-item b{color:var(--anatomy-strong);display:block;margin-bottom:4px}
 /* вопросы среза (приложение И): вопрос — строка-кнопка, ответ раскрывается */
 .srz{border-bottom:1px solid var(--anatomy-faint)}
 .srz>summary{cursor:pointer;padding:11px 0;min-height:44px;font-weight:500;color:var(--anatomy-strong);list-style-position:outside;margin-left:18px;overflow-wrap:anywhere}
