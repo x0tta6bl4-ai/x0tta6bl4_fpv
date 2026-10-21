@@ -912,6 +912,10 @@ export const CHAPTERS_A = [
     "id": "lowv",
     "preset": {},
     "tab": "Урок: LOW V"
+   },
+   {
+    "lab": "charge",
+    "tab": "Подготовь к зарядке"
    }
   ],
   "sections": [
