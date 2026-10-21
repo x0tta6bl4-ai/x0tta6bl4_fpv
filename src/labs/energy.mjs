@@ -71,10 +71,10 @@ export function mount(root, ctx) {
     $("#drone").innerHTML = `<g transform="translate(${x.toFixed(1)} ${(110 + bob).toFixed(1)})"><path d="M-22 0H22M-16 -6 16 6M16 -6 -16 6" class="fly-arm"/><rect x="-10" y="-6" width="20" height="12" rx="3" class="fly-body"/><ellipse cx="-22" cy="-4" rx="10" ry="2.5" class="fly-disc"/><ellipse cx="22" cy="-4" rx="10" ry="2.5" class="fly-disc"/><rect x="-9" y="6" width="18" height="${c.p.g > 800 ? 14 : 7}" rx="2" class="${c.p.g > 800 ? "e-heavy" : "fly-body"}"/></g><text x="330" y="40" class="lt" text-anchor="end">масса ${fmt(c.mass)} г</text>`;
     const red = c.imax > c.canGive;
     const steps = `<div class="step"><small>1. Ток в полёте</small><b>${fmt(c.I, 1)} А</b><span>чем тяжелее и резче полёт, тем больше</span></div>
-      <div class="step"><small>2. Время на бумаге = мА·ч ÷ мА × 60</small><b>${fmt(c.p.mah)} ÷ ${fmt(c.I * 1000)} × 60 = ${fmt(c.tPaper, 1)} мин</b></div>
+      <div class="step"><small>2. Время на бумаге</small><b>${fmt(c.p.mah)} ÷ ${fmt(c.I * 1000)} × 60 = ${fmt(c.tPaper, 1)} мин</b></div>
       <div class="step"><small>3. Честно: ×0,8 (батарею не высаживают до нуля)</small><b>${fmt(c.tReal, 1)} мин</b></div>
-      <div class="step"><small>4. Мощность = вольты × амперы</small><b>${fmt(c.V, 1)} × ${fmt(c.I, 1)} = ${fmt(c.P)} Вт</b></div>
-      <div class="step ${red ? "bad" : ""}"><small>5. Хватит ли тока на максимуме? ёмкость (А·ч) × C</small><b>${fmt(c.canGive)} А ${red ? "<" : "≥"} ${fmt(c.imax)} А ${red ? "— НЕ хватит" : "— хватит"}</b></div>`;
+      <div class="step"><small>4. Мощность</small><b>${fmt(c.V, 1)} × ${fmt(c.I, 1)} = ${fmt(c.P)} Вт</b></div>
+      <div class="step ${red ? "bad" : ""}"><small>5. Хватит ли тока на максимуме?</small><b>${fmt(c.canGive)} А ${red ? "<" : "≥"} ${fmt(c.imax)} А ${red ? "— НЕ хватит" : "— хватит"}</b></div>`;
     if ($("#steps").innerHTML !== steps) $("#steps").innerHTML = steps;
     // Во сколько раз выросло время по сравнению с одной батареей 6S 6000 при том же стиле полёта.
     const gain = s.pack === "6s6000x2" ? c.tReal / calc("6s6000").tReal : 1;

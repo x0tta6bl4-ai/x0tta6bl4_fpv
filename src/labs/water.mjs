@@ -88,7 +88,7 @@ export function mount(root, ctx) {
     $("#labels").innerHTML = `<text x="55" y="30" class="lt" text-anchor="middle">Бак = батарея</text><text x="292" y="92" class="lt" text-anchor="middle">Колесо = мотор</text><text x="168" y="${py - w / 2 - 10}" class="lt" text-anchor="middle">труба = провод</text>`;
     const html = `<div class="chip"><small>Напряжение (давление)</small><b>${fmt(s.V)} В</b></div><div class="chip"><small>Ток (сколько течёт)</small><b>${fmt(I, 2)} А</b></div><div class="chip"><small>Мощность (сила колеса)</small><b>${fmt(P, 1)} Вт</b></div>`;
     if (chips.innerHTML !== html) chips.innerHTML = html;
-    const msg = `Ток = напряжение ÷ сопротивление = ${fmt(s.V)} ÷ ${fmt(s.R)} = ${fmt(I, 2)} А. Мощность = напряжение × ток = ${fmt(s.V)} × ${fmt(I, 2)} = ${fmt(P, 1)} Вт.`;
+    const msg = `Ток: ${fmt(s.V)} ÷ ${fmt(s.R)} = ${fmt(I, 2)} А. Мощность: ${fmt(s.V)} × ${fmt(I, 2)} = ${fmt(P, 1)} Вт.`;
     if (read.textContent !== msg) read.textContent = msg;
   });
   return { destroy: () => L.stop() };

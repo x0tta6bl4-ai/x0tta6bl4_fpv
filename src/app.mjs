@@ -934,6 +934,18 @@ function bindOnce() {
 }
 
 function bind(ch, a) {
+  // Ссылки расчётов работают и из главы, и внутри самой шпаргалки.
+  $$("#main [data-srz-sec]").forEach((link) => link.addEventListener("click", (event) => {
+    render.sec = link.dataset.srzSec || null;
+    if (link.hash !== location.hash) return;
+    event.preventDefault();
+    const target = render.sec === "#check" ? $("#check") : $$("#main section.sec").find((s) => s.querySelector("h3")?.textContent === render.sec);
+    if (target) {
+      for (let el = target; el; el = el.parentElement) if (el.tagName === "DETAILS") el.open = true;
+      target.scrollIntoView({ block: "start" });
+    }
+    render.sec = null;
+  }));
   const full = $("#full");
   if (full)
     full.addEventListener("click", () => {
@@ -1053,7 +1065,6 @@ function bind(ch, a) {
       }),
     );
     $("#srzq")?.addEventListener("input", apply);
-    $$("[data-srz-sec]").forEach((l) => l.addEventListener("click", () => (render.sec = l.dataset.srzSec || null)));
 
     // Пробный срез (20 случайных вопросов)
     const cov = new Map(SREZ_COV.items.map((c) => [String(c.n), c]));
