@@ -1406,3 +1406,35 @@ table.t{max-width:100%;-webkit-overflow-scrolling:touch}
  .workspace #fig .iso-figure[data-fig="flighttime"] .fig-tools{
   position:static;justify-content:flex-end;margin-top:8px
 }
+/* Гл. 6, «Подготовь к зарядке» (src/labs/charge.mjs) */
+.ct{display:grid;gap:10px}
+.ct-cases{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.ct-cases button{flex:0 0 auto;min-height:44px;min-width:52px;font:600 13px var(--anatomy-mono)}
+.ct-title{margin:0;font-size:15px}
+.ct-stage{border-radius:12px;box-shadow:0 0 0 1px var(--anatomy-faint);background:var(--anatomy-page)}
+.ct-stage svg{display:block;width:100%;height:auto}
+.ct-now{margin:0;padding:8px 12px;border-radius:10px;background:color-mix(in srgb,var(--accent) 10%,var(--anatomy-card));color:var(--anatomy-strong);font-weight:500}
+.ct-sec{border-top:1px solid var(--anatomy-faint);padding-top:8px}
+.ct-sec h4{margin:0 0 6px;font-size:14px;color:var(--anatomy-strong)}
+.ct-sec .lab-row{flex-wrap:wrap;gap:6px}
+.ct-sec .lab-btn{min-height:44px}
+.ct-ev ul{margin:6px 0 0;padding-left:18px}
+.ct-known{width:100%}
+.ct-known td:first-child{width:42%;color:var(--anatomy-muted)}
+.ct-screen{font:600 13px/1.4 var(--anatomy-mono);padding:8px 10px;border-radius:8px;background:var(--anatomy-strong);color:var(--anatomy-page);overflow-wrap:anywhere}
+.ct-set{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.ct-set>span:first-child{min-width:58px;font-size:13px;color:var(--anatomy-muted)}
+.ct-set button{min-height:44px;min-width:44px}
+.ct-reasons{display:grid;gap:6px;margin-top:8px}
+.ct-reasons p{margin:0}
+.ct-bat{fill:var(--anatomy-card);stroke:var(--anatomy-strong);stroke-width:1.2}
+.ct-bat.ct-bad{stroke:var(--bad);fill:color-mix(in srgb,var(--bad) 12%,var(--anatomy-card))}
+.ct-chg{fill:var(--anatomy-card);stroke:var(--anatomy-mid);stroke-width:1}
+.ct-scr{fill:var(--anatomy-strong)}
+.ct-scrt{font:600 11px var(--anatomy-mono);fill:var(--anatomy-page)}
+.ct-lbl{font:600 10px var(--anatomy-mono);fill:var(--anatomy-strong)}
+.ct-tag{font:10px var(--anatomy-mono);fill:var(--anatomy-muted)}
+.ct-wire{fill:none;stroke:var(--anatomy-muted);stroke-width:1.2;stroke-dasharray:3 3}
+.ct-wire.thin{stroke-width:.8}
+.ct-wire.on{stroke:var(--accent);stroke-dasharray:none}
+
