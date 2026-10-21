@@ -264,11 +264,24 @@ export function createViewer(canvas, { onPick, onView } = {}) {
     }
     if (pts.size === 0) start = null;
   };
+  const cancel = (e) => {
+    pts.delete(e.pointerId); pinch = 0; start = null; moved = true;
+  };
+  const keydown = (e) => {
+    const delta = { ArrowLeft: [0.14,0], ArrowRight: [-0.14,0], ArrowUp: [0,0.12], ArrowDown: [0,-0.12] }[e.key];
+    if (delta) { view.yaw += delta[0]; view.pitch += delta[1]; }
+    else if (e.key === "+" || e.key === "=") view.zoom *= .85;
+    else if (e.key === "-") view.zoom /= .85;
+    else if (e.key === "Escape") { onPick && onPick(null); e.preventDefault(); return; }
+    else return;
+    e.preventDefault(); clampView(); invalidate(); onView && onView(view,"keyboard");
+  };
   const wheel = (e) => { e.preventDefault(); view.zoom *= Math.exp(e.deltaY * 0.0012); clampView(); invalidate(); onView && onView(view, "user"); };
   canvas.addEventListener("pointerdown", down);
   canvas.addEventListener("pointermove", move);
   canvas.addEventListener("pointerup", up);
-  canvas.addEventListener("pointercancel", up);
+  canvas.addEventListener("pointercancel", cancel);
+  canvas.addEventListener("keydown", keydown);
   canvas.addEventListener("wheel", wheel, { passive: false });
   const ro = typeof ResizeObserver === "function" ? new ResizeObserver(resize) : null;
   if (ro) ro.observe(canvas);
@@ -297,7 +310,8 @@ export function createViewer(canvas, { onPick, onView } = {}) {
       canvas.removeEventListener("pointerdown", down);
       canvas.removeEventListener("pointermove", move);
       canvas.removeEventListener("pointerup", up);
-      canvas.removeEventListener("pointercancel", up);
+      canvas.removeEventListener("pointercancel", cancel);
+      canvas.removeEventListener("keydown", keydown);
       canvas.removeEventListener("wheel", wheel);
       const lose = gl.getExtension("WEBGL_lose_context");
       if (lose) lose.loseContext();

@@ -1,0 +1,37 @@
+name: drone3d-details
+on:
+  push:
+    paths:
+      - 'src/labs/drone3d.mjs'
+      - 'src/labs/drone-model.mjs'
+      - 'src/gl3d.mjs'
+      - 'src/style.css'
+      - 'tests/drone3d-details.mjs'
+      - '.github/workflows/drone3d-details.yml'
+  pull_request:
+    paths:
+      - 'src/labs/drone3d.mjs'
+      - 'src/labs/drone-model.mjs'
+      - 'src/gl3d.mjs'
+      - 'src/style.css'
+      - 'tests/drone3d-details.mjs'
+      - '.github/workflows/drone3d-details.yml'
+jobs:
+  details:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build:dev
+      - run: node tests/drone3d-details.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: drone3d-preview
+          path: tests/out/drone3d-detail-*.png
