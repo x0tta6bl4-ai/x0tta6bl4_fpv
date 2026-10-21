@@ -152,7 +152,7 @@ function build(dark) {
   const C = palette(dark);
   const parts = [];
   const add = (id, mesh, color, center, extra) => {
-    parts.push({ id, mesh, color, center, ...extra });
+    parts.push({ id, mesh, color: color.slice(), base: color.slice(), center, ...extra });
     return parts[parts.length - 1];
   };
   const radio = new Mesh();
@@ -272,6 +272,119 @@ function build(dark) {
   add("camera", new Mesh().tube([12.05, 2.5, 0], [8.95, 2.55, 0], 0.08, 6), C.wire, [12.7, 2.55, cz]);
   add("camera", new Mesh().cyl(0.2, 0.08, 10, M4.chain(camM, M4.t(1.12, 0, 0), M4.rz(-Math.PI / 2))), C.glass, [12.7, 2.55, cz]);
 
+  // Мелкая геометрия остаётся в существующих группах выбора деталей.
+  // Размеры условные: модель объясняет устройство, не заменяет сборочный чертёж.
+  const bolt = (mesh, x, y, z, r = 0.12) => {
+    mesh.cyl(r, 0.1, 6, M4.t(x, y, z));
+    mesh.box(r * 1.2, 0.015, r * 0.22, M4.t(x, y + 0.058, z));
+  };
+  const ring = (mesh, outer, inner, height, matrix) => mesh.lathe([
+    [inner, -height / 2], [outer, -height / 2], [outer, height / 2],
+    [inner, height / 2], [inner, -height / 2],
+  ], 20, matrix);
+
+  // Пульт: гнёзда карданов, насечки ручек, рамка экрана, энкодер и плечевые тумблеры.
+  const gimbals = new Mesh(), knobs = new Mesh();
+  for (const z of [-6.2, -4.6]) {
+    ring(gimbals, 0.88, 0.62, 0.14, M4.t(-13.45, 2.18, z));
+    for (let i = 0; i < 4; i++) {
+      const angle = i * Math.PI / 2;
+      bolt(gimbals, -13.45 + Math.cos(angle) * 0.74, 2.29, z + Math.sin(angle) * 0.74, 0.055);
+    }
+    for (let i = 0; i < 3; i++) ring(knobs, 0.24, 0.18, 0.04, M4.t(-13.45, 3.0 + i * 0.09, z));
+  }
+  add("radio", gimbals, C.bezel, [-15.2, 1.5, -5.4]);
+  add("radio", knobs, C.metal, [-15.2, 1.5, -5.4]);
+  const bezelTX = new Mesh();
+  for (const z of [-6.18, -4.62]) bezelTX.box(2.55, 0.12, 0.12, M4.t(-16.15, 2.18, z));
+  for (const x of [-17.38, -14.92]) bezelTX.box(0.12, 0.12, 1.68, M4.t(x, 2.18, -5.4));
+  add("radio", bezelTX, C.bezel, [-15.2, 1.5, -5.4]);
+  const controlsTX = new Mesh(), trimTX = new Mesh();
+  for (const z of [-7.05, -3.75]) {
+    controlsTX.cyl(0.18, 0.16, 10, M4.t(-16.1, 2.2, z));
+    controlsTX.tube([-17.0, 2.12, z], [-16.85, 2.78, z], 0.065, 8);
+    trimTX.box(0.7, 0.08, 0.12, M4.t(-14.25, 2.14, z));
+  }
+  for (let i = 0; i < 3; i++) trimTX.box(0.12, 0.08, 0.42, M4.t(-17.8 + i * 0.22, 2.12, -5.4));
+  add("radio", controlsTX, C.metal, [-15.2, 1.5, -5.4]);
+  add("radio", trimTX, C.bezel, [-15.2, 1.5, -5.4]);
+  const gripTX = new Mesh();
+  for (const z of [-7.35, -3.45]) for (let i = 0; i < 5; i++) gripTX.box(1.1, 0.06, 0.07, M4.t(-15.4, 1.96, z + i * 0.045));
+  add("radio", gripTX, C.bezel, [-15.2, 1.5, -5.4]);
+
+  // Очки: мягкие окуляры, переносица, колёсики фокуса, вентиляция и антенный разъём.
+  const cups = new Mesh(), gogglesDetails = new Mesh();
+  for (const z of [4.9, 6.7]) {
+    ring(cups, 0.77, 0.49, 0.34, M4.chain(M4.t(-9.95, 1.7, z), M4.rz(-Math.PI / 2)));
+    gogglesDetails.cyl(0.24, 0.14, 14, M4.t(-12.4, 2.68, z));
+  }
+  cups.box(0.45, 0.35, 0.52, M4.t(-10.0, 1.25, 5.8));
+  for (let i = 0; i < 6; i++) cups.box(0.12, 0.045, 0.7, M4.t(-15.1 + i * 0.27, 2.65, 5.8));
+  add("goggles", cups, C.bezel, [-13.4, 1.7, 5.8]);
+  add("goggles", gogglesDetails, C.metal, [-13.4, 1.7, 5.8]);
+  add("gant", new Mesh().cyl(0.29, 0.22, 6, M4.t(-10.3, 2.75, 5.8)), C.gold, VID_B);
+
+  // Рама: верхние боковины оставляют электронику открытой для касания.
+  const rails = new Mesh(), fasteners = new Mesh();
+  for (const z of [-1.68, 1.68]) {
+    rails.box(4.0, 0.18, 0.28, M4.t(cx, 2.35, z));
+    for (const x of [cx - 1.65, cx + 1.65]) {
+      fasteners.cyl(0.12, 0.34, 10, M4.t(x, 2.2, z));
+      bolt(fasteners, x, 2.48, z);
+    }
+  }
+  add("frame", rails, C.carbon, [cx, cy, cz]);
+  add("frame", fasteners, C.metal, [cx, cy, cz]);
+  const motorVents = new Mesh(), motorHardware = new Mesh();
+  for (const [x,z] of motors) {
+    ring(motorHardware, 0.71, 0.53, 0.09, M4.t(x, cy + 0.77, z));
+    bolt(motorHardware, x, cy + 1.46, z, 0.18);
+    for (let i = 0; i < 8; i++) {
+      const angle = i * Math.PI / 4;
+      motorVents.box(0.13, 0.32, 0.05, M4.chain(M4.t(x + Math.sin(angle) * 0.71, cy + 0.46, z + Math.cos(angle) * 0.71), M4.ry(angle)));
+    }
+  }
+  add("frame", motorVents, C.bezel, [cx, cy, cz]);
+  add("frame", motorHardware, C.motor, [cx, cy + 0.5, cz]);
+
+  // Полётник: стойки стека, разъём USB, отдельные компоненты и контактные площадки.
+  const fcHardware = new Mesh(), fcComponents = new Mesh(), pads = new Mesh();
+  for (const dx of [-1.1,1.1]) for (const dz of [-1.1,1.1]) {
+    fcHardware.cyl(0.11, 0.3, 10, M4.t(cx+dx,2.35,dz));
+    bolt(fcHardware,cx+dx,2.64,dz,0.10);
+  }
+  fcHardware.box(0.44,0.22,0.6,M4.t(cx+1.4,2.63,0));
+  fcComponents.box(0.07,0.1,0.35,M4.t(cx+1.64,2.64,0));
+  for (let i=0;i<5;i++) {
+    pads.box(0.22,0.035,0.14,M4.t(cx-0.7+i*0.35,2.58,1.26));
+    fcComponents.box(0.22,0.14,0.13,M4.t(cx-0.65+i*0.3,2.65,-0.85));
+  }
+  add("fc",fcHardware,C.metal,[cx,2.52,cz]);
+  add("fc",fcComponents,C.chip,[cx,2.52,cz]);
+  add("fc",pads,C.gold,[cx,2.52,cz]);
+  const rxComponents=new Mesh().box(0.46,0.12,0.45,M4.t(5.18,3.04,-2.65));
+  const rxPads=new Mesh();
+  for(let i=0;i<4;i++) rxPads.box(0.12,0.045,0.16,M4.t(5.0+i*0.3,2.92,-3.08));
+  add("rx",rxComponents,C.chip,rxAt); add("rx",rxPads,C.gold,rxAt);
+  add("rxant",new Mesh().box(0.45,0.32,0.5,M4.t(4.8,7.82,-5.6)),C.bezel,CMD_B);
+  // Три фазных провода к каждому мотору: видимая связь мотор–силовая часть.
+  const phaseWires=new Mesh();
+  for(const [x,z] of motors) for(let i=0;i<3;i++) {
+    const offset=(i-1)*0.12;
+    phaseWires.tube([cx+(x-cx)*0.27,2.27,z*0.27+offset],[x-(x-cx)*0.12,2.25,z-z*0.12+offset],0.035,6);
+  }
+  add("frame",phaseWires,C.wire,[cx,cy,cz]);
+  // Ремни аккумулятора и силовой кабель к XT-разъёму.
+  const straps=new Mesh();
+  for(const x of [6.0,8.4]) {
+    straps.box(0.28,0.06,2.25,M4.t(x,1.76,0));
+    for(const z of [-1.1,1.1]) straps.box(0.28,1.42,0.055,M4.t(x,1.02,z));
+  }
+  add("battery",straps,C.bezel,[7.2,1.05,cz]);
+  const power=new Mesh().tube([5.2,1.45,0.4],[4.5,1.5,0.4],0.07,8);
+  power.tube([4.5,1.5,0.4],[4.65,1.15,0],0.07,8);
+  add("battery",power,C.batt,[7.2,1.05,cz]);
+
   const cmdColor = BLUE.slice();
   const vidColor = ORANGE.slice();
   add("beam_cmd", new Mesh().tube(CMD_A, CMD_B, 0.28, 8), cmdColor, mid(CMD_A, CMD_B), { lane: "cmd" });
@@ -304,20 +417,21 @@ const MODE_LEAD = {
 
 export function mount(root, ctx) {
   root.innerHTML = `<div class="d3-stage"><canvas class="d3-canvas" tabindex="0" role="img" aria-label="Два радиомоста: синий — команды от пульта к приёмнику, оранжевый — картинка от видеопередатчика к очкам"></canvas>
+    <span class="p3-flow" data-flow="cmd">Команды: пульт → дрон</span>
+    <span class="p3-flow" data-flow="vid">Видео: дрон → очки</span>
     <svg class="d3-leaders" aria-hidden="true"><path/></svg>
     <span class="d3-marker" hidden style="pointer-events:none"></span>
     <p class="d3-hint">Крути пальцем · щипок — масштаб · касание — деталь</p></div>
-    <p class="lab-read" style="display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center">
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:50%;background:#2f78f6;display:inline-block"></i> синий — управление</span>
-      <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:50%;background:#f27814;display:inline-block"></i> оранжевый — видео</span>
-    </p>
+    <p class="p3-prompt">Выбери симптом — посмотри, какой поток остановится.</p>
     <div class="d3-bar" role="group" aria-label="Какой мост замолчал"><button type="button" class="lab-btn" data-sym="ok" aria-pressed="true">Оба моста</button><button type="button" class="lab-btn" data-sym="cmd" aria-pressed="false">Нет управления</button><button type="button" class="lab-btn" data-sym="vid" aria-pressed="false">Нет картинки</button></div>
-    <div class="d3-bar" role="group" aria-label="Ракурс"><button type="button" class="lab-btn" data-view="top">Сверху</button><button type="button" class="lab-btn" data-view="side">Сбоку</button><button type="button" class="lab-btn" data-view="home">Как вначале</button></div>
-    <div class="d3-parts" role="group" aria-label="Звенья мостов">${CHIPS.map((id) => `<button type="button" data-part="${id}" aria-pressed="false">${SHORT[id]}</button>`).join("")}</div>
-    <p class="lab-read d3-info" aria-live="polite">${MODE_LEAD.ok}</p>`;
+    <p class="p3-legend">Синий — команды · оранжевый — видео</p>
+    <div class="d3-bar" role="group" aria-label="Ракурс"><button type="button" class="lab-btn" data-view="top" hidden>Сверху</button><button type="button" class="lab-btn" data-view="side" hidden>Сбоку</button><button type="button" class="lab-btn" data-view="home" hidden>Как вначале</button></div>
+    <div class="d3-parts" hidden role="group" aria-label="Звенья мостов">${CHIPS.map((id) => `<button type="button" data-part="${id}" aria-pressed="false">${SHORT[id]}</button>`).join("")}</div>
+    <p class="lab-read d3-info" hidden aria-live="polite">${MODE_LEAD.ok}</p>`;
   const $ = (q) => root.querySelector(q);
   const canvas = $(".d3-canvas"), infoEl = $(".d3-info");
-  const s = { sel: null, act: null, mode: "ok", seen: new Set(), cmdColor: null, vidColor: null, fitted: false, refit: false };
+  root.classList.add("path3d");
+  const s = { explored: window.matchMedia("(min-width:701px)").matches, accent: null, sel: null, act: null, mode: "ok", seen: new Set(), cmdColor: null, vidColor: null, fitted: false, refit: false };
   let camTo = null, last = 0;
   let viewer;
   try { viewer = createViewer(canvas, { onPick: (id) => select(id, "tap"), onView: () => checkView() }); }
@@ -325,11 +439,17 @@ export function mount(root, ctx) {
   const setPressed = () => {
     root.querySelectorAll("[data-sym]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sym === s.mode)));
     root.querySelectorAll("[data-part]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.part === s.sel)));
+    const relevant = s.mode === "cmd" ? CMD_PARTS : s.mode === "vid" ? VID_PARTS : null;
+    root.querySelectorAll("[data-part]").forEach((b) => b.toggleAttribute("data-off", !!relevant && !relevant.has(b.dataset.part)));
+    $(".d3-parts").hidden = !s.explored;
+    infoEl.hidden = !s.explored;
+    root.querySelectorAll('[data-view="top"], [data-view="side"]').forEach((b) => b.hidden = !s.explored);
+    checkView();
     root.dataset.mode = s.mode;
     root.dataset.sel = s.sel || "";
   };
   function note(id) {
-    if (s.mode === "cmd" && id === "fc") return " Сейчас молчит синий мост. Полётник команд по радио не ловит: они приходят проводом от приёмника.";
+    if (s.mode === "cmd" && id === "fc") return " Здесь остановлен радиопоток команд. В реальной диагностике на столе со снятыми пропеллерами открой вкладку «Приёмник»: видит ли FC движения стиков? Не видит — проверяй пульт, RX и соединение до FC. Видит — проверяй арм, ESC, моторы и их силовое питание. Камера — не первая подозреваемая.";
     if (s.mode === "cmd" && VID_PARTS.has(id)) return " Это звено видео, а оно как раз живо: оранжевые точки идут. Ищи синий мост.";
     if (s.mode === "vid" && id === "fc") return " Полётник только подписывает картинку. Эфир видео — оранжевый мост, он сейчас молчит.";
     if (s.mode === "vid" && CMD_PARTS.has(id)) return " Это звено управления, а оно живо: синие точки идут. Ищи оранжевый мост.";
@@ -351,6 +471,7 @@ export function mount(root, ctx) {
   }
   function select(id, how) {
     s.sel = id && PARTS[id] ? id : null;
+    if (s.sel) s.explored = true;
     if (viewer) viewer.look.sel = s.sel;
     if (s.sel) s.seen.add(s.sel);
     if (how === "tap" || how === "chip") s.act = s.sel;
@@ -360,7 +481,7 @@ export function mount(root, ctx) {
     if (viewer) viewer.invalidate();
   }
   function setMode(mode) {
-    if (s.mode === mode) return;
+    s.explored = true;
     s.mode = mode;
     s.act = null;
     setPressed();
@@ -383,6 +504,8 @@ export function mount(root, ctx) {
   };
   root.addEventListener("click", onClick);
   if (!viewer) {
+    s.explored = true;
+    setPressed();
     root.dataset.webgl = "0";
     $(".d3-stage").innerHTML = `<p class="lab-read">Этот браузер не показывает 3D. Звенья те же: синий мост — команды, оранжевый — картинка. Выбери их в списке.</p>`;
     return { destroy() { root.removeEventListener("click", onClick); } };
@@ -396,24 +519,32 @@ export function mount(root, ctx) {
   const theme = () => {
     const [r, g, b] = cssColor(root, "--anatomy-page", [1, 1, 1]);
     viewer.look.bg = [r, g, b];
-    viewer.look.hi = cssColor(root, "--accent", [0.2, 0.5, 1]);
+    s.accent = cssColor(root, "--accent", [0.2, 0.5, 1]);
+    viewer.look.hi = s.accent;
     const built = build(r * 0.3 + g * 0.59 + b * 0.11 < 0.5);
     s.cmdColor = built.cmdColor;
     s.vidColor = built.vidColor;
     viewer.setParts(built.parts);
+    paint();
   };
   theme();
   const mo = new MutationObserver(theme);
   mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   const mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
   if (mq && mq.addEventListener) mq.addEventListener("change", theme);
-  const paint = () => {
-    const cmdOn = s.mode !== "cmd", vidOn = s.mode !== "vid";
-    const c = cmdOn ? BLUE : BLUE_DEAD, v = vidOn ? ORANGE : ORANGE_DEAD;
-    if (s.cmdColor) { s.cmdColor[0] = c[0]; s.cmdColor[1] = c[1]; s.cmdColor[2] = c[2]; }
-    if (s.vidColor) { s.vidColor[0] = v[0]; s.vidColor[1] = v[1]; s.vidColor[2] = v[2]; }
-    for (const p of viewer.parts) if (p.packet) p.hidden = p.lane === "cmd" ? !cmdOn : !vidOn;
-  };
+  function paint() {
+    const relevant = s.mode === "cmd" ? CMD_PARTS : s.mode === "vid" ? VID_PARTS : null;
+    const dead = s.mode === "cmd" ? BLUE_DEAD : ORANGE_DEAD;
+    viewer.look.hi = relevant && relevant.has(s.sel) ? dead : s.accent;
+    // Каждая деталь хранит свой цвет: приглушение очков не меняет антенны RX.
+    for (const p of viewer.parts) {
+      const off = p.lane === "cmd" ? s.mode === "cmd" : p.lane === "vid" ? s.mode === "vid" : false;
+      p.hidden = !!p.packet && off;
+      const color = p.lane ? (off ? dead : p.base) : p.base;
+      const fade = relevant && !relevant.has(p.id) ? 0.45 : 0;
+      for (let i = 0; i < 3; i++) p.color[i] = color[i] * (1 - fade) + viewer.look.bg[i] * fade;
+    }
+  }
   viewer.onFrame = () => {
     const now = performance.now(), dt = last ? Math.min((now - last) / 1000, 0.05) : 0.016;
     last = now;
@@ -447,10 +578,26 @@ export function mount(root, ctx) {
         const ly = Math.max(28, Math.min(rect.height - 28, y - 22));
         marker.style.left = lx + "px";
         marker.style.top = ly + "px";
-        marker.textContent = SHORT[s.sel] || PARTS[s.sel].name;
+        marker.textContent = (SHORT[s.sel] || PARTS[s.sel].name) + ((s.mode === "cmd" && s.sel === "beam_cmd") || (s.mode === "vid" && s.sel === "beam_vid") ? " — встал" : "");
         leader.setAttribute("d", `M${x},${y}L${lx},${ly}`);
       }
     }
+    const rect = canvas.getBoundingClientRect();
+    const ys = [];
+    for (const [lane, a, b] of [["cmd", CMD_A, CMD_B], ["vid", VID_A, VID_B]]) {
+      const label = $(`[data-flow="${lane}"]`);
+      const [x, y, visible] = viewer.project(mid(a, b));
+      label.hidden = !visible;
+      const half = label.offsetWidth / 2 + 5;
+      let ly = Math.max(18, Math.min(rect.height - 42, y - 24));
+      if (ys.some((prev) => Math.abs(ly - prev) < 30)) ly = Math.min(rect.height - 42, ly + 34);
+      ys.push(ly);
+      label.style.left = Math.max(half, Math.min(rect.width - half, x)) + "px";
+      label.style.top = ly + "px";
+      label.toggleAttribute("data-stopped", s.mode === lane);
+      label.textContent = lane === "cmd" ? `Команды: пульт → дрон${s.mode === "cmd" ? " · встал" : ""}` : `Видео: дрон → очки${s.mode === "vid" ? " · встал" : ""}`;
+    }
+    checkView();
     root.dataset.yaw = viewer.view.yaw.toFixed(3);
     root.dataset.pitch = viewer.view.pitch.toFixed(3);
     root.dataset.zoom = viewer.view.zoom.toFixed(3);
@@ -459,11 +606,17 @@ export function mount(root, ctx) {
     return true;
   };
   function checkView() {
+    if (!viewer) return;
+    const away = Math.abs(viewer.view.yaw - VIEWS.home[0]) > 0.04 || Math.abs(viewer.view.pitch - VIEWS.home[1]) > 0.04 || Math.abs(viewer.view.zoom - 1) > 0.02;
+    $('[data-view="home"]').hidden = !away;
     root.dataset.yaw = viewer.view.yaw.toFixed(3);
     root.dataset.pitch = viewer.view.pitch.toFixed(3);
   }
   viewer.invalidate();
+  setPressed();
   root.__p3 = {
+    highlight: () => viewer.look.hi.slice(),
+    accent: () => s.accent.slice(),
     pick: (x, y) => viewer.pickAt(x, y),
     at(id) {
       const p = viewer.parts.find((q) => q.id === id && !q.packet);
