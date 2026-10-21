@@ -32,8 +32,19 @@ await go('3'); await p.evaluate(()=>document.querySelector('[data-act=explode]')
   console.log('ch3 esc до ответа', await ok(), await q('[data-qi="1"]')); await W(300); console.log('ch3 неверный', await q('[data-conf="1"]')); await W(300);
   console.log('ch3 подсказка', await p.evaluate(()=>(document.querySelector('#quest .q-wrong')||{}).textContent||'нет')); await q('[data-conf="0"]'); await W(300); }
 await set('select','antenna'); await W(300); await seg('frame','TRUEX'); await W(300); console.log('ch3 truex', await ok()); await seg('frame','DEADCAT'); await W(500); console.log('ch3', await ok()); await seg('fov','150'); await W(500); console.log('ch3 wide', await ok());
-await go('4'); await seg('mode','ACRO'); await set('stick',0.5); await W(800); await set('stick',0); await W(600); await seg('mode','ANGLE'); await set('stick',0.8); await W(1500); await set('stick',0); await W(2500); await set('acc',true); await W(2500); await set('acc',false); await set('wind',true); await set('ki',0); await W(3500); console.log('ch4', await ok());
-await go('5'); await set('throttle',1); await W(9000); await set('cold',true); await W(800); await set('cold',false); await set('throttle',0.2); await W(1500);
+await go('4');
+await p.evaluate(() => { const e = document.querySelector('#quest [data-pred="1"]'); e && e.click(); }); await W(200);
+await seg('mode','ACRO'); await set('stick',0.5); await W(800); await set('stick',0); await W(600);
+for (let k = 0; k < 20 && !(await p.$('#quest [data-conf]')); k++) await W(200);
+await p.evaluate(() => { const e = document.querySelector('#quest [data-conf="1"]'); e && e.click(); }); await W(200);
+await seg('mode','ANGLE'); await set('stick',0.8); await W(1500); await set('stick',0); await W(2500); await set('acc',true); await W(2500); await set('acc',false); await set('wind',true); await set('ki',0); await W(3500); console.log('ch4', await ok());
+await go('5');
+await p.evaluate(() => { const e = document.querySelector('#quest [data-qi="1"]'); e && e.click(); }); await W(200);
+await p.evaluate(() => { const e = document.querySelector('#quest [data-pred="1"]'); e && e.click(); }); await W(200);
+await set('throttle',1); await W(9000);
+for (let k = 0; k < 24 && !(await p.$('#quest [data-conf]')); k++) { await p.evaluate(() => { const e = document.querySelector('#quest [data-qi="1"]'); e && e.click(); }); await W(250); }
+await p.evaluate(() => { const e = document.querySelector('#quest [data-conf="0"]'); e && e.click(); }); await W(200);
+await set('cold',true); await W(800); await set('cold',false); await set('throttle',0.2); await W(1500);
 // eco — как в подсказке: на винте 5″ больше ≈7,4 г/Вт не выйти, нужен 7×4×3 на ~15 % газа (≈184 г, ≈10 г/Вт). Раньше звезда
 // ловилась только всплеском показаний при сбросе газа и в CI не ловилась.
 await set('prop','7x4x3'); await W(800); await set('throttle',0.15); await W(1500); console.log('ch5', await ok());
@@ -45,8 +56,22 @@ await go('6');
   await q6('[data-qi="2"]'); await W(150); await q6('[data-pred="1"]'); await W(200); await set('cold',true); await set('load',80); await waitConf(); await q6('[data-conf="0"]'); await W(200);
   await q6('[data-qi="3"]'); await W(150); await q6('[data-pred="1"]'); await W(200); await seg('mode','storage'); for (let k = 0; k < 60 && (await p.evaluate(()=>document.querySelectorAll('#missions li.ok').length)) < 4; k++) await W(250); }
 console.log('ch6', await ok());
-await go('9'); await set('hill',14); await W(600); await set('txH',15); await set('rxH',15); await set('hill',8); await W(600); await set('pol','cross'); await set('hill',14); await W(600); await set('pol','same'); await seg('freq','915'); await W(600); await set('power',25); await set('pol','cross'); await seg('freq','5800'); await W(800); console.log('ch9', await ok());
-await go('16'); await set('link',false); await W(2500); await set('link',true); await W(600); await set('profile','climb'); await set('link',false); await W(800); await set('link',true); await seg('rx','fspos'); await W(300); await set('link',false); await W(2500); console.log('ch16', await ok());
+await go('9');
+await p.evaluate(() => { const e = document.querySelector('#quest [data-qi="2"]'); e && e.click(); }); await W(150);
+await p.evaluate(() => { const e = document.querySelector('#quest [data-pred="1"]'); e && e.click(); }); await W(150);
+await set('hill',14); await W(600); await set('txH',15); await set('rxH',15); await set('hill',8); await W(600); await set('pol','cross'); await set('hill',14); await W(600); await set('pol','same'); await seg('freq','915'); await W(600); await set('power',25); await set('pol','cross'); await seg('freq','5800'); await W(800);
+await p.evaluate(() => { const e = document.querySelector('#quest [data-qi="2"]'); e && e.click(); }); await W(200);
+for (let k = 0; k < 20 && !(await p.$('#quest [data-conf]')); k++) await W(200);
+await p.evaluate(() => { const e = document.querySelector('#quest [data-conf="1"]'); e && e.click(); }); await W(200);
+console.log('ch9', await ok());
+await go('16');
+await p.evaluate(() => { const e = document.querySelector('#quest [data-qi="1"]'); e && e.click(); }); await W(150);
+await p.evaluate(() => { const e = document.querySelector('#quest [data-pred="1"]'); e && e.click(); }); await W(150);
+await set('link',false); await W(2500); await set('link',true); await W(600); await set('profile','climb'); await set('link',false); await W(800); await set('link',true); await seg('rx','fspos'); await W(300); await set('link',false); await W(2500);
+await p.evaluate(() => { const e = document.querySelector('#quest [data-qi="1"]'); e && e.click(); }); await W(200);
+for (let k = 0; k < 20 && !(await p.$('#quest [data-conf]')); k++) await W(200);
+await p.evaluate(() => { const e = document.querySelector('#quest [data-conf="1"]'); e && e.click(); }); await W(200);
+console.log('ch16', await ok());
 await go('10');
 { const q = (sel) => p.evaluate((sel)=>{const e=document.querySelector('#quest '+sel); if(e) e.click(); return !!e;}, sel);
   const waitConf = async () => { for (let k = 0; k < 40 && !(await p.evaluate(()=>!!document.querySelector('#quest [data-conf]'))); k++) await W(250); };
