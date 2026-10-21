@@ -243,7 +243,9 @@ function glossaryOf(word) {
 function blockHtml(b) {
   const head = b.title ? `${BLOCK[b.type]}: ${b.title}` : BLOCK[b.type];
   const open = b.type === "key" || b.open ? " open" : "";
-  return `<details class="blk" data-type="${b.type}"${open}><summary class="blk-h">${tags(head)}</summary><div class="blk-body"><p>${tags(b.text)}</p>${b.breaks ? `<p class="breaks"><b>Где ломается:</b> ${tags(b.breaks)}</p>` : ""}</div></details>`;
+  const text = tags(b.text);
+  const body = /<(?:p|h[1-6]|ul|ol|dl|table|div|details)(?:\s|>)/i.test(text) ? text : `<p>${text}</p>`;
+  return `<details class="blk" data-type="${b.type}"${open}><summary class="blk-h">${tags(head)}</summary><div class="blk-body">${body}${b.breaks ? `<p class="breaks"><b>Где ломается:</b> ${tags(b.breaks)}</p>` : ""}</div></details>`;
 }
 function sectionHtml(sec) {
   // ③ «любопытным» не на пути по умолчанию: свёрнут, открывается касанием.
@@ -951,6 +953,18 @@ function bindOnce() {
 }
 
 function bind(ch, a) {
+  // Ссылки расчётов работают и из главы, и внутри самой шпаргалки.
+  $$("#main [data-srz-sec]").forEach((link) => link.addEventListener("click", (event) => {
+    render.sec = link.dataset.srzSec || null;
+    if (link.hash !== location.hash) return;
+    event.preventDefault();
+    const target = render.sec === "#check" ? $("#check") : $$("#main section.sec").find((s) => s.querySelector("h3")?.textContent === render.sec);
+    if (target) {
+      for (let el = target; el; el = el.parentElement) if (el.tagName === "DETAILS") el.open = true;
+      target.scrollIntoView({ block: "start" });
+    }
+    render.sec = null;
+  }));
   const full = $("#full");
   if (full)
     full.addEventListener("click", () => {
@@ -1070,7 +1084,6 @@ function bind(ch, a) {
       }),
     );
     $("#srzq")?.addEventListener("input", apply);
-    $$("[data-srz-sec]").forEach((l) => l.addEventListener("click", () => (render.sec = l.dataset.srzSec || null)));
 
     // Пробный срез (20 случайных вопросов)
     const cov = new Map(SREZ_COV.items.map((c) => [String(c.n), c]));

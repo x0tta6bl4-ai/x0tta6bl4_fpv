@@ -199,7 +199,7 @@ function dipole(el) {
     const cm = half * 100, k = 9; // 1 см = 9 единиц, линейка 0–50 см
     const len = Math.min(cm, 50) * k;
     pic.innerHTML = `<svg class="nw-dip" viewBox="0 0 470 84" role="img" aria-label="Диполь в масштабе"><line x1="10" y1="56" x2="460" y2="56" class="nw-ruler"/>${[0, 10, 20, 30, 40, 50].map((c) => `<line x1="${10 + c * k}" y1="52" x2="${10 + c * k}" y2="60" class="nw-ruler"/><text x="${10 + c * k}" y="80" text-anchor="middle">${c}</text>`).join("")}<line x1="10" y1="32" x2="${10 + len / 2 - 3}" y2="32" class="nw-arm"/><line x1="${10 + len / 2 + 3}" y1="32" x2="${10 + len}" y2="32" class="nw-arm"/><circle cx="${10 + len / 2}" cy="32" r="5" class="nw-feed"/><text x="${10 + len / 2}" y="18" text-anchor="middle">${fmt(cm, 1)} см</text></svg>`;
-    o.innerHTML = `<p class="nw-big">λ = 300 / ${fmt(f)} = <b>${fmt(lam * 100, 1)} см</b></p><p>Диполь ½ λ = <b>${fmt(cm, 1)} см</b> (каждое плечо ¼ λ = ${fmt(cm / 2, 1)} см).${fromLen ? ` Длина ${fmt(fromLen, 1)} см → f ≈ 300 / (2 × ${fmt(fromLen / 100, 3)}) ≈ <b>${fmt(f)} МГц</b>.` : ""}</p>`;
+    o.innerHTML = `<p class="nw-big">Длина волны: <b>${fmt(lam * 100, 1)} см</b></p><p>Диполь ½ λ = <b>${fmt(cm, 1)} см</b> (каждое плечо ¼ λ = ${fmt(cm / 2, 1)} см).${fromLen ? ` Диполь ${fmt(fromLen, 1)} см соответствует примерно <b>${fmt(f)} МГц</b>.` : ""}</p>`;
   };
   el.addEventListener("input", (e) => {
     const k = e.target.dataset.k;

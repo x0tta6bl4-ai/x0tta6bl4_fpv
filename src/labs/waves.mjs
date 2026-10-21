@@ -46,7 +46,7 @@ export function mount(root, ctx) {
     const px = lam * 4.4;
     let d = "";
     for (let x = 10; x <= 250; x += 2) d += `${x === 10 ? "M" : "L"}${x} ${(70 + Math.sin(((x - 10) / px) * TAU - s.t * 6) * 26).toFixed(1)}`;
-    $("#wave").innerHTML = `<path d="${d}" class="wv-line"/><text x="12" y="24" class="lt" text-anchor="start">Волна ${FREQS.find((q) => q[0] === s.f)[1]}: λ = 300 ÷ ${s.f} = ${fmt(lam / 100, 3)} м ≈ ${fmt(lam, 1)} см</text>${px < 240 ? `<path d="M10 112h${px.toFixed(1)}" class="wv-dim"/><path d="M10 107v10M${(10 + px).toFixed(1)} 107v10" class="wv-dim"/><text x="${(10 + px / 2).toFixed(1)}" y="128" class="lab-small" text-anchor="middle">одна волна</text>` : `<text x="130" y="128" class="lab-small" text-anchor="middle">волна длиннее экрана</text>`}`;
+    $("#wave").innerHTML = `<path d="${d}" class="wv-line"/><text x="12" y="24" class="lt" text-anchor="start">Волна ${FREQS.find((q) => q[0] === s.f)[1]}: длина ${fmt(lam, 1)} см</text>${px < 240 ? `<path d="M10 112h${px.toFixed(1)}" class="wv-dim"/><path d="M10 107v10M${(10 + px).toFixed(1)} 107v10" class="wv-dim"/><text x="${(10 + px / 2).toFixed(1)}" y="128" class="lab-small" text-anchor="middle">одна волна</text>` : `<text x="130" y="128" class="lab-small" text-anchor="middle">волна длиннее экрана</text>`}`;
     // Антенна справа на линейке (1 см = 4,4 px).
     const top = 150 - s.len * 4.4;
     const tq = 150 - quarter * 4.4;
