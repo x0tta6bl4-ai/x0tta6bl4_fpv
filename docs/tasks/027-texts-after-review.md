@@ -3,7 +3,7 @@
 - Исполнитель: gpt
 - Статус: на ревью
 - Ветка: gpt/texts-after-review
-- PR: —
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/55
 - Основание: `docs/qa/2026-10-21-phone-after-021.md` (слито с веткой claude/merge-round-2), `docs/reviews/2026-10-21-srez-facts.md`.
   Задача 022 закрыта раньше, чем эти замечания пришли, поэтому отдельная карточка.
 
