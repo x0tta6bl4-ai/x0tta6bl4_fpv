@@ -31,7 +31,9 @@ export const meta = {
   ],
   missions: [
     { id: "drop", look: ["timer","motor"], touch: ["link"], see: "таймер этапов и мотор",  text: "Выключи связь и дождись этапа 2: моторы выключатся", check: (f) => f.stage === 2 },
-    { id: "hidden", look: ["rx","rack"], touch: ["rx=fspos","link"], see: "каретки каналов после обрыва",  text: "Поставь приёмник в FS Pos и выключи связь: Failsafe не включится", check: (f, s) => s.rx === "fspos" && !s.link && f.since > s.delay + 0.3 },
+    { id: "hidden", look: ["rx","rack"], touch: ["rx=fspos","link"], see: "каретки каналов после обрыва",  text: "Поставь приёмник в FS Pos и выключи связь: Failsafe не включится", check: (f, s) => s.rx === "fspos" && !s.link && f.since > s.delay + 0.3,
+      predict: { q: "Приёмник в FS Pos, связь пропала. Что видит полётник?", options: ["Обрыв: включится Failsafe", "Команды идут — запомненные стики. Failsafe полётника не включится", "Сразу этап 2, моторы глохнут"], right: 1 },
+      confirm: { q: "Почему при FS Pos этап Failsafe не начинается?", options: ["Полётник выключен", "Приёмник не замолкает, а шлёт каналы, и полётник думает, что связь есть. В Cut приёмник молчит — Failsafe включается", "AUX всегда держит газ"], right: 1, miss: "Cut: приёмник замолчал — полётник видит обрыв. FS Pos: приёмник шлёт запомненные стики — обрыва полётник не видит." } },
     { id: "climb", look: ["rack","timer"], touch: ["profile=climb","link"], see: "каретки каналов на этапе 1",  text: "Выбери профиль «выровняться и набрать» и посмотри этап 1", check: (f, s) => s.profile === "climb" && f.stage === 1 },
     { id: "back", look: ["rack","motor"], touch: ["link"], see: "возвращается ли управление",  text: "После обрыва верни связь: управление вернулось", check: (f, s) => s.link && f.hadFs },
   ],

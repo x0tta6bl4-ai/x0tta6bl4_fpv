@@ -754,11 +754,66 @@ function render() {
 render.first = true;
 
 let CUR = null;
-// Липкие схемы на телефоне: схема прилипает к верху, только если между ней и панелью задания
-// остаётся место для элементов управления. Иначе они проезжали бы под схемой и их не было бы видно.
+// Липкие схемы: схема прилипает к верху, только если под ней остаётся место для управления.
+// Иначе кнопки проезжали бы под схемой. У стенда со стиками рисунок ужимается, чтобы сцена и пульт
+// были на одном экране: иначе стики ниже сгиба, а при прокрутке к ним сцена уезжает.
 const STICKY = ".workspace #fig, .labroot > .lab-stage:first-child, .mx-stage";
 const ROOM = 200; // столько пикселей экрана оставляем под ползунки и кнопки
+const STICK_GAP = 16;
+const STICK_MIN = 150; // ниже рисунок уже не разобрать
 let stickyRO = null;
+function dockTop() {
+  const card = document.getElementById("labcard");
+  if (card && card.classList.contains("full")) return 0;
+  const bar = document.querySelector(".top");
+  if (!bar || getComputedStyle(bar).position !== "sticky") return 0;
+  return Math.ceil(bar.getBoundingClientRect().height);
+}
+// Возвращает true, если это стенд со стиками: липкость решает он сам, общий порог ROOM не применяем.
+function fitStickScene(fig) {
+  const ws = fig.closest(".workspace");
+  const sticks = ws && ws.querySelector(".ctl-sticks");
+  const svg = fig.querySelector(".iso-svg");
+  if (!ws || !sticks || !svg) return false;
+  const vb = svg.viewBox && svg.viewBox.baseVal;
+  if (!vb || !vb.width || !vb.height) return false;
+  const vh = (window.visualViewport && window.visualViewport.height) || innerHeight;
+  const top = dockTop();
+  const stickH = Math.ceil(sticks.getBoundingClientRect().height) || 160;
+  const figR = fig.getBoundingClientRect();
+  const svgR = svg.getBoundingClientRect();
+  const chrome = Math.max(36, Math.round(figR.height - svgR.height));
+  const maxSvg = Math.floor(vh - top - stickH - chrome - STICK_GAP);
+  const stage = svg.closest(".iso-stage");
+  const maxW = Math.max(120, (stage ? stage.clientWidth : fig.clientWidth) || 120);
+  const ratio = vb.height / vb.width;
+  let w = maxW;
+  let h = w * ratio;
+  const fits = maxSvg >= STICK_MIN;
+  if (h > maxSvg) {
+    h = Math.max(STICK_MIN, maxSvg);
+    w = h / ratio;
+  }
+  h = Math.round(h);
+  w = Math.round(Math.min(w, maxW));
+  const prevH = parseFloat(svg.style.height) || 0;
+  if (Math.abs(prevH - h) > 2) {
+    svg.style.height = h + "px";
+    svg.style.width = w + "px";
+    svg.style.maxWidth = "100%";
+  }
+  const figH = chrome + h;
+  const sticksTop = top + figH;
+  const curTop = parseFloat(ws.style.getPropertyValue("--sticks-top")) || 0;
+  if (Math.abs(curTop - sticksTop) > 2) {
+    ws.style.setProperty("--dock-top", top + "px");
+    ws.style.setProperty("--sticks-top", sticksTop + "px");
+  }
+  // Влезает — сцена и стики липнут вместе. Не влезает даже минимальный рисунок — не запираем пульт под схемой.
+  fig.classList.toggle("nosticky", !fits);
+  ws.classList.toggle("stick-dock", fits);
+  return true;
+}
 function fitSticky() {
   const vh = (window.visualViewport && window.visualViewport.height) || innerHeight;
   const quest = document.getElementById("quest");
@@ -770,6 +825,7 @@ function fitSticky() {
     // nosticky, поставленный самой лабораторией (например, карта), не трогаем
     if (el.dataset.ownNs === undefined) el.dataset.ownNs = el.classList.contains("nosticky") ? "1" : "";
     if (el.dataset.ownNs) continue;
+    if (el.id === "fig" && fitStickScene(el)) continue;
     // Панель задания прилипает к низу: в лаборатории — всегда, у стенда главы — на телефоне (пульт там под стендом).
     const inLab = el.closest("#labcard") || (el.id === "fig" && innerWidth <= 700);
     const h = el.getBoundingClientRect().height;

@@ -1359,3 +1359,13 @@ table.t{max-width:100%;-webkit-overflow-scrolling:touch}
 .d3-info{padding:12px 14px;border-radius:12px;background:var(--anatomy-card);border-left:3px solid var(--accent);line-height:1.55}
 @media(max-width:700px){.d3-hint{font-size:11px;padding:0 12px;line-height:1.4}.d3-marker{max-width:150px;font-size:12px}.d3-bar{gap:5px}.d3-bar .lab-btn{padding:8px 10px;font-size:13px}}
 .lv-instr{margin:6px 0 10px;padding:8px 10px;border-radius:8px;background:var(--anatomy-page);box-shadow:inset 0 0 0 1px var(--anatomy-faint);font:13px/1.5 var(--anatomy-mono);color:var(--anatomy-strong)}
+/* Стенд со стиками: сцена прилипает, стики — сразу под ней. Высоту рисунка ставит fitStickScene,
+   чтобы сцена и пульт помещались в одно окно (иначе стики ниже сгиба, а сцена при прокрутке уезжает). */
+.workspace.stick-dock #fig{position:sticky;top:var(--dock-top,0px);z-index:4;background:var(--anatomy-page);width:100%;max-width:100%}
+.workspace.stick-dock #fig .iso-svg{display:block;margin-inline:auto;max-width:100%}
+.workspace.stick-dock .ctl-sticks{position:sticky;top:var(--sticks-top,46dvh);z-index:5;background:var(--anatomy-card)}
+/* «Что на столе» иначе встаёт между рисунком и пультом: у него тот же order, что у сцены. */
+@media (min-width:701px){.workspace.stick-dock #figinfo{order:4}}
+.workspace:has(.ctl-sticks) #fig .fig-card .iso-plate{padding:32px 8px 10px}
+@media (max-width:700px){.workspace:has(.ctl-sticks) #fig .fig-card .iso-plate{padding-top:22px;padding-bottom:0}}
+.labcard.full:has(.ctl-sticks) .workspace:has(.ctl-sticks) #fig{max-width:100%}

@@ -90,8 +90,8 @@ export const meta = {
   caption: "Метод детектива: сначала улики, потом подозреваемые. Проверяй по одному — от простого к сложному. Хорошая проверка отсекает часть причин. Одинаковый признак может иметь разные причины, поэтому в каждом деле причина выбирается заново — решают улики, а не память.",
   aria: "Справа: выбор дела, выбор проверки (каждая — своим прибором) и вердикт.",
   missions: [
-    { id: "three", look: ["board"], touch: ["case", "chk", "verdict"], see: "доску дела", text: "Раскрой 3 дела", check: (f) => f.solved >= 3 },
     { id: "sharp", look: ["board"], touch: ["chk", "verdict"], see: "сколько проверок на доске", text: "Раскрой дело по уликам: 1–2 проверки и без ошибки", check: (f) => f.sharp },
+    { id: "three", look: ["board"], touch: ["case", "chk", "verdict"], see: "доску дела", text: "Раскрой 3 дела", check: (f) => f.solved >= 3 },
     { id: "flip", look: ["drone", "props"], touch: ["case=flip", "chk", "verdict"], see: "мотор и пропеллеры дрона", text: "Раскрой дело «Кувыркнулся на взлёте»", check: (f) => f.flipSolved },
     { id: "all", look: ["board"], touch: ["case"], see: "отметки ✓ у дел", text: "Раскрой все 6 дел", check: (f) => f.solved >= 6 },
   ],
@@ -113,22 +113,31 @@ function settle(state) {
     state.done = "";
     state.bad = "";
     state.verdictSeen = "";
+    state.blind = "";
   }
   const [cid, idx] = String(state.chk || "").split(":");
   if (cid === c.id && idx !== undefined && !list(state.done).includes(idx) && !list(state.solvedNow).includes(c.id)) state.done = [...list(state.done), idx].join(",");
   const [vid, vk] = String(state.verdict || "").split(":");
-  let msg = "";
-  if (vid === c.id && vk && state.verdictSeen !== state.verdict) {
-    state.verdictSeen = state.verdict;
+  if (vid === c.id && vk) {
     if (vk === state.truth) {
-      const solved = new Set(list(state.solved));
-      solved.add(c.id);
-      state.solved = [...solved].join(",");
-      state.solvedNow = c.id;
-      const n = list(state.done).length, wrong = list(state.bad).length;
-      if (n >= 1 && n <= 2 && !wrong) state.sharp = 1;
-      if (c.id === "flip") state.flipSolved = 1;
-    } else if (!list(state.bad).includes(vk)) state.bad = [...list(state.bad), vk].join(",");
+      const n = list(state.done).length;
+      // Верный вердикт без единой проверки — угадайка: дело не раскрыто, звезда не растёт.
+      if (n < 1) state.blind = c.id;
+      else if (!list(state.solved).includes(c.id)) {
+        state.blind = "";
+        const solved = new Set(list(state.solved));
+        solved.add(c.id);
+        state.solved = [...solved].join(",");
+        state.solvedNow = c.id;
+        const wrong = list(state.bad).length;
+        if (n <= 2 && !wrong) state.sharp = 1;
+        if (c.id === "flip") state.flipSolved = 1;
+      }
+    } else if (state.verdictSeen !== state.verdict) {
+      state.verdictSeen = state.verdict;
+      state.blind = "";
+      if (!list(state.bad).includes(vk)) state.bad = [...list(state.bad), vk].join(",");
+    }
   }
   return c;
 }
@@ -313,7 +322,8 @@ export function controller(root, built, state) {
       const [vid, vk] = String(state.verdict || "").split(":");
       if (state.chk && cid !== c.id) return "<b>Эта проверка — из другого дела.</b> Выбери проверку из группы текущего дела.";
       if (state.verdict && vid !== c.id) return "<b>Этот вердикт — из другого дела.</b> Выбери причину из группы текущего дела.";
-      if (state.solvedNow === c.id) { const n = list(state.done).length, w = list(state.bad).length; return `<b>Дело раскрыто</b> за ${n} ${n === 1 ? "проверку" : n >= 2 && n <= 4 ? "проверки" : "проверок"}${w ? `, ошибок: ${w}` : " без ошибок"}. ${n === 0 ? "Угадал без улик — повезло, но детектив так не делает!" : ""} Выбери другое дело. Чтобы повторить это — переключись на другое и вернись: причина может оказаться другой.`; }
+      if (state.blind === c.id && state.solvedNow !== c.id) return "<b>Вердикт совпал, но улик нет.</b> Сначала сделай проверку — без неё дело не засчитывается.";
+      if (state.solvedNow === c.id) { const n = list(state.done).length, w = list(state.bad).length; return `<b>Дело раскрыто</b> за ${n} ${n === 1 ? "проверку" : n >= 2 && n <= 4 ? "проверки" : "проверок"}${w ? `, ошибок: ${w}` : " без ошибок"}. Выбери другое дело. Чтобы повторить это — переключись на другое и вернись: причина может оказаться другой.`; }
       if (vk && list(state.bad).includes(vk)) return list(state.done).length ? "<b>Улики с этим не сходятся.</b> Перечитай их на доске." : "<b>Догадка без улик.</b> Сначала проверь что-нибудь!";
       return `<b>Что видим:</b> ${c.sym} Выбери проверку — прибор подсветится, улика появится на доске.`;
     },
