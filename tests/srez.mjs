@@ -49,6 +49,9 @@ for (const c of COV.items) {
   const ch = c.ch != null ? CH.find((x) => x.id === String(c.ch)) : null;
   if (["full", "partial"].includes(c.status) && (!ch || (c.sec && c.sec !== "#check" && !(ch.sections || []).some((s) => s.title === c.sec)))) badSec.push(`${c.n}: гл ${c.ch} «${c.sec}»`);
 }
+// Расхождение с ключом без уточнения ученик не увидит: в приложении «И» осталась бы только неверная строка таблицы.
+const noFix = COV.items.filter((c) => c.status === "conflict" && !String(c.fix || "").trim()).map((c) => c.n);
+rep("у каждого расхождения с таблицей есть уточнение для ученика (fix)", !noFix.length, noFix.join(", "));
 rep("каждая цитата «где объяснено» дословно есть в учебнике", !lost.length, lost.slice(0, 8).join(" | "));
 rep("ссылка на объяснение ведёт в существующую главу и раздел", !badSec.length, badSec.slice(0, 8).join(" | "));
 const count = Object.fromEntries(ST.map((s) => [s, COV.items.filter((c) => c.status === s).length]));
