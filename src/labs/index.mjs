@@ -14,5 +14,6 @@ import * as gonogo from "./gonogo.mjs";
 import * as map from "./map.mjs";
 import * as quiz from "./quiz.mjs";
 import * as drone3d from "./drone3d.mjs";
+import * as path3d from "./path3d.mjs";
 
-export const LABS = { water, fly, energy, waves, bind, lq, video, jam, solder, bf, detective, gonogo, map, quiz, drone3d };
+export const LABS = { water, fly, energy, waves, bind, lq, video, jam, solder, bf, detective, gonogo, map, quiz, drone3d, path3d };

@@ -117,6 +117,19 @@ export const CHAPTERS_A = [
     "fault": "ok"
    }
   },
+  "figs": [
+   {
+    "id": "path",
+    "preset": {
+     "fault": "ok"
+    },
+    "tab": "Схема: два моста"
+   },
+   {
+    "lab": "path3d",
+    "tab": "3D: два моста"
+   }
+  ],
   "sections": [
    {
     "title": "Два отдельных канала",
