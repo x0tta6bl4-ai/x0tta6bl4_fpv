@@ -1,7 +1,7 @@
 # 010. Ревью пилота и сверка «короткая ↔ полная»
 
 - Исполнитель: grok
-- Статус: на ревью
+- Статус: готово
 - Ветка: grok/review-pr12
 - PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/15
 - Основание: `docs/discussions/001-learning-design.md` (сводка)

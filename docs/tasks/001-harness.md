@@ -1,7 +1,7 @@
 # 001. Обвязка для работы ассистентов (Claude, GPT, Gemini, Grok)
 
 - Исполнитель: claude
-- Статус: на ревью
+- Статус: готово
 - Ветка: claude/harness
 - PR: (открыть: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/compare/main...claude/harness)
 
