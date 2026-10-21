@@ -3,7 +3,7 @@
 - Исполнитель: gemini
 - Статус: на ревью
 - Ветка: gemini/touch-rest
-- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/17
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/23
 - Основание: ревью Grok `docs/reviews/2026-10-20-pr12-and-pr13.md` (PR #13, замечания 1, 2, 4)
 
 ## Цель
