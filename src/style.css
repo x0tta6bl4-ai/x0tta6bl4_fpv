@@ -1,6 +1,6 @@
 /* FPV Anatomy v4 — страница поверх токенов anatomy (ISO_CSS). Светлая тема по умолчанию. */
 .iso{--accent:#3e63dd;--ok:#30a46c;--bad:#e5484d;--warn:#b5770a;--serif:"Literata",Georgia,"Times New Roman",serif;--sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--anatomy-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  --blk-key:#3e63dd;--blk-analogy:#8e4ec6;--blk-follows:#30a46c;--blk-remember:#0b8a8f;--blk-trap:#e5484d;--blk-exam:#b5770a;--blk-safety:#d6409f;--blk-myth:#6f6e77;--blk-note:#8c8c90}
+  --blk-key:#3e63dd;--blk-analogy:#8e4ec6;--blk-follows:#30a46c;--blk-remember:#0b8a8f;--blk-trap:#e5484d;--blk-exam:#8a5600;--blk-safety:#d6409f;--blk-myth:#6f6e77;--blk-note:#8c8c90}
 .iso:not([data-theme="light"]){--accent:#6b9bff;--ok:#6be0a0;--bad:#ff6b6b;--warn:#f0b34a;--blk-key:#6b9bff;--blk-analogy:#b48cf2;--blk-follows:#6be0a0;--blk-remember:#4cc9cd;--blk-trap:#ff6b6b;--blk-exam:#f0b34a;--blk-safety:#f07cc0;--blk-myth:#9a99a1}
 *{box-sizing:border-box}
 html{scroll-padding-top:70px}
@@ -174,7 +174,7 @@ ol.qs{padding-left:22px}
 /* свёрнутое по умолчанию: разделы ③ и блок «Физика: откуда это» в конце главы */
 details.sec-more,details.extra{margin:14px 0;border-radius:10px;box-shadow:0 0 0 1px var(--anatomy-faint);background:var(--anatomy-card)}
 details.sec-more>summary,details.extra>summary{cursor:pointer;min-height:44px;padding:11px 14px;font-weight:500;color:var(--anatomy-strong);overflow-wrap:anywhere}
-details.sec-more>summary{font-size:14px;color:var(--anatomy-muted)}
+details.sec-more>summary{font-size:14px}
 details.sec-more[open],details.extra[open]{padding:0 14px 6px}
 details.sec-more[open]>summary,details.extra[open]>summary{margin:0 -14px;border-bottom:1px solid var(--anatomy-faint)}
 .filters button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:8px 13px;font-size:13.5px;border-radius:8px}
@@ -190,6 +190,7 @@ details.sec-more[open]>summary,details.extra[open]>summary{margin:0 -14px;border
 .srz>summary{cursor:pointer;padding:11px 0;min-height:44px;font-weight:500;color:var(--anatomy-strong);list-style-position:outside;margin-left:18px;overflow-wrap:anywhere}
 .srz-n{font:600 12px var(--anatomy-mono);color:var(--anatomy-muted);margin-right:4px}
 .srz-a{padding:0 0 14px 18px;overflow-wrap:anywhere}
+@media (max-width:700px){a[data-srz-sec]{display:inline-flex;align-items:center;min-height:44px;padding:6px 0}}
 .srz-a ul{margin:4px 0 10px;padding-left:20px}
 #dsearch,#gsearch{max-width:420px;margin-bottom:8px}
 .verdict{font-size:12.5px;font-weight:600}
@@ -678,7 +679,7 @@ body.noscroll{overflow:hidden}
    колонки сетки страницы должны уметь сжиматься (min-width:0), иначе их распирает самое широкое содержимое. */
 #main,#toc,.chapter,.chapter>*,.sec,.appx{min-width:0}
 table.t{max-width:100%;-webkit-overflow-scrolling:touch}
-@media (max-width:600px){table.t{font-size:12.5px;line-height:1.35;margin:8px 0}table.t th,table.t td{padding:5px 6px}}
+@media (max-width:600px){table.t{font-size:12.5px;line-height:1.35;margin:8px 0}table.t th,table.t td{padding:5px 6px;overflow-wrap:anywhere}table.t:has(tr>:nth-child(3):last-child){display:table;width:100%;table-layout:fixed}}
 
 /* Выбранная деталь — ярко, остальные — бледно; без синей вспышки касания. */
 .iso-stage,.iso-stage *{-webkit-tap-highlight-color:transparent}
