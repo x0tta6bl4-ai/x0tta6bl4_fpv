@@ -22,6 +22,7 @@ for (const n of ns) {
     await p.evaluate(()=>document.querySelector('#fig').scrollIntoView({block:'start'})); await p.waitForTimeout(250);
     const pt = await p.evaluate((i) => {
       const st = document.querySelector('#fig .iso-stage'); const l = st.__anchors()[i]; if (!l.a) return null;
+      const layerOf = (el) => !!el.closest && !!el.closest('#fig .iso-stage svg');
       const key = (el) => { const n = el && el.closest && el.closest('.it[data-g], [data-pick]'); return n && st.contains(n) ? (n.dataset.c || n.dataset.pick || 'g:' + n.dataset.g) : ''; };
       let k = l.pick; if (!k) for (const el of document.elementsFromPoint(l.a[0], l.a[1])) if ((k = key(el))) break;
       if (!k) return { x: l.a[0], y: l.a[1], k: '-', vv: visualViewport.offsetTop };
@@ -34,6 +35,8 @@ for (const n of ns) {
         const x = l.a[0] + Math.cos(j / 12 * 6.283) * r, y = l.a[1] + Math.sin(j / 12 * 6.283) * r;
         if (x < sr.left + 4 || x > sr.right - 4 || y < sr.top + 4 || y > sr.bottom - 4) continue;
         const top = document.elementFromPoint(x, y); if (!top || key(top) !== k) continue;
+        // Точка в пикселе от кнопок поверх стенда (не рисунок) зависит от долей пикселя в высоте страницы — не берём.
+        if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => { const t = document.elementFromPoint(x + dx, y + dy); return !t || !layerOf(t); })) continue;
         const margin = Math.min(99, ...others.map((o) => Math.hypot(o[0] - x, o[1] - y))) - r;
         if (!best || margin > best.margin + 0.5) best = { x, y, k, r, margin, vv: visualViewport.offsetTop };
       }
