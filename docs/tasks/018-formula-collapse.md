@@ -1,9 +1,9 @@
 # 018. Свёртка академических формул в «Любопытным» (P0-3)
 
 - Исполнитель: ведущий инженер (по поручению владельца при исчерпании лимитов Claude/GPT)
-- Статус: PR #38
+- Статус: готово
 - Ветка: claude/formula-collapse
-- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/38
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/38 (смержен в main)
 - Основание: решение владельца от 21.10.2026 в `docs/discussions/001-learning-design.md` (пункт P0-3).
 
 ## Цель
