@@ -246,9 +246,8 @@ export function controller(root, built, state) {
       return [
         ["Обороты", `${fmt(model.rpm)} об/мин`, "оценка"],
         ["Без нагрузки", `${fmt(MOTORS[state.motor].kv)} × ${fmt(model.voltage, 1)} В ≈ ${fmt(MOTORS[state.motor].kv * model.voltage)} об/мин`, "KV × V"],
-        ["Ток батареи / фазы", `${fmt(model.current, 1)} / ${fmt(model.phase, 1)} А`, "оценка"],
+        ["Ток батареи", `${fmt(model.current, 1)} А`, "оценка"],
         ["Напряжение под нагрузкой", `${fmt(model.voltage, 2)} В (${fmt(model.cell, 2)} В/банка)`, "закон Ома"],
-        ["Нагрев меди I²R", `${fmt(model.copper, 1)} Вт`, "закон"],
         ["Обмотка", `${fmt(sim.T)} °C · ${hot}`, "оценка"],
       ];
     },
