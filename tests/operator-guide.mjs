@@ -9,6 +9,8 @@ import { CHAPTERS_C as C } from '../data/chapters-c.mjs';
 import { KIDS } from '../data/kids.mjs';
 import { HINTS } from '../data/hints.mjs';
 const chapters=[...A,...B,...C], guide=chapters.find(c=>c.id==='20');
+assert.equal(chapters.reduce((n,c)=>n+(c.questions?.length||0),0),146,'chapter questions preserved');
+assert.doesNotMatch(chapters.find(c=>c.id==='12').sections.find(s=>s.title==='Диапазоны и таблицы каналов').body,/910, 980|1405, 1430/,'channel grids are reference material');
 const calculations=chapters.flatMap(c=>c.sections.flatMap(s=>[...s.body.matchAll(/data-calc-id="([^"]+)"/g)].map(m=>({id:m[1],ch:c.id,section:s}))));
 assert.equal(calculations.length,11);assert.equal(new Set(calculations.map(x=>x.id)).size,11);
 assert.equal(calculations.filter(c=>c.ch==='20').length,10);
