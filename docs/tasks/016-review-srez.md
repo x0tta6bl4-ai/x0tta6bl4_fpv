@@ -1,9 +1,9 @@
 # 016. Ревью: вопросы среза (приложение «И», колода, тест покрытия)
 
 - Исполнитель: grok
-- Статус: новая
+- Статус: готово
 - Ветка: grok/review-srez
-- PR: —
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/29 и https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/32 (смержены в main)
 
 ## Цель
 Независимо проверить ветку claude/srez-coverage: честность карты покрытия и теста.
