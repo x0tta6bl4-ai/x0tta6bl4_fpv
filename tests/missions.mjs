@@ -52,7 +52,7 @@ await go('6');
 { const q6 = (sel) => p.evaluate((sel)=>{const e=document.querySelector('#quest '+sel); if(e) e.click(); return !!e;}, sel);
   const waitConf = async () => { for (let k = 0; k < 60 && !(await p.evaluate(()=>!!document.querySelector('#quest [data-conf]'))); k++) await W(250); };
   await q6('[data-qi="0"]'); await W(150); await q6('[data-pred="1"]'); await W(200); await set('config','3S2P'); await waitConf(); await q6('[data-conf="0"]'); await W(200);
-  await q6('[data-qi="1"]'); await W(150); await q6('[data-pred="1"]'); await W(200); await seg('mode','hv'); await waitConf(); await q6('[data-conf="1"]'); await W(200);
+  await q6('[data-qi="1"]'); await W(150); await q6('[data-pred="1"]'); await W(200); await seg('mode','charge'); await waitConf(); await q6('[data-conf="1"]'); await W(200);
   await q6('[data-qi="2"]'); await W(150); await q6('[data-pred="1"]'); await W(200); await set('cold',true); await set('load',80); await waitConf(); await q6('[data-conf="0"]'); await W(200);
   await q6('[data-qi="3"]'); await W(150); await q6('[data-pred="1"]'); await W(200); await seg('mode','storage'); for (let k = 0; k < 60 && (await p.evaluate(()=>document.querySelectorAll('#missions li.ok').length)) < 4; k++) await W(250); }
 console.log('ch6', await ok());
