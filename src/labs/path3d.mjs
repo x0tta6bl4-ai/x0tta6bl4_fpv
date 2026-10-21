@@ -156,47 +156,57 @@ function build(dark) {
     return parts[parts.length - 1];
   };
   const radio = new Mesh();
-  radio.box(6.2, 1.7, 4.2, M4.t(-15.2, 0.98, -5.4));
-  radio.box(5.6, 0.28, 3.7, M4.t(-15.0, 1.9, -5.4));
-  radio.box(1.15, 1.15, 2.5, M4.t(-18.15, 1.35, -5.4));
+  radio.box(5.4, 1.35, 3.4, M4.t(-15.3, 1.05, -5.4));
+  radio.box(4.4, 0.2, 2.8, M4.t(-15.2, 1.78, -5.4));
+  radio.box(1.15, 2.15, 1.2, M4.t(-15.45, 1.35, -7.25));
+  radio.box(1.15, 2.15, 1.2, M4.t(-15.45, 1.35, -3.55));
+  radio.box(1.4, 1.3, 2.2, M4.t(-18.05, 1.22, -5.4));
   add("radio", radio, C.radio, [-15.2, 1.5, -5.4]);
   const toggles = new Mesh();
-  toggles.box(0.28, 0.55, 0.55, M4.t(-18.05, 2.15, -6.35));
-  toggles.box(0.28, 0.55, 0.55, M4.t(-18.05, 2.15, -4.45));
+  toggles.cyl(0.22, 0.16, 10, M4.t(-17.15, 1.95, -6.55));
+  toggles.cyl(0.1, 0.7, 8, M4.chain(M4.t(-17.15, 2.3, -6.55), M4.rz(0.55)));
+  toggles.cyl(0.22, 0.16, 10, M4.t(-17.15, 1.95, -4.25));
+  toggles.cyl(0.1, 0.7, 8, M4.chain(M4.t(-17.15, 2.3, -4.25), M4.rz(-0.45)));
   add("radio", toggles, C.stick, [-15.2, 1.5, -5.4]);
+  const cups = new Mesh();
+  const wells = new Mesh();
   const sticks = new Mesh();
-  for (const z of [-6.2, -4.6]) {
-    sticks.cyl(0.78, 0.16, 14, M4.t(-13.45, 2.08, z));
-    sticks.cyl(0.18, 1.15, 8, M4.t(-13.45, 2.65, z));
-    ball(sticks, 0.38, [-13.45, 3.28, z], 10);
+  for (const z of [-6.15, -4.65]) {
+    cups.cyl(0.92, 0.2, 16, M4.t(-13.5, 1.95, z));
+    wells.cyl(0.52, 0.1, 12, M4.t(-13.5, 2.05, z));
+    sticks.cyl(0.14, 1.3, 8, M4.t(-13.5, 2.68, z));
+    ball(sticks, 0.44, [-13.5, 3.4, z], 10);
   }
+  add("radio", cups, C.bezel, [-15.2, 1.5, -5.4]);
+  add("radio", wells, C.chip, [-15.2, 1.5, -5.4]);
   add("radio", sticks, C.stick, [-15.2, 1.5, -5.4]);
-  add("radio", new Mesh().box(2.35, 0.12, 1.45, M4.t(-16.15, 2.12, -5.4)), C.screen, [-15.2, 1.5, -5.4]);
+  add("radio", new Mesh().box(2.55, 0.14, 1.9, M4.t(-16.25, 1.96, -5.4)), C.bezel, [-15.2, 1.5, -5.4]);
+  add("radio", new Mesh().box(2.15, 0.1, 1.5, M4.t(-16.25, 2.08, -5.4)), C.screen, [-15.2, 1.5, -5.4]);
 
   const tx = new Mesh();
-  tx.cyl(0.28, 0.35, 10, M4.t(-15.2, 2.25, -5.4));
-  tx.tube([-15.2, 2.4, -5.4], CMD_A, 0.1, 8);
-  ball(tx, 0.28, CMD_A);
+  tx.cyl(0.32, 0.4, 10, M4.t(-15.2, 2.15, -5.4));
+  tx.tube([-15.2, 2.35, -5.4], CMD_A, 0.14, 8);
+  ball(tx, 0.32, CMD_A);
   add("txant", tx, C.metal, CMD_A);
 
   const gog = new Mesh();
-  gog.box(5.4, 2.15, 3.5, M4.t(-13.4, 1.55, 5.8));
-  gog.box(0.45, 0.4, 2.9, M4.t(-10.15, 2.55, 5.8));
-  gog.tube([-16.3, 1.9, 5.8], [-13.4, 3.15, 5.8], 0.16, 8);
-  gog.tube([-13.4, 3.15, 5.8], [-10.5, 1.9, 5.8], 0.16, 8);
+  gog.box(2.8, 1.9, 5.4, M4.t(-13.6, 1.5, 5.8));
+  gog.box(0.35, 0.32, 4.4, M4.t(-12.05, 2.5, 5.8));
+  gog.tube([-15.15, 1.8, 5.8], [-13.6, 2.85, 5.8], 0.18, 8);
+  gog.tube([-13.6, 2.85, 5.8], [-12.05, 1.8, 5.8], 0.18, 8);
   add("goggles", gog, C.gog, [-13.4, 1.7, 5.8]);
-  const bezel = new Mesh();
-  bezel.box(0.22, 1.5, 1.28, M4.t(-10.2, 1.7, 4.9));
-  bezel.box(0.22, 1.5, 1.28, M4.t(-10.2, 1.7, 6.7));
-  add("goggles", bezel, C.bezel, [-13.4, 1.7, 5.8]);
+  const eyes = new Mesh();
   const lenses = new Mesh();
-  lenses.box(0.16, 1.15, 0.95, M4.t(-10.02, 1.7, 4.9));
-  lenses.box(0.16, 1.15, 0.95, M4.t(-10.02, 1.7, 6.7));
+  for (const z of [4.55, 7.05]) {
+    eyes.cyl(0.95, 0.8, 16, M4.chain(M4.t(-11.9, 1.52, z), M4.rz(-Math.PI / 2)));
+    lenses.cyl(0.7, 0.1, 16, M4.chain(M4.t(-11.45, 1.52, z), M4.rz(-Math.PI / 2)));
+  }
+  add("goggles", eyes, C.bezel, [-13.4, 1.7, 5.8]);
   add("goggles", lenses, C.lens, [-13.4, 1.7, 5.8]);
   const gant = new Mesh();
-  gant.cyl(0.22, 0.3, 8, M4.t(-10.3, 2.55, 5.8));
-  gant.tube([-10.3, 2.7, 5.8], VID_B, 0.09, 8);
-  ball(gant, 0.22, VID_B);
+  gant.cyl(0.24, 0.28, 8, M4.t(-12.05, 2.55, 5.8));
+  gant.tube([-12.05, 2.7, 5.8], VID_B, 0.12, 8);
+  ball(gant, 0.26, VID_B);
   add("gant", gant, C.metal, VID_B);
 
   const pad = new Mesh();
@@ -208,19 +218,23 @@ function build(dark) {
   const cx = 7.6, cy = 2.05, cz = 0;
   frame.box(4.3, 0.38, 4.2, M4.t(cx, cy, cz));
   const motors = [[11.5, 3.7], [11.5, -3.7], [3.7, 3.7], [3.7, -3.7]];
+  const mounts = new Mesh();
   const cans = new Mesh();
   for (const [x, z] of motors) {
-    arm(frame, [cx, cz], [x, z], cy, 0.85, 0.26);
-    cans.lathe([[0.42, 0.02], [0.7, 0.18], [0.72, 0.72], [0.38, 0.92], [0.14, 1.02]], 14, M4.t(x, cy + 0.08, z));
-    cans.cyl(0.2, 0.14, 8, M4.t(x, cy + 1.2, z));
+    arm(frame, [cx, cz], [x, z], cy, 1.0, 0.28);
+    mounts.cyl(1.05, 0.14, 14, M4.t(x, cy + 0.2, z));
+    cans.lathe([[0.62, 0.02], [0.9, 0.16], [0.88, 0.58], [0.4, 0.82], [0.18, 0.96]], 16, M4.t(x, cy + 0.22, z));
+    cans.cyl(0.2, 0.12, 8, M4.t(x, cy + 1.22, z));
   }
   add("frame", frame, C.carbon, [cx, cy, cz]);
+  add("frame", mounts, C.chip, [cx, cy + 0.5, cz]);
   add("frame", cans, C.metal, [cx, cy + 0.5, cz]);
   const batt = new Mesh().box(4.2, 1.45, 2.15, M4.t(7.2, 1.0, cz));
-  batt.box(0.12, 1.2, 0.38, M4.t(5.15, 1.05, 0.45));
-  batt.box(0.12, 1.2, 0.38, M4.t(9.25, 1.05, 0.45));
+  batt.box(0.16, 1.25, 0.42, M4.t(5.2, 1.05, 0.55));
+  batt.box(0.16, 1.25, 0.42, M4.t(9.2, 1.05, 0.55));
   add("battery", batt, C.batt, [7.2, 1.05, cz]);
-  add("battery", new Mesh().box(0.7, 0.42, 0.5, M4.t(4.85, 1.15, 0)), C.gold, [7.2, 1.05, cz]);
+  add("battery", new Mesh().box(2.2, 1.1, 0.08, M4.t(7.2, 1.2, 1.02)), C.chip, [7.2, 1.05, cz]);
+  add("battery", new Mesh().box(0.85, 0.55, 0.62, M4.t(4.7, 1.15, 0)), C.gold, [7.2, 1.05, cz]);
   const props = new Mesh();
   // У заднего мотора у приёмника винт вдоль Z: иначе лопасть входит в корпус RX.
   const propYaw = { "3.7,-3.7": 0.12 };
@@ -263,14 +277,15 @@ function build(dark) {
   vtxant.lathe([[0.06, -0.16], [1.05, -0.08], [1.25, 0], [1.05, 0.08], [0.06, 0.16]], 18, M4.chain(M4.t(...VID_A), M4.rx(0.95)));
   add("vtxant", vtxant, C.metal, VID_A);
 
-  const camM = M4.chain(M4.t(12.7, 2.5, cz), M4.rz(0.4));
+  const camM = M4.chain(M4.t(12.7, 2.5, cz), M4.rz(0.22));
   const cam = new Mesh();
-  cam.box(1.2, 1.05, 1.2, camM);
-  cam.cyl(0.32, 0.55, 12, M4.chain(camM, M4.t(0.75, 0, 0), M4.rz(-Math.PI / 2)));
-  cam.cyl(0.48, 0.14, 14, M4.chain(camM, M4.t(1.05, 0, 0), M4.rz(-Math.PI / 2)));
+  cam.box(1.45, 1.15, 1.35, camM);
+  cam.box(0.35, 0.35, 0.7, M4.chain(camM, M4.t(-0.7, -0.55, 0)));
+  cam.cyl(0.42, 0.7, 14, M4.chain(camM, M4.t(0.85, 0, 0), M4.rz(-Math.PI / 2)));
+  cam.cyl(0.62, 0.16, 16, M4.chain(camM, M4.t(1.2, 0, 0), M4.rz(-Math.PI / 2)));
   add("camera", cam, C.cam, [12.7, 2.55, cz]);
   add("camera", new Mesh().tube([12.05, 2.5, 0], [8.95, 2.55, 0], 0.08, 6), C.wire, [12.7, 2.55, cz]);
-  add("camera", new Mesh().cyl(0.2, 0.08, 10, M4.chain(camM, M4.t(1.12, 0, 0), M4.rz(-Math.PI / 2))), C.glass, [12.7, 2.55, cz]);
+  add("camera", new Mesh().cyl(0.32, 0.08, 12, M4.chain(camM, M4.t(1.28, 0, 0), M4.rz(-Math.PI / 2))), C.glass, [12.7, 2.55, cz]);
 
   const cmdColor = BLUE.slice();
   const vidColor = ORANGE.slice();
@@ -303,33 +318,46 @@ const MODE_LEAD = {
 };
 
 export function mount(root, ctx) {
-  root.innerHTML = `<div class="d3-stage"><canvas class="d3-canvas" tabindex="0" role="img" aria-label="Два радиомоста: синий — команды от пульта к приёмнику, оранжевый — картинка от видеопередатчика к очкам"></canvas>
+  root.innerHTML = `<div class="d3-stage" data-lab="path3d"><canvas class="d3-canvas" tabindex="0" role="img" aria-label="Два радиомоста: синий — команды от пульта к приёмнику, оранжевый — картинка от видеопередатчика к очкам"></canvas>
     <svg class="d3-leaders" aria-hidden="true"><path/></svg>
     <span class="d3-marker" hidden style="pointer-events:none"></span>
-    <p class="d3-hint">Крути пальцем · щипок — масштаб · касание — деталь</p></div>
+    <span class="p3-lane" data-lane="cmd" hidden>Команды: пульт → дрон</span>
+    <span class="p3-lane" data-lane="vid" hidden>Видео: дрон → очки</span>
+    <p class="d3-hint">Крути пальцем · поломка — кнопки ниже</p></div>
+    <div class="d3-bar" role="group" aria-label="Какой мост замолчал"><button type="button" class="lab-btn" data-sym="ok" aria-pressed="true">Оба моста</button><button type="button" class="lab-btn" data-sym="cmd" aria-pressed="false">Нет управления</button><button type="button" class="lab-btn" data-sym="vid" aria-pressed="false">Нет картинки</button></div>
     <p class="lab-read" style="display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center">
       <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:50%;background:#2f78f6;display:inline-block"></i> синий — управление</span>
       <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:50%;background:#f27814;display:inline-block"></i> оранжевый — видео</span>
     </p>
-    <div class="d3-bar" role="group" aria-label="Какой мост замолчал"><button type="button" class="lab-btn" data-sym="ok" aria-pressed="true">Оба моста</button><button type="button" class="lab-btn" data-sym="cmd" aria-pressed="false">Нет управления</button><button type="button" class="lab-btn" data-sym="vid" aria-pressed="false">Нет картинки</button></div>
-    <div class="d3-bar" role="group" aria-label="Ракурс"><button type="button" class="lab-btn" data-view="top">Сверху</button><button type="button" class="lab-btn" data-view="side">Сбоку</button><button type="button" class="lab-btn" data-view="home">Как вначале</button></div>
+    <div class="d3-bar p3-views" role="group" aria-label="Ракурс"><button type="button" class="lab-btn" data-view="top">Сверху</button><button type="button" class="lab-btn" data-view="side">Сбоку</button><button type="button" class="lab-btn" data-view="home" hidden>Как вначале</button></div>
     <div class="d3-parts" role="group" aria-label="Звенья мостов">${CHIPS.map((id) => `<button type="button" data-part="${id}" aria-pressed="false">${SHORT[id]}</button>`).join("")}</div>
     <p class="lab-read d3-info" aria-live="polite">${MODE_LEAD.ok}</p>`;
   const $ = (q) => root.querySelector(q);
   const canvas = $(".d3-canvas"), infoEl = $(".d3-info");
-  const s = { sel: null, act: null, mode: "ok", seen: new Set(), cmdColor: null, vidColor: null, fitted: false, refit: false };
+  const s = { sel: null, act: null, mode: "ok", seen: new Set(), cmdColor: null, vidColor: null, fitted: false, refit: false, accent: null, bg: [1, 1, 1] };
+  // Телефон: до первого действия под холстом только три кнопки симптома (обсуждение 003, K1). Ракурсы «Сверху / Сбоку»
+  // и список деталей — после первого симптома или касания детали; «Как вначале» — когда ракурс ушёл с домашнего.
+  // На широком экране места хватает — всё видно сразу.
+  const phone = !!(window.matchMedia && window.matchMedia("(max-width:700px)").matches);
+  const partsEl = $(".d3-parts"), topBtns = [...root.querySelectorAll('[data-view="top"],[data-view="side"]')], homeBtn = $('[data-view="home"]');
+  const reveal = () => { partsEl.hidden = false; topBtns.forEach((b) => (b.hidden = false)); };
+  if (phone) { partsEl.hidden = true; topBtns.forEach((b) => (b.hidden = true)); } else reveal();
+  const dead = (id) => (s.mode === "cmd" && CMD_PARTS.has(id)) || (s.mode === "vid" && VID_PARTS.has(id));
+  const chain = () => (s.mode === "cmd" ? CMD_PARTS : s.mode === "vid" ? VID_PARTS : null);
   let camTo = null, last = 0;
   let viewer;
   try { viewer = createViewer(canvas, { onPick: (id) => select(id, "tap"), onView: () => checkView() }); }
   catch (e) { viewer = null; }
   const setPressed = () => {
     root.querySelectorAll("[data-sym]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sym === s.mode)));
-    root.querySelectorAll("[data-part]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.part === s.sel)));
+    // K3: звенья вне цепочки симптома бледные, но нажимаются — по ним есть «почему не здесь».
+    const ch = chain();
+    root.querySelectorAll("[data-part]").forEach((b) => { b.setAttribute("aria-pressed", String(b.dataset.part === s.sel)); b.toggleAttribute("data-off", !!ch && !ch.has(b.dataset.part)); });
     root.dataset.mode = s.mode;
     root.dataset.sel = s.sel || "";
   };
   function note(id) {
-    if (s.mode === "cmd" && id === "fc") return " Сейчас молчит синий мост. Полётник команд по радио не ловит: они приходят проводом от приёмника.";
+    if (s.mode === "cmd" && id === "fc") return " Сейчас молчит синий мост. Полётник команд по радио не ловит: они приходят проводом от приёмника. Картинка есть, а стики молчат — камера не первая дверь. На столе без пропеллеров открой в Betaflight вкладку «Приёмник»: не видит полётник движения стиков — ищи в пульте, приёмнике и проводе до FC; видит — дело в арме, ESC, моторах и их питании.";
     if (s.mode === "cmd" && VID_PARTS.has(id)) return " Это звено видео, а оно как раз живо: оранжевые точки идут. Ищи синий мост.";
     if (s.mode === "vid" && id === "fc") return " Полётник только подписывает картинку. Эфир видео — оранжевый мост, он сейчас молчит.";
     if (s.mode === "vid" && CMD_PARTS.has(id)) return " Это звено управления, а оно живо: синие точки идут. Ищи оранжевый мост.";
@@ -351,6 +379,7 @@ export function mount(root, ctx) {
   }
   function select(id, how) {
     s.sel = id && PARTS[id] ? id : null;
+    if (s.sel && (how === "tap" || how === "chip")) reveal();
     if (viewer) viewer.look.sel = s.sel;
     if (s.sel) s.seen.add(s.sel);
     if (how === "tap" || how === "chip") s.act = s.sel;
@@ -370,7 +399,7 @@ export function mount(root, ctx) {
   }
   const onClick = (e) => {
     const sym = e.target.closest("[data-sym]");
-    if (sym) return setMode(sym.dataset.sym);
+    if (sym) { reveal(); return setMode(sym.dataset.sym); }
     const pb = e.target.closest("[data-part]");
     if (pb) return select(pb.dataset.part === s.sel ? null : pb.dataset.part, "chip");
     const vb = e.target.closest("[data-view]");
@@ -383,6 +412,7 @@ export function mount(root, ctx) {
   };
   root.addEventListener("click", onClick);
   if (!viewer) {
+    reveal(); // без 3D список звеньев — единственный способ выбрать деталь
     root.dataset.webgl = "0";
     $(".d3-stage").innerHTML = `<p class="lab-read">Этот браузер не показывает 3D. Звенья те же: синий мост — команды, оранжевый — картинка. Выбери их в списке.</p>`;
     return { destroy() { root.removeEventListener("click", onClick); } };
@@ -396,8 +426,12 @@ export function mount(root, ctx) {
   const theme = () => {
     const [r, g, b] = cssColor(root, "--anatomy-page", [1, 1, 1]);
     viewer.look.bg = [r, g, b];
-    viewer.look.hi = cssColor(root, "--accent", [0.2, 0.5, 1]);
+    s.accent = cssColor(root, "--accent", [0.2, 0.5, 1]);
+    s.bg = [r, g, b];
+    viewer.look.hi = s.accent;
     const built = build(r * 0.3 + g * 0.59 + b * 0.11 < 0.5);
+    // Цвета в build() общие по ссылке (один металл у пяти деталей): даём каждой детали свою копию и запоминаем исходный.
+    for (const p of built.parts) if (!p.lane) { p.base = p.color.slice(); p.color = p.base.slice(); }
     s.cmdColor = built.cmdColor;
     s.vidColor = built.vidColor;
     viewer.setParts(built.parts);
@@ -413,6 +447,11 @@ export function mount(root, ctx) {
     if (s.cmdColor) { s.cmdColor[0] = c[0]; s.cmdColor[1] = c[1]; s.cmdColor[2] = c[2]; }
     if (s.vidColor) { s.vidColor[0] = v[0]; s.vidColor[1] = v[1]; s.vidColor[2] = v[2]; }
     for (const p of viewer.parts) if (p.packet) p.hidden = p.lane === "cmd" ? !cmdOn : !vidOn;
+    // K3: детали вне цепочки симптома приглушены к фону, не скрыты (скрытая деталь не ловит касание).
+    const ch = chain();
+    for (const p of viewer.parts) if (p.base) { const k = ch && !ch.has(p.id) ? 0.6 : 0; for (let i = 0; i < 3; i++) p.color[i] = p.base[i] + (s.bg[i] - p.base[i]) * k; }
+    // K2: выбранная деталь замолчавшего моста подсвечивается его серым, а не акцентом — мост не «оживает».
+    viewer.look.hi = s.sel && dead(s.sel) ? (s.mode === "cmd" ? BLUE_DEAD : ORANGE_DEAD) : s.accent;
   };
   viewer.onFrame = () => {
     const now = performance.now(), dt = last ? Math.min((now - last) / 1000, 0.05) : 0.016;
@@ -447,10 +486,21 @@ export function mount(root, ctx) {
         const ly = Math.max(28, Math.min(rect.height - 28, y - 22));
         marker.style.left = lx + "px";
         marker.style.top = ly + "px";
-        marker.textContent = SHORT[s.sel] || PARTS[s.sel].name;
+        marker.textContent = s.sel === "beam_cmd" && dead(s.sel) ? "Мост команд — встал" : s.sel === "beam_vid" && dead(s.sel) ? "Мост видео — встал" : (SHORT[s.sel] || PARTS[s.sel].name) + (dead(s.sel) ? " · мост встал" : "");
         leader.setAttribute("d", `M${x},${y}L${lx},${ly}`);
       }
     }
+    // K4: подписи направлений у линий (на трети пути от начала моста), касание не ловят.
+    const rect = canvas.getBoundingClientRect();
+    for (const [lane, a, b] of [["cmd", CMD_A, CMD_B], ["vid", VID_A, VID_B]]) {
+      const el = root.querySelector(`.p3-lane[data-lane="${lane}"]`);
+      const [x, y, vis] = viewer.project([a[0] + (b[0] - a[0]) * 0.35, a[1] + (b[1] - a[1]) * 0.35 + 1.6, a[2] + (b[2] - a[2]) * 0.35]);
+      el.hidden = !vis || x < 30 || x > rect.width - 30 || y < 12 || y > rect.height - 12;
+      el.style.left = Math.max(70, Math.min(rect.width - 70, x)) + "px";
+      el.style.top = y + "px";
+      el.toggleAttribute("data-dead", s.mode === lane);
+    }
+    syncHome();
     root.dataset.yaw = viewer.view.yaw.toFixed(3);
     root.dataset.pitch = viewer.view.pitch.toFixed(3);
     root.dataset.zoom = viewer.view.zoom.toFixed(3);
@@ -461,6 +511,13 @@ export function mount(root, ctx) {
   function checkView() {
     root.dataset.yaw = viewer.view.yaw.toFixed(3);
     root.dataset.pitch = viewer.view.pitch.toFixed(3);
+    syncHome();
+  }
+  // «Как вначале» видна, только когда ракурс ушёл с домашнего: тогда она и нужна.
+  function syncHome() {
+    const v = viewer.view, dy = Math.atan2(Math.sin(v.yaw - VIEWS.home[0]), Math.cos(v.yaw - VIEWS.home[0]));
+    const away = Math.abs(dy) > 0.05 || Math.abs(v.pitch - VIEWS.home[1]) > 0.05 || Math.abs(v.zoom - 1) > 0.02;
+    if (homeBtn.hidden === away) homeBtn.hidden = !away;
   }
   viewer.invalidate();
   root.__p3 = {
@@ -472,6 +529,8 @@ export function mount(root, ctx) {
       const r = canvas.getBoundingClientRect();
       return [r.left + x, r.top + y];
     },
+    hi: () => viewer.look.hi.slice(),
+    accent: () => s.accent.slice(),
     packets() {
       const n = { cmd: 0, vid: 0 };
       for (const p of viewer.parts) if (p.packet && !p.hidden) n[p.lane]++;

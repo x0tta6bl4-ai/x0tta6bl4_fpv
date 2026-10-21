@@ -44,6 +44,15 @@ if (p3.length) {
   const st = await p.evaluate((t) => { const d = [...document.querySelectorAll("#main details.sec-more")].find((x) => x.querySelector("h3")?.textContent === t); return d ? { open: d.open, h: Math.round(d.querySelector("summary").getBoundingClientRect().height) } : null; }, p3[0][1]);
   rep("раздел ③ свёрнут, заголовок свёртки не мельче 44 px", !!st && !st.open && st.h >= 44, JSON.stringify(st));
 } else rep("раздел ③ свёрнут", true, "разделов ③ нет");
+// Цветные блоки: открыто нужное на срезе и в поле, свёрнуто пояснительное
+// (в главах 6, 17, 18 — там правила безопасности и ответы среза; заметку данные могут открыть сами через open)
+const blk = { n: 0, closed: 0, bad: [] };
+for (const id of ["6", "17", "18"]) {
+  await go(id);
+  const r = await p.evaluate(() => { const all = [...document.querySelectorAll("#main details.blk")]; const want = new Set(["key", "safety", "exam", "remember", "trap"]); return { n: all.length, closed: all.filter((d) => !d.open).length, bad: all.filter((d) => want.has(d.dataset.type) && !d.open).map((d) => d.dataset.type) }; });
+  blk.n += r.n; blk.closed += r.closed; blk.bad.push(...r.bad.map((t) => `${id}:${t}`));
+}
+rep("блоки «безопасность», «на экзамене», «запомни», «ловушка» открыты, пояснения свёрнуты", blk.n > 0 && blk.closed > 0 && !blk.bad.length, JSON.stringify(blk));
 await go("6");
 const labels = await p.$$eval("#main .prio", (els) => els.map((e) => e.textContent));
 rep("метка «① главное» вместо «① экзамен»", labels.includes("① главное") && !labels.some((l) => /экзамен/.test(l)), [...new Set(labels)].join(", "));
