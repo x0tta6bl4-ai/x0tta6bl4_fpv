@@ -55,6 +55,8 @@ const instr = () => p.evaluate(() => {
   return { meter: num('[data-part="mets"]'), osd: num('[data-part="osds"]') };
 });
 const agree = []; // [шаг, мультиметр, OSD] — на каждом открытом шаге приборы обязаны совпадать
+const inline = []; // [шаг, число в карточке шага, число на мультиметре] — показания рядом с действием те же, что на сцене
+const cellsLine = []; // [случай, расчёт среднего на шаге «число банок»]
 async function solveCase(sc, { wrongFirst = false, useHelp = false, oldFix = null } = {}) {
   const steps = CASES.STEPS.map((s) => s.id);
   let sawGate = true, explained = false;
@@ -63,7 +65,8 @@ async function solveCase(sc, { wrongFirst = false, useHelp = false, oldFix = nul
     if (/Твой вывод/.test(before)) sawGate = false; // вывод виден до проверки
     if (useHelp && sid === "inspect") await act("help");
     await act("open");
-    if (sid === "voltage" || sid === "load") { const r = await instr(); agree.push([`${sc.id}:${sid}`, r.meter, r.osd]); }
+    if (sid === "voltage" || sid === "load") { const r = await instr(); agree.push([`${sc.id}:${sid}`, r.meter, r.osd]); const line = (await panel()).match(/мультиметр (\d+,\d) В · OSD (\d+,\d) В/); inline.push([`${sc.id}:${sid}`, line ? line[1] : "—", r.meter]); }
+    if (sid === "cells") cellsLine.push([sc.id, ((await panel()).match(/среднее = общее ÷ S = [^;<]+/) || ["—"])[0]]);
     const tone = sc.evidence[sid][0];
     if (wrongFirst && sid === "voltage") { await act("i:here"); explained = /✗/.test(await panel()); }
     await act(`i:${EXPECT[tone]}`);
@@ -115,6 +118,9 @@ const bad = agree.filter(([, m, o]) => m !== o || m === "—");
 rep("на шагах «приборы» и «нагрузка» мультиметр и OSD показывают одно и то же", agree.length >= 4 && !bad.length, JSON.stringify(bad.length ? bad : agree));
 const exB = B.example;
 rep("числа на приборах — из данных случая (покой и холодная нагрузка B)", agree.some(([k, m]) => k === `${B.id}:voltage` && m === String(exB.rest_V).replace(".", ",")) && agree.some(([k, m]) => k === `${B.id}:load` && m === String(exB.cold_load_V).replace(".", ",")), JSON.stringify(agree.filter(([k]) => k.startsWith(B.id))));
+rep("показания приборов в карточке шага совпадают со сценой", inline.length >= 4 && inline.every(([, a, m]) => a === m), JSON.stringify(inline));
+const Cx = CASES.SCENARIOS.find((s) => s.id === CASES.lesson_flow.transfer.scenario_id).example;
+rep("на шаге «число банок» виден расчёт среднего с ошибочным S", cellsLine.some(([id, t]) => id === CASES.lesson_flow.transfer.scenario_id && t.includes(`÷ ${Cx.cells_configured} = 3,43`)), JSON.stringify(cellsLine));
 await p.screenshot({ path: `${ROOT}/tests/out/lowv-390.png` });
 await b.close();
 const fail = res.filter((x) => !x).length;

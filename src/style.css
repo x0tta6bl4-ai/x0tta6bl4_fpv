@@ -1322,3 +1322,4 @@ table.t{max-width:100%;-webkit-overflow-scrolling:touch}
 .lv-th{font:600 10px var(--anatomy-mono);fill:var(--anatomy-strong);paint-order:stroke;stroke:var(--anatomy-page);stroke-width:2.5px}
 .lv-warn{stroke:var(--warn);stroke-width:.5;stroke-dasharray:1.6 1.2;fill:none}
 .lv-cold{stroke:var(--bad);stroke-width:1;fill:none}.lv-ctl{stroke:var(--ok);stroke-width:1;fill:none}
+.lv-instr{margin:6px 0 10px;padding:8px 10px;border-radius:8px;background:var(--anatomy-page);box-shadow:inset 0 0 0 1px var(--anatomy-faint);font:13px/1.5 var(--anatomy-mono);color:var(--anatomy-strong)}
