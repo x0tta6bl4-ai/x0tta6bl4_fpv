@@ -20,13 +20,13 @@ const BLUE_DEAD = [0.40, 0.44, 0.52];
 const ORANGE_DEAD = [0.52, 0.40, 0.32];
 
 // Концы мостов. Z разный и постоянный: сверху две параллельные линии.
-const CMD_A = [-23, 13.2, -6];
-const CMD_B = [13.0, 8.0, -6];
-const VID_A = [15.8, 7.6, 7.2];
-const VID_B = [-16.2, 6.4, 7.2];
+// Стол короткий, синий мост высокий: на узком телефоне мосты занимают кадр, а не поля.
+const CMD_A = [-15.2, 15.4, -5.6];
+const CMD_B = [4.8, 8.0, -5.6];
+const VID_A = [6.5, 6.8, 6.0];
+const VID_B = [-9.8, 6.0, 6.0];
 const BOUNDS = [
-  [-28, 0, -11], [-28, 14.2, -6], [-12, 4, 12],
-  [25, 0, -9], [25, 9, 10], [9, 9, -9],
+  [-18.5, 0.2, -8], [-18.5, 16, -5.6], [14.2, 0.2, -6], [14.2, 8.4, 8],
   CMD_A, CMD_B, VID_A, VID_B,
 ];
 const VIEWS = { top: [0.02, 1.18], side: [0.02, 0.16], home: [0.72, 0.40] };
@@ -107,9 +107,11 @@ function palette(dark) {
     glass: [0.55, 0.78, 0.90],
     batt: [0.74, 0.16, 0.18],
     motor: dark ? [0.42, 0.44, 0.48] : [0.28, 0.30, 0.34],
-    prop: dark ? [0.62, 0.64, 0.68] : [0.22, 0.24, 0.28],
+    prop: [0.78, 0.80, 0.84],
     pad: dark ? [0.20, 0.22, 0.26] : [0.82, 0.84, 0.86],
     stick: [0.86, 0.72, 0.28],
+    wire: [0.42, 0.45, 0.50],
+    gog: dark ? [0.22, 0.26, 0.32] : [0.10, 0.13, 0.18],
   };
 }
 
@@ -121,89 +123,94 @@ function build(dark) {
     return parts[parts.length - 1];
   };
   const radio = new Mesh();
-  radio.box(6.8, 2.15, 4.6, M4.t(-23, 1.2, -6));
-  add("radio", radio, C.radio, [-23, 1.8, -6]);
+  radio.box(6.2, 2.05, 4.2, M4.t(-15.2, 1.15, -5.4));
+  add("radio", radio, C.radio, [-15.2, 1.7, -5.4]);
   const sticks = new Mesh();
-  sticks.cyl(0.28, 1.15, 10, M4.t(-21.15, 2.7, -6.95));
-  sticks.cyl(0.28, 1.15, 10, M4.t(-21.15, 2.7, -5.05));
-  sticks.box(0.85, 0.28, 0.62, M4.t(-21.15, 3.35, -6.95));
-  sticks.box(0.85, 0.28, 0.62, M4.t(-21.15, 3.35, -5.05));
-  add("radio", sticks, C.stick, [-23, 1.8, -6]);
-  add("radio", new Mesh().box(2.6, 0.14, 1.7, M4.t(-24.3, 2.34, -6)), C.screen, [-23, 1.8, -6]);
+  sticks.cyl(0.34, 1.25, 10, M4.t(-13.5, 2.7, -6.15));
+  sticks.cyl(0.34, 1.25, 10, M4.t(-13.5, 2.7, -4.65));
+  sticks.box(0.95, 0.32, 0.7, M4.t(-13.5, 3.4, -6.15));
+  sticks.box(0.95, 0.32, 0.7, M4.t(-13.5, 3.4, -4.65));
+  add("radio", sticks, C.stick, [-15.2, 1.7, -5.4]);
+  add("radio", new Mesh().box(2.5, 0.16, 1.6, M4.t(-16.3, 2.25, -5.4)), C.screen, [-15.2, 1.7, -5.4]);
 
   const tx = new Mesh();
-  tx.tube([-23, 2.3, -6], CMD_A, 0.09, 8);
-  ball(tx, 0.28, CMD_A);
+  tx.tube([-15.2, 2.25, -5.4], CMD_A, 0.11, 8);
+  ball(tx, 0.32, CMD_A);
   add("txant", tx, C.metal, CMD_A);
 
   const gog = new Mesh();
-  gog.box(7.6, 2.5, 3.5, M4.t(-20.2, 1.7, 7.2));
-  gog.box(0.35, 1.3, 2.6, M4.t(-24.1, 1.9, 7.2));
-  add("goggles", gog, C.radio, [-20.2, 1.9, 7.2]);
+  gog.box(6.2, 2.35, 3.3, M4.t(-13.2, 1.6, 5.8));
+  gog.tube([-16.2, 2.1, 5.8], [-13.2, 3.35, 5.8], 0.18, 8);
+  gog.tube([-13.2, 3.35, 5.8], [-10.2, 2.1, 5.8], 0.18, 8);
+  add("goggles", gog, C.gog, [-13.2, 1.8, 5.8]);
   const lenses = new Mesh();
-  lenses.box(2.3, 0.16, 1.35, M4.t(-21.5, 3.02, 7.2));
-  lenses.box(2.3, 0.16, 1.35, M4.t(-18.7, 3.02, 7.2));
-  add("goggles", lenses, C.lens, [-20.2, 1.9, 7.2]);
+  lenses.box(0.24, 1.2, 1.0, M4.t(-9.95, 1.75, 4.9));
+  lenses.box(0.24, 1.2, 1.0, M4.t(-9.95, 1.75, 6.7));
+  add("goggles", lenses, C.lens, [-13.2, 1.8, 5.8]);
   const gant = new Mesh();
-  gant.tube([-16.5, 2.8, 7.2], VID_B, 0.09, 8);
-  ball(gant, 0.26, VID_B);
+  gant.tube([-10.05, 2.7, 5.8], VID_B, 0.1, 8);
+  ball(gant, 0.28, VID_B);
   add("gant", gant, C.metal, VID_B);
 
   const pad = new Mesh();
-  pad.box(16, 0.12, 14, M4.t(-21, 0.06, 0.6));
-  pad.box(22, 0.12, 18, M4.t(17, 0.06, 0.6));
-  add("pad", pad, C.pad, [-21, 0.1, 0.6]);
+  pad.box(13, 0.12, 12, M4.t(-14, 0.06, 0.2));
+  pad.box(16, 0.12, 13, M4.t(7.6, 0.06, 0));
+  add("pad", pad, C.pad, [-14, 0.1, 0.2]);
 
   const frame = new Mesh();
-  const cy = 2.05, cz = 0.6, cx = 17;
-  frame.box(4.4, 0.38, 4.4, M4.t(cx, cy, cz));
-  const motors = [[21.4, 4.4], [21.4, -3.2], [12.6, 4.4], [12.6, -3.2]];
+  const cx = 7.6, cy = 2.05, cz = 0;
+  frame.box(4.3, 0.38, 4.2, M4.t(cx, cy, cz));
+  const motors = [[11.5, 3.7], [11.5, -3.7], [3.7, 3.7], [3.7, -3.7]];
   const cans = new Mesh();
   for (const [x, z] of motors) {
-    arm(frame, [cx, cz], [x, z], cy, 1.05, 0.3);
-    cans.cyl(0.72, 0.7, 14, M4.t(x, cy + 0.4, z));
+    arm(frame, [cx, cz], [x, z], cy, 0.95, 0.28);
+    cans.cyl(0.7, 0.68, 14, M4.t(x, cy + 0.38, z));
   }
   add("frame", frame, C.carbon, [cx, cy, cz]);
   add("frame", cans, C.metal, [cx, cy + 0.4, cz]);
-  add("battery", new Mesh().box(4.6, 1.55, 2.3, M4.t(16.4, 1.05, cz)), C.batt, [16.4, 1.05, cz]);
+  add("battery", new Mesh().box(4.2, 1.5, 2.15, M4.t(7.2, 1.02, cz)), C.batt, [7.2, 1.05, cz]);
   const props = new Mesh();
   for (const [x, z] of motors) {
-    props.box(0.22, 0.07, 3.7, M4.chain(M4.t(x, cy + 0.95, z), M4.ry(0.5)));
-    props.box(0.22, 0.07, 3.7, M4.chain(M4.t(x, cy + 0.95, z), M4.ry(0.5 + Math.PI / 2)));
+    props.box(0.32, 0.1, 3.5, M4.chain(M4.t(x, cy + 0.92, z), M4.ry(0.45)));
+    props.box(0.32, 0.1, 3.5, M4.chain(M4.t(x, cy + 0.92, z), M4.ry(0.45 + Math.PI / 2)));
   }
   add("frame", props, C.prop, [cx, cy + 1, cz]);
 
   const fc = new Mesh();
-  fc.box(3.05, 0.2, 3.05, M4.t(cx, 2.5, cz));
+  fc.box(2.85, 0.2, 2.85, M4.t(cx, 2.48, cz));
   add("fc", fc, C.fc, [cx, 2.55, cz]);
-  add("fc", new Mesh().box(0.85, 0.12, 0.85, M4.t(cx, 2.66, cz + 0.3)), C.chip, [cx, 2.55, cz]);
+  add("fc", new Mesh().box(0.8, 0.12, 0.8, M4.t(cx, 2.64, 0.35)), C.chip, [cx, 2.55, cz]);
 
-  const rx = new Mesh().box(2.3, 0.7, 1.55, M4.t(14.6, 3.35, -4.5));
-  add("rx", rx, C.rx, [14.6, 3.4, -4.5]);
+  // Приёмник сидит на заднем углу рамы. Т-антенна вынесена в воздух — это конец синего моста.
+  const rxAt = [5.5, 2.72, -2.55];
+  add("rx", new Mesh().box(1.7, 0.82, 1.25, M4.t(...rxAt)), C.rx, rxAt);
+  add("rx", new Mesh().tube([6.2, 2.65, -1.75], [7.35, 2.58, -0.5], 0.08, 6), C.wire, rxAt);
   const rxant = new Mesh();
-  rxant.tube([14.6, 3.75, -4.5], CMD_B, 0.1, 8);
-  rxant.tube([CMD_B[0], CMD_B[1], CMD_B[2] - 1.7], [CMD_B[0], CMD_B[1], CMD_B[2] + 1.7], 0.09, 6);
-  ball(rxant, 0.22, CMD_B);
+  rxant.tube([rxAt[0], rxAt[1] + 0.45, rxAt[2]], CMD_B, 0.1, 8);
+  rxant.tube([CMD_B[0], CMD_B[1], CMD_B[2] - 1.55], [CMD_B[0], CMD_B[1], CMD_B[2] + 1.55], 0.09, 6);
+  ball(rxant, 0.24, CMD_B);
   add("rxant", rxant, C.metal, CMD_B);
 
-  const vtx = new Mesh().box(1.7, 0.7, 1.25, M4.t(15.4, 2.85, 2.9));
-  add("vtx", vtx, C.vtx, [15.4, 2.9, 2.9]);
+  const vtxAt = [6.15, 2.82, 2.25];
+  add("vtx", new Mesh().box(1.55, 0.65, 1.15, M4.t(...vtxAt)), C.vtx, vtxAt);
+  add("vtx", new Mesh().tube([7.45, 2.58, 0.65], [vtxAt[0] + 0.15, vtxAt[1], vtxAt[2] - 0.3], 0.08, 6), C.wire, vtxAt);
   const vtxant = new Mesh();
-  vtxant.tube([15.4, 3.25, 2.9], VID_A, 0.08, 8);
-  ball(vtxant, 0.48, VID_A, 12);
+  vtxant.tube([vtxAt[0], vtxAt[1] + 0.4, vtxAt[2]], VID_A, 0.1, 8);
+  ball(vtxant, 0.5, VID_A, 12);
   add("vtxant", vtxant, C.metal, VID_A);
 
   const cam = new Mesh();
-  cam.box(1.35, 1.15, 1.35, M4.t(22.2, 2.55, cz));
-  cam.cyl(0.32, 0.55, 12, M4.chain(M4.t(23.05, 2.55, cz), M4.rz(-Math.PI / 2)));
-  add("camera", cam, C.cam, [22.2, 2.6, cz]);
-  add("camera", new Mesh().cyl(0.22, 0.12, 10, M4.chain(M4.t(23.28, 2.55, cz), M4.rz(-Math.PI / 2))), C.glass, [22.2, 2.6, cz]);
+  cam.box(1.25, 1.1, 1.25, M4.t(12.7, 2.5, cz));
+  cam.cyl(0.3, 0.5, 12, M4.chain(M4.t(13.45, 2.5, cz), M4.rz(-Math.PI / 2)));
+  add("camera", cam, C.cam, [12.7, 2.55, cz]);
+  add("camera", new Mesh().tube([12.05, 2.5, 0], [8.95, 2.55, 0], 0.08, 6), C.wire, [12.7, 2.55, cz]);
+  add("camera", new Mesh().cyl(0.2, 0.12, 10, M4.chain(M4.t(13.68, 2.5, cz), M4.rz(-Math.PI / 2))), C.glass, [12.7, 2.55, cz]);
 
   const cmdColor = BLUE.slice();
   const vidColor = ORANGE.slice();
-  add("beam_cmd", new Mesh().tube(CMD_A, CMD_B, 0.26, 8), cmdColor, mid(CMD_A, CMD_B), { lane: "cmd" });
-  add("beam_vid", new Mesh().tube(VID_A, VID_B, 0.26, 8), vidColor, mid(VID_A, VID_B), { lane: "vid" });
-  const ballMesh = sphere(0.5, 12);
+  add("beam_cmd", new Mesh().tube(CMD_A, CMD_B, 0.28, 8), cmdColor, mid(CMD_A, CMD_B), { lane: "cmd" });
+  add("beam_vid", new Mesh().tube(VID_A, VID_B, 0.28, 8), vidColor, mid(VID_A, VID_B), { lane: "vid" });
+  const ballMesh = sphere(0.52, 12);
   for (let i = 0; i < 6; i++) {
     add("beam_cmd", ballMesh, cmdColor, [0, 0, 0], { packet: true, lane: "cmd", phase: i / 6, a: CMD_A, b: CMD_B, model: fly(i / 6, CMD_A, CMD_B) });
     add("beam_vid", ballMesh, vidColor, [0, 0, 0], { packet: true, lane: "vid", phase: i / 6, a: VID_A, b: VID_B, model: fly(i / 6 + 0.08, VID_A, VID_B) });
@@ -317,7 +324,7 @@ export function mount(root, ctx) {
   root.dataset.webgl = "1";
   viewer.view.yaw = VIEWS.home[0];
   viewer.view.pitch = VIEWS.home[1];
-  viewer.view.target = [-2.2, 5.4, 0.5];
+  viewer.view.target = [-3.2, 6.2, 0.2];
   viewer.view.zoom = 1;
   viewer.look.dimOthers = 0.5;
   const theme = () => {
