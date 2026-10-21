@@ -43,6 +43,14 @@ try{
   await page.locator('a[data-srz-sec="Расчёт 4. Длина волны"]').first().click();
   await page.waitForSelector('[data-calc-id="wave"]');
   assert.equal(await page.locator('[data-calc-id="wave"]').evaluate(e=>{const r=e.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight;}),true,'cross-chapter jump');
+  if(width<500){
+   await page.goto(pathToFileURL(resolve('dist/dev.html')).href+'#7');
+   await page.waitForSelector('[data-fig="flighttime"] .fig-tools');
+   const overlaps=await page.evaluate(()=>{const s=document.querySelector('#fig .iso-stage').getBoundingClientRect(),t=document.querySelector('#fig .fig-tools').getBoundingClientRect();return t.left<s.right&&t.right>s.left&&t.top<s.bottom&&t.bottom>s.top;});
+   assert.equal(overlaps,false,'toolbar does not cover the tank');
+   await page.locator('#fig').scrollIntoViewIfNeeded();
+   await page.screenshot({path:`tests/out/operator-tank-${width}.png`});
+  }
   assert.deepEqual(errors,[]);await page.close();console.log(`PASS operator ${width}: links and width`);
  }
 }finally{await browser.close();}

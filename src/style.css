@@ -1369,3 +1369,11 @@ table.t{max-width:100%;-webkit-overflow-scrolling:touch}
 .workspace:has(.ctl-sticks) #fig .fig-card .iso-plate{padding:32px 8px 10px}
 @media (max-width:700px){.workspace:has(.ctl-sticks) #fig .fig-card .iso-plate{padding-top:22px;padding-bottom:0}}
 .labcard.full:has(.ctl-sticks) .workspace:has(.ctl-sticks) #fig{max-width:100%}
+
+/* У высокого бака не должно быть кнопки поверх его верхушки: сенсорный
+   браузер может перенаправить касание близкого края к кнопке «Пауза». */
+@media (max-width:599px){
+  .workspace #fig .iso-figure[data-fig="flighttime"] .fig-tools{
+    position:static;justify-content:flex-end;margin-top:8px
+  }
+}

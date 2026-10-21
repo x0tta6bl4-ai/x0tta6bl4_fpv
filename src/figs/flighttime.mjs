@@ -193,11 +193,6 @@ export function controller(root, built, state) {
   const P = built.P;
   const q = (s) => root.querySelector(`[data-part="${s}"]`);
   const liqEl = q("liquid"), wmEl = q("wm"), flagEl = q("flag"), needleEl = q("needle");
-  // Жидкость перерисовывается каждый кадр. Захват сохраняем на её постоянной
-  // группе, чтобы отпускание пальца не потерялось при замене дочерних граней.
-  liqEl.onpointerdown = (event) => {
-    if (event.pointerType !== "mouse") liqEl.setPointerCapture(event.pointerId);
-  };
   const propEls = [...root.querySelectorAll("[data-prop]")];
   const sim = { fly: 0, spin: 0, needle: 0 };
   const M = built.model;
