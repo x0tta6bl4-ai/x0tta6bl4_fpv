@@ -166,6 +166,12 @@ ol.qs{padding-left:22px}
 .gloss>div{display:grid;grid-template-columns:240px 1fr;gap:12px;padding:7px 0;border-bottom:1px solid var(--anatomy-faint)}
 .gloss dt{font-weight:600;color:var(--anatomy-strong)}.gloss dd{margin:0}
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+/* вопросы среза (приложение И): вопрос — строка-кнопка, ответ раскрывается */
+.srz{border-bottom:1px solid var(--anatomy-faint)}
+.srz>summary{cursor:pointer;padding:11px 0;min-height:44px;font-weight:500;color:var(--anatomy-strong);list-style-position:outside;margin-left:18px;overflow-wrap:anywhere}
+.srz-n{font:600 12px var(--anatomy-mono);color:var(--anatomy-muted);margin-right:4px}
+.srz-a{padding:0 0 14px 18px;overflow-wrap:anywhere}
+.srz-a ul{margin:4px 0 10px;padding-left:20px}
 #dsearch,#gsearch{max-width:420px;margin-bottom:8px}
 .verdict{font-size:12.5px;font-weight:600}
 .verdict[data-verdict="Неверно"]{color:var(--bad)}.verdict[data-verdict="Верно второе"],.verdict[data-verdict="Оба частично верны"]{color:var(--ok)}.verdict[data-verdict="Частный случай"]{color:var(--warn)}.verdict[data-verdict="Уточнить"]{color:var(--accent)}
