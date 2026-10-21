@@ -244,7 +244,7 @@ export function mount(root, ctx) {
     <p class="lab-read d3-info" aria-live="polite">${MODE_LEAD.ok}</p>`;
   const $ = (q) => root.querySelector(q);
   const canvas = $(".d3-canvas"), infoEl = $(".d3-info");
-  const s = { sel: null, mode: "ok", seen: new Set(), cmdColor: null, vidColor: null, fitted: false, refit: false };
+  const s = { sel: null, act: null, mode: "ok", seen: new Set(), cmdColor: null, vidColor: null, fitted: false, refit: false };
   let camTo = null, last = 0;
   let viewer;
   try { viewer = createViewer(canvas, { onPick: (id) => select(id, "tap"), onView: () => checkView() }); }
@@ -265,27 +265,33 @@ export function mount(root, ctx) {
   }
   function checkMissions() {
     if (s.seen.has("beam_cmd") && s.seen.has("beam_vid")) ctx.done("air");
-    if (s.mode === "cmd" && CMD_PARTS.has(s.sel)) ctx.done("deaf");
-    if (s.mode === "vid" && VID_PARTS.has(s.sel)) ctx.done("dark");
+    // Звезда за выбор уже при этом симптоме. Касание с прошлого задания и сама кнопка режима не считаются.
+    if (s.mode === "cmd" && CMD_PARTS.has(s.act)) ctx.done("deaf");
+    if (s.mode === "vid" && VID_PARTS.has(s.act)) ctx.done("dark");
   }
-  function select(id, how) {
-    s.sel = id && PARTS[id] ? id : null;
-    if (viewer) viewer.look.sel = s.sel;
-    if (s.sel) s.seen.add(s.sel);
-    setPressed();
+  function paintInfo(how) {
     if (!s.sel) infoEl.textContent = how === "tap" ? "Мимо детали. Нажми мост, антенну или строку в списке." : MODE_LEAD[s.mode];
     else {
       const P = PARTS[s.sel];
       infoEl.innerHTML = `<b>${P.name}.</b> ${P.text}${note(s.sel)}`;
     }
+  }
+  function select(id, how) {
+    s.sel = id && PARTS[id] ? id : null;
+    if (viewer) viewer.look.sel = s.sel;
+    if (s.sel) s.seen.add(s.sel);
+    if (how === "tap" || how === "chip") s.act = s.sel;
+    setPressed();
+    paintInfo(how);
     checkMissions();
     if (viewer) viewer.invalidate();
   }
   function setMode(mode) {
+    if (s.mode === mode) return;
     s.mode = mode;
+    s.act = null;
     setPressed();
-    if (!s.sel) infoEl.textContent = MODE_LEAD[mode];
-    else select(s.sel, "chip");
+    paintInfo("mode");
     checkMissions();
     if (viewer) viewer.invalidate();
   }
@@ -322,7 +328,6 @@ export function mount(root, ctx) {
     s.cmdColor = built.cmdColor;
     s.vidColor = built.vidColor;
     viewer.setParts(built.parts);
-    s.fitted = false;
   };
   theme();
   const mo = new MutationObserver(theme);
@@ -376,6 +381,7 @@ export function mount(root, ctx) {
     root.dataset.yaw = viewer.view.yaw.toFixed(3);
     root.dataset.pitch = viewer.view.pitch.toFixed(3);
     root.dataset.zoom = viewer.view.zoom.toFixed(3);
+    root.dataset.radius = viewer.view.radius.toFixed(3);
     root.dataset.mode = s.mode;
     return true;
   };

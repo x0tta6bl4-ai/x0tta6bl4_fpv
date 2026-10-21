@@ -70,7 +70,15 @@ const W = (p, ms) => p.waitForTimeout(ms);
   rep("390", "касание оранжевого моста выбирает его", d.sel === "beam_vid", `sel ${d.sel}`);
   const air = await p.evaluate(() => document.querySelector('#missions li[data-m="air"]')?.classList.contains("ok"));
   rep("390", "задание «оба моста» засчитано", !!air, `score ${(await D()).score}`);
+  await p.evaluate(() => { const t = document.getElementById("toast"); if (t) t.hidden = true; });
+  await p.click('[data-sym="vid"]'); await W(p, 200);
+  const leaked = await p.evaluate(() => document.querySelector('#missions li[data-m="dark"]')?.classList.contains("ok"));
+  rep("390", "«Нет картинки» не закрывает задание прошлым касанием моста", !leaked);
+  await show(); await W(p, 150);
+  await tapAt(await at("beam_cmd"));
   await p.click('[data-sym="cmd"]'); await W(p, 200);
+  const leakedCmd = await p.evaluate(() => document.querySelector('#missions li[data-m="deaf"]')?.classList.contains("ok"));
+  rep("390", "«Нет управления» не закрывает задание прошлым касанием моста", !leakedCmd);
   await show(); await W(p, 200);
   const pk1 = await p.evaluate(() => document.querySelector("#labroot").__p3.packets());
   d = await D();
@@ -118,8 +126,10 @@ const W = (p, ms) => p.waitForTimeout(ms);
   const c = await D();
   rep("1280", "мышь крутит модель", Math.abs(c.yaw - a.yaw) > 0.25, `yaw ${a.yaw}→${c.yaw}`);
   await p.click("#theme"); await W(p, 400);
+  const e = await D();
   const shot = await p.locator(".d3-canvas").screenshot({ path: resolve(ROOT, "tests/out/path3d-dark.png") });
   rep("1280", "после смены темы сцена на месте", shot.length > 8000, `${shot.length} байт`);
+  rep("1280", "смена темы не сбрасывает ракурс", Math.abs(e.yaw - c.yaw) < 0.02 && Math.abs(e.radius - c.radius) < 0.05, `yaw ${c.yaw}→${e.yaw}, radius ${c.radius}→${e.radius}`);
   await ctx.close();
 }
 
