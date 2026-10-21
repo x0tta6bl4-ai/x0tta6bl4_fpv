@@ -46,3 +46,12 @@ try{
   assert.deepEqual(errors,[]);await page.close();console.log(`PASS operator ${width}: links and width`);
  }
 }finally{await browser.close();}
+
+// Повторяем исходную проверку касаний главы 7 без изменения её допусков.
+const { spawnSync } = await import('node:child_process');
+const tapped = spawnSync(process.execPath, [resolve('tests/tap-parts.mjs'), pathToFileURL(resolve('dist/dev.html')).href, '7'], {encoding:'utf8'});
+const hit = tapped.stdout.match(/OK (\d+)\/(\d+)/);
+assert.equal(tapped.status, 0, tapped.stderr);
+assert.ok(hit && Number(hit[1]) === Number(hit[2]) && Number(hit[2]) > 0, tapped.stdout);
+assert.match(tapped.stdout, /errors \[\]/);
+console.log('PASS operator: все детали главы 7 отвечают на касание');
