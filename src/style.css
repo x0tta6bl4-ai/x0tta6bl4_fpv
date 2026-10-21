@@ -166,6 +166,8 @@ ol.qs{padding-left:22px}
 .gloss>div{display:grid;grid-template-columns:240px 1fr;gap:12px;padding:7px 0;border-bottom:1px solid var(--anatomy-faint)}
 .gloss dt{font-weight:600;color:var(--anatomy-strong)}.gloss dd{margin:0}
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.filters button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:8px 13px;font-size:13.5px;border-radius:8px}
+#srzq{min-height:44px;padding:9px 12px;font-size:14.5px;border-radius:8px;margin-bottom:12px}
 /* вопросы среза (приложение И): вопрос — строка-кнопка, ответ раскрывается */
 .srz{border-bottom:1px solid var(--anatomy-faint)}
 .srz>summary{cursor:pointer;padding:11px 0;min-height:44px;font-weight:500;color:var(--anatomy-strong);list-style-position:outside;margin-left:18px;overflow-wrap:anywhere}
@@ -308,7 +310,7 @@ body.noscroll{overflow:hidden}
 .lab-choice{display:grid;gap:6px}
 .lab-choice b{font-size:14px;font-weight:500;color:var(--anatomy-strong)}
 .lab-choice [role="radiogroup"]{display:flex;flex-wrap:wrap;gap:6px}
-.lab-choice button{min-height:42px;padding:8px 13px;font-size:14px;border-radius:10px}
+.lab-choice button{min-height:44px;padding:8px 13px;font-size:14px;border-radius:10px}
 .lab-btn{min-height:44px;padding:10px 14px;border-radius:10px;font-size:14.5px;font-weight:500}
 .lab-btn:disabled{opacity:.55;cursor:default}
 .lab-btn.good{box-shadow:0 0 0 2px var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--anatomy-card))}
@@ -384,7 +386,10 @@ body.noscroll{overflow:hidden}
 .fc-q{font:400 21px/1.35 var(--serif);color:var(--anatomy-strong);margin:0}
 .fc-a{font-size:16px;color:var(--anatomy-strong);margin:0;padding-top:10px;border-top:1px dashed var(--anatomy-faint)}
 .fc-hint{color:var(--anatomy-muted);margin:0;font-size:14px}
-.fc-btns .lab-btn{flex:1;min-height:54px;font-size:16px}
+.fc-btns{display:flex;gap:12px;width:100%}
+.fc-btns .lab-btn{flex:1;min-height:54px;font-size:16px;border-radius:12px;font-weight:600}
+.fc-btns .lab-btn.bad{background:color-mix(in srgb,var(--bad) 12%,var(--anatomy-card));border:1.5px solid color-mix(in srgb,var(--bad) 40%,transparent);color:var(--bad)}
+.fc-btns .lab-btn.good{background:color-mix(in srgb,var(--ok) 12%,var(--anatomy-card));border:1.5px solid color-mix(in srgb,var(--ok) 40%,transparent);color:var(--ok)}
 .fc-prog{font:12.5px/1.4 var(--anatomy-mono);color:var(--anatomy-muted)}
 /* объяснение на пальцах */
 .kid{margin:18px 0;padding:16px 18px;border-radius:14px;background:color-mix(in srgb,var(--ok) 7%,var(--anatomy-card));box-shadow:0 0 0 1px color-mix(in srgb,var(--ok) 40%,transparent)}
@@ -656,6 +661,7 @@ body.noscroll{overflow:hidden}
    колонки сетки страницы должны уметь сжиматься (min-width:0), иначе их распирает самое широкое содержимое. */
 #main,#toc,.chapter,.chapter>*,.sec,.appx{min-width:0}
 table.t{max-width:100%;-webkit-overflow-scrolling:touch}
+@media (max-width:600px){table.t{font-size:12.5px;line-height:1.35;margin:8px 0}table.t th,table.t td{padding:5px 6px}}
 
 /* Выбранная деталь — ярко, остальные — бледно; без синей вспышки касания. */
 .iso-stage,.iso-stage *{-webkit-tap-highlight-color:transparent}
