@@ -206,6 +206,16 @@ function readings(sc, sid, solved) {
   const avg = osdTotal / set;
   return { total, osdTotal, set, avg, low: avg < ex.profile_warning_cell_V };
 }
+// Показания приборов прямо в карточке шага: на телефоне сцена уезжает вверх, а результат должен быть рядом с действием.
+// На шаге ③ — расчёт среднего, где виден сам параметр S: что изменил → где используется → что получилось.
+export function instrumentsLine(sc, sid) {
+  if (!sc || !sid || sid === "inspect") return "";
+  const ex = sc.example, r = readings(sc, sid, false);
+  let s = `<b>Приборы:</b> мультиметр ${f1(r.total)} В · OSD ${f1(r.osdTotal)} В · на банку ${f2(r.avg)} В`;
+  if (sid === "cells") s += `<br><b>Расчёт OSD:</b> среднее = общее ÷ S = ${f1(r.osdTotal)} ÷ ${ex.cells_configured} = ${f2(r.osdTotal / ex.cells_configured)} В` + (ex.cells_configured !== ex.cells_actual ? `; при реальных ${ex.cells_actual}S было бы ${f2(r.osdTotal / ex.cells_actual)} В` : "");
+  if (sid === "compare" && ex.rest_V != null) s += `<br><b>Запись при ${ex.current_A} А:</b> холодно ${f1(ex.cold_load_V)} В (${f2(ex.cold_load_V / ex.cells_actual)} на банку) · контроль ${f1(ex.control_load_V)} В (${f2(ex.control_load_V / ex.cells_actual)})`;
+  return `<p class="lv-instr">${s}</p>`;
+}
 function bfScreen(sc, sid, solved) {
   const w = SW, ex = sc ? sc.example : null;
   const head = (t) => txt(3, 7, t, "bf-t");
@@ -279,7 +289,7 @@ export function controller(root, built, state) {
       if (ph === "look") {
         const s = STEPS[step], [tone, seen] = sc.evidence[s.id];
         const verdict = tone === "ok" ? "норма" : tone === "hint" ? "улика — запоминаем, но причина ещё не доказана" : "причина подтверждена";
-        h += `<div class="proc-card"><h4>Пример · шаг ${s.n} ${s.name}</h4><p class="proc-do"><b>Что делаем:</b> ${s.do}</p><p class="proc-see"><b>Что видим:</b> ${seen}</p><p><b>Вывод:</b> ${verdict}.</p>${step === 0 ? `<p class="proc-small">${sc.help.text}</p>` : ""}<button type="button" class="proc-go" data-fig-act="wnext">${tone === "bad" ? "Как исправить →" : "Следующий шаг →"}</button></div>`;
+        h += `<div class="proc-card"><h4>Пример · шаг ${s.n} ${s.name}</h4><p class="proc-do"><b>Что делаем:</b> ${s.do}</p><p class="proc-see"><b>Что видим:</b> ${seen}</p>${instrumentsLine(sc, s.id)}<p><b>Вывод:</b> ${verdict}.</p>${step === 0 ? `<p class="proc-small">${sc.help.text}</p>` : ""}<button type="button" class="proc-go" data-fig-act="wnext">${tone === "bad" ? "Как исправить →" : "Следующий шаг →"}</button></div>`;
       } else {
         h += `<div class="proc-card"><h4>Пример · исправление и контроль</h4><p><b>Верно:</b> ${sc.fix[0][0]}</p>${sc.fix.slice(1).map(([t, why]) => `<p><b>Неверно:</b> ${t} <i>${why}</i></p>`).join("")}<p><b>Контроль:</b></p><ul class="lv-checks">${sc.postfix_checks.map((c) => `<li>✓ ${c}</li>`).join("")}</ul><button type="button" class="proc-go" data-fig-act="lesson:guided">Теперь сам, с подсказками →</button></div>`;
       }
@@ -297,7 +307,7 @@ export function controller(root, built, state) {
         h += `${fb}<div class="proc-card"><h4>Шаг ${s.n} · ${s.name}</h4><p class="proc-do"><b>Что делаешь:</b> ${s.do}</p><button type="button" class="proc-go" data-fig-act="open">Выполнить проверку</button>${helpHtml}</div>`;
         return h;
       }
-      h += `${fb}<div class="proc-card"><h4>Шаг ${s.n} · ${s.name}</h4><p class="proc-do"><b>Что делаешь:</b> ${s.do}</p><p class="proc-see"><b>Что видишь:</b> ${sc.evidence[s.id][1]}</p><p class="proc-q"><b>Твой вывод?</b></p>${CHOICES.map(([id, label]) => `<button type="button" class="proc-opt" data-fig-act="i:${id}">${label}</button>`).join("")}${helpHtml}</div>`;
+      h += `${fb}<div class="proc-card"><h4>Шаг ${s.n} · ${s.name}</h4><p class="proc-do"><b>Что делаешь:</b> ${s.do}</p><p class="proc-see"><b>Что видишь:</b> ${sc.evidence[s.id][1]}</p>${instrumentsLine(sc, s.id)}<p class="proc-q"><b>Твой вывод?</b></p>${CHOICES.map(([id, label]) => `<button type="button" class="proc-opt" data-fig-act="i:${id}">${label}</button>`).join("")}${helpHtml}</div>`;
       return h;
     }
     if (ph === "fix") {
