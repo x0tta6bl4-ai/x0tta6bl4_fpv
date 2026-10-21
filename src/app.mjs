@@ -240,9 +240,12 @@ function glossaryOf(word) {
     GLOSSARY.find(([t]) => parts(t).some((p) => p.length >= 4 && toks.some((k) => k.split(/[-_]/)[0] === p)));
   return hit ? `${hit[0]} — ${hit[1]}` : "";
 }
+const OPEN_BLK = new Set(["key", "safety", "exam", "remember", "trap"]);
 function blockHtml(b) {
   const head = b.title ? `${BLOCK[b.type]}: ${b.title}` : BLOCK[b.type];
-  const open = b.type === "key" || b.open ? " open" : "";
+  // Открыто то, что нужно на срезе и в поле: ключ, безопасность, «на экзамене», «запомни», ловушка.
+  // Свёрнуто пояснительное: аналогия, «что из этого следует», миф, заметка (или b.open в данных).
+  const open = OPEN_BLK.has(b.type) || b.open ? " open" : "";
   const text = tags(b.text);
   const body = /<(?:p|h[1-6]|ul|ol|dl|table|div|details)(?:\s|>)/i.test(text) ? text : `<p>${text}</p>`;
   return `<details class="blk" data-type="${b.type}"${open}><summary class="blk-h">${tags(head)}</summary><div class="blk-body">${body}${b.breaks ? `<p class="breaks"><b>Где ломается:</b> ${tags(b.breaks)}</p>` : ""}</div></details>`;
