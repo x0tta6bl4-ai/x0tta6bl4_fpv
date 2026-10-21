@@ -123,6 +123,44 @@ await phone(412, 915, false);
   await ctx.close();
 }
 
+// Детализация 029: геометрия не закрывает цели касания на телефонах в обеих темах.
+for (const width of [360, 390, 412]) for (const theme of ["light", "dark"]) {
+  const ctx = await b.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true, colorScheme: theme });
+  const p = await ctx.newPage();
+  p.on("pageerror", e => errs.push(e.message));
+  await p.goto(U);
+  await p.evaluate(t => document.documentElement.dataset.theme = t, theme);
+  await p.click('[data-figtab="lab:path3d"]'); await W(p, 900);
+  await p.locator(".d3-canvas").scrollIntoViewIfNeeded();
+  await W(p, 250);
+  await p.locator(".d3-stage").screenshot({ path: resolve(ROOT, `tests/out/path3d-detail-${width}-${theme}.png`) });
+  for (const id of ["beam_cmd", "beam_vid", "rx", "vtx"]) {
+    const at = await p.evaluate(id => document.querySelector("#labroot").__p3.at(id), id);
+    await p.touchscreen.tap(...at); await W(p, 150);
+    const selected = await p.locator("#labroot").getAttribute("data-sel");
+    rep(`${width}/${theme}`, `детализация не перекрывает ${id}`, selected === id, `sel ${selected}`);
+  }
+  rep(`${width}/${theme}`, "нет горизонтального переполнения", await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await ctx.close();
+}
+// Без WebGL список остаётся доступным, все три задания можно выполнить.
+{
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  await ctx.addInitScript(() => {
+    const get = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type, ...args) { return /webgl/i.test(type) ? null : get.call(this, type, ...args); };
+  });
+  const p = await ctx.newPage();
+  p.on("pageerror", e => errs.push(e.message));
+  await p.goto(U); await p.click('[data-figtab="lab:path3d"]');
+  rep("без WebGL", "пояснение и список доступны", await p.locator("#labroot").getAttribute("data-webgl") === "0" && await p.locator(".d3-parts").isVisible() && /не показывает 3D/.test(await p.locator(".d3-stage").innerText()));
+  for (const id of ["beam_cmd", "beam_vid"]) await p.click(`[data-part="${id}"]`);
+  await p.click('[data-sym="cmd"]'); await p.click('[data-part="rx"]');
+  await p.click('[data-sym="vid"]'); await p.click('[data-part="vtx"]');
+  rep("без WebGL", "описание и все три задания работают через список", /Видеопередатчик/.test(await p.locator(".d3-info").innerText()) && await p.locator('#missions li.ok').count() === 3);
+  await ctx.close();
+}
+
 await b.close();
 const fail = res.filter((x) => !x).length;
 console.log(`ИТОГ: ${res.length} проверок, FAIL ${fail}`);
