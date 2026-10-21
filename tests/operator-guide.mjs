@@ -33,6 +33,8 @@ try{
    await page.evaluate(t=>document.documentElement.setAttribute('data-theme',t),theme);
    assert.equal(await page.locator('.operator-rules > li').count(),12);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`width ${width} ${theme}`);
+   await page.locator('.operator-rules > li').first().scrollIntoViewIfNeeded();
+   await page.screenshot({path:`tests/out/operator-${width}-${theme}-rules.png`});
    await page.locator('a[data-srz-sec="Расчёт 10. Масштаб карты"]').first().click();
    assert.equal(await page.locator('[data-calc-id="scale"]').evaluate(e=>{const r=e.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight;}),true,'same-chapter jump');
    await page.screenshot({path:`tests/out/operator-${width}-${theme}.png`});
