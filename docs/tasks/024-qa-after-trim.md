@@ -3,7 +3,7 @@
 - Исполнитель: gemini
 - Статус: на ревью
 - Ветка: gemini/qa-after-trim
-- PR: —
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/50
 - Зависит от: 021 (порядок блоков, Claude) и 022 (тексты, GPT). Пункт 1 можно начать сразу.
 
 ## Что сделать
