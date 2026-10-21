@@ -13,10 +13,12 @@ assert.equal(calculations.length,11);assert.equal(new Set(calculations.map(x=>x.
 assert.equal(calculations.filter(c=>c.ch==='20').length,10);
 assert.equal(calculations.find(c=>c.id==='temperature').ch,'19');
 for(const calc of calculations.filter(c=>c.ch==='20')){assert.match(calc.section.body,/Пример/);assert.match(calc.section.body,/Граница/);}
-assert.deepEqual(KIDS,{});
-const optional=chapters.flatMap(c=>c.sections.flatMap(s=>s.blocks||[])).filter(b=>b.title==='Любопытным: физика этой главы');
-assert.equal(optional.length,19);assert.equal(optional.every(b=>b.type==='note'&&b.open===false),true);
-assert.equal(optional.filter(b=>b.text.includes('I = U ÷ R')).length,1);
+assert.equal(KIDS['20'],undefined);
+assert.equal(Object.keys(KIDS).length,19);
+assert.match(JSON.stringify(KIDS['0']),/Закон Ома/);
+assert.equal(Object.values(KIDS).flatMap(k=>k.laws||[]).filter(l=>/^I = U ÷ R/.test(l.f)).length,0);
+const lostVideo=chapters.find(c=>c.id==='18').questions.find(q=>q.q.startsWith('Пропало видео'));
+assert.match(lostVideo.a,/только при подтверждённом свободном безопасном пространстве/);
 for(const c of chapters)for(const s of c.sections)for(const b of s.blocks||[])if(['safety','trap'].includes(b.type))assert.match(b.text,/^Если /,`${c.id}: ${b.type}`);
 assert.equal((guide.sections[0].body.match(/<li><b>Если /g)||[]).length,12);
 const coverage=JSON.parse(fs.readFileSync(new URL('../docs/content/srez-coverage.json',import.meta.url)));
@@ -43,6 +45,16 @@ try{
   await page.locator('a[data-srz-sec="Расчёт 4. Длина волны"]').first().click();
   await page.waitForSelector('[data-calc-id="wave"]');
   assert.equal(await page.locator('[data-calc-id="wave"]').evaluate(e=>{const r=e.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight;}),true,'cross-chapter jump');
+  await page.goto(pathToFileURL(resolve('dist/dev.html')).href+'#3');
+  const rich = page.locator('details.blk').filter({hasText:'Любопытным: геометрия зазоров'}).first();
+  await rich.locator('summary').click();
+  assert.notEqual((await rich.locator('.blk-body').evaluate(e=>e.firstElementChild.textContent)).trim(),'','no empty parser-repaired paragraph');
+  await page.goto(pathToFileURL(resolve('dist/dev.html')).href+'#0');
+  const physics=page.locator('#extra');
+  assert.equal(await physics.evaluate(e=>e.open),false,'physics closed at chapter end');
+  await physics.locator(':scope > summary').click();
+  await page.waitForSelector('#extra .kid');
+  assert.ok(await physics.locator('.law').count()>0,'physics retained in the shared chapter fold');
   if(width<500){
    await page.goto(pathToFileURL(resolve('dist/dev.html')).href+'#7');
    await page.waitForSelector('[data-fig="flighttime"] .fig-tools');

@@ -65,7 +65,7 @@ code{font-family:var(--anatomy-mono);font-size:.92em;background:var(--anatomy-ca
 .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px;flex-wrap:wrap}
 .prio{font:500 11px/1 var(--anatomy-mono);padding:4px 8px;border-radius:99px;box-shadow:0 0 0 1px var(--anatomy-faint);color:var(--anatomy-muted);white-space:nowrap}
 .prio[data-prio="1"]{color:var(--anatomy-strong);box-shadow:0 0 0 1px var(--anatomy-mid)}
-body[data-fast] .sec[data-prio="2"],body[data-fast] .sec[data-prio="3"]{display:none}
+body[data-fast] .sec[data-prio="2"],body[data-fast] .sec[data-prio="3"],body[data-fast] details.sec-more,body[data-fast] details.extra{display:none}
 .blk{border-left:3px solid var(--c,var(--blk-note));background:var(--anatomy-card);padding:10px 14px;margin:12px 0;border-radius:0 8px 8px 0;box-shadow:0 0 0 1px var(--anatomy-faint)}
 .blk[data-type="key"]{--c:var(--blk-key)}.blk[data-type="analogy"]{--c:var(--blk-analogy)}.blk[data-type="follows"]{--c:var(--blk-follows)}.blk[data-type="remember"]{--c:var(--blk-remember)}.blk[data-type="trap"]{--c:var(--blk-trap)}.blk[data-type="exam"]{--c:var(--blk-exam)}.blk[data-type="safety"]{--c:var(--blk-safety)}.blk[data-type="myth"]{--c:var(--blk-myth)}
 .blk-h{font:600 12px/1.3 var(--sans);color:var(--c);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
@@ -171,6 +171,12 @@ ol.qs{padding-left:22px}
 .gloss>div{display:grid;grid-template-columns:240px 1fr;gap:12px;padding:7px 0;border-bottom:1px solid var(--anatomy-faint)}
 .gloss dt{font-weight:600;color:var(--anatomy-strong)}.gloss dd{margin:0}
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+/* свёрнутое по умолчанию: разделы ③ и блок «Физика: откуда это» в конце главы */
+details.sec-more,details.extra{margin:14px 0;border-radius:10px;box-shadow:0 0 0 1px var(--anatomy-faint);background:var(--anatomy-card)}
+details.sec-more>summary,details.extra>summary{cursor:pointer;min-height:44px;padding:11px 14px;font-weight:500;color:var(--anatomy-strong);overflow-wrap:anywhere}
+details.sec-more>summary{font-size:14px;color:var(--anatomy-muted)}
+details.sec-more[open],details.extra[open]{padding:0 14px 6px}
+details.sec-more[open]>summary,details.extra[open]>summary{margin:0 -14px;border-bottom:1px solid var(--anatomy-faint)}
 .filters button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:8px 13px;font-size:13.5px;border-radius:8px}
 #srzq{min-height:44px;padding:9px 12px;font-size:14.5px;border-radius:8px;margin-bottom:12px}
 .srz-modes{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}

@@ -57,7 +57,7 @@ const PARTS = ["Перед стартом", "Часть I · Как дрон л�
 const BLOCK = {
   key: "Ключ к пониманию", analogy: "Аналогия", follows: "Что из этого следует", remember: "Запомни", trap: "Ловушка", exam: "На экзамене", safety: "Безопасность", myth: "Миф и правда", note: "Заметка",
 };
-const PRIO = { 1: "① экзамен", 2: "② понимание", 3: "③ любопытным" };
+const PRIO = { 1: "① главное", 2: "② понимание", 3: "③ любопытным" };
 const DAY = 864e5;
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -243,9 +243,16 @@ function glossaryOf(word) {
 function blockHtml(b) {
   const head = b.title ? `${BLOCK[b.type]}: ${b.title}` : BLOCK[b.type];
   const open = b.type === "key" || b.open ? " open" : "";
-  return `<details class="blk" data-type="${b.type}"${open}><summary class="blk-h">${tags(head)}</summary><div class="blk-body"><p>${tags(b.text)}</p>${b.breaks ? `<p class="breaks"><b>Где ломается:</b> ${tags(b.breaks)}</p>` : ""}</div></details>`;
+  const text = tags(b.text);
+  const body = /<(?:p|h[1-6]|ul|ol|dl|table|div|details)(?:\s|>)/i.test(text) ? text : `<p>${text}</p>`;
+  return `<details class="blk" data-type="${b.type}"${open}><summary class="blk-h">${tags(head)}</summary><div class="blk-body">${body}${b.breaks ? `<p class="breaks"><b>Где ломается:</b> ${tags(b.breaks)}</p>` : ""}</div></details>`;
 }
 function sectionHtml(sec) {
+  // ③ «любопытным» не на пути по умолчанию: свёрнут, открывается касанием.
+  if (sec.prio === 3) return `<details class="sec-more"><summary>${PRIO[3]}: ${esc(sec.title)}</summary>${sectionBody(sec)}</details>`;
+  return sectionBody(sec);
+}
+function sectionBody(sec) {
   return `<section class="sec" data-prio="${sec.prio}"><div class="sec-h"><h3>${esc(sec.title)}</h3><span class="prio" data-prio="${sec.prio}">${PRIO[sec.prio]}</span></div>${tags(sec.body || "")}${sec.w ? `<div class="nw" data-w="${esc(sec.w)}"></div>` : ""}${(sec.blocks || []).map(blockHtml).join("")}</section>`;
 }
 function questionsHtml(ch) {
@@ -500,21 +507,24 @@ function chapterView(ch) {
   ${ch.lead ? `<p class="lead">${tags(ch.lead)}</p>` : ""}
   ${ch.riddle ? `<section class="riddle"><div class="eyebrow">Загадка</div><p class="riddle-t">${esc(ch.riddle)}</p><p class="muted small">Ответь до чтения, даже наугад. Разгадка — в конце главы.</p><textarea rows="2" id="guess" placeholder="Моя догадка…">${esc(S.guess[ch.id] || "")}</textarea></section>` : ""}
   ${ch.goals ? `<div class="goals"><div><div class="eyebrow">После главы ты сможешь</div><ul>${ch.goals.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div>${ch.words ? `<div><div class="eyebrow">Новые слова</div><p class="words">${ch.words.map((w) => `<span class="word" tabindex="0" title="${esc(glossaryOf(w))}">${esc(w)}</span>`).join("")}</p></div>` : ""}</div>` : ""}
-  ${kidHtml(ch)}
   ${ch.standAfter === undefined ? interactiveHtml(ch) : ""}
-  ${ch.methodsEnd ? "" : methodsInline(ch)}
   ${ch.calc === "scale" ? scaleCalc() : ""}
   ${(ch.sections || []).map((sec, i) => sectionHtml(sec) + (ch.standAfter === i ? interactiveHtml(ch) : "")).join("")}
-  ${ch.methodsEnd ? ((m) => (m ? `<div class="eyebrow mx-extra">Дополнительно · сравнение моделей</div>${m}` : ""))(methodsInline(ch)) : ""}
   ${ch.corrections ? `<p class="lab-note"><b>Уточнение лаборатории.</b> ${esc(ch.corrections.replace(/^Уточнение( лаборатории)?: /, ""))}</p>` : ""}
   ${ch.answer ? `<section class="solution"><div class="eyebrow">Разгадка</div><p class="muted small" id="myguess">${S.guess[ch.id] ? `Твоя догадка: «${esc(S.guess[ch.id])}»` : "Ты не записал догадку — ничего страшного."}</p><button type="button" class="ghost" id="reveal" aria-expanded="false">Открыть разгадку</button><p class="answer" hidden>${esc(ch.answer)}</p></section>` : ""}
   ${ch.summary ? `<section class="summary"><div class="eyebrow">Итог</div><p>${esc(ch.summary)}</p></section>` : ""}
   ${questionsHtml(ch)}
   ${repeatHtml(ch)}
+  ${extraHtml(ch)}
   <div class="ch-actions"><button type="button" id="markdone" aria-pressed="${!!S.done[ch.id]}">${S.done[ch.id] ? "✓ Глава изучена" : "Отметить главу изученной"}</button></div>
   ${sourceHtml(ch.id)}
   <nav class="pager">${prev ? `<a href="#${prev.id}">← ${prev.num}. ${esc(prev.title)}</a>` : `<a href="#start">← Как пользоваться книгой</a>`}<a href="#${next.id}">${next.num !== undefined ? `${next.num}. ` : `${next.id}. `}${esc(next.title)} →</a></nav>
   </article>`;
+}
+// Формулы «по-школьному» и опыт лаборатории методов — не на пути ученика: после итога и вопросов, свёрнуто.
+function extraHtml(ch) {
+  const inner = kidHtml(ch) + methodsInline(ch);
+  return inner ? `<details class="extra" id="extra"><summary>Физика: откуда это <span class="muted">(по желанию)</span></summary>${inner}</details>` : "";
 }
 function scaleCalc() {
   return `<section class="calc"><div class="eyebrow">Счётная линейка масштаба</div><div class="calc-row"><label>Масштаб 1 : <input type="number" id="sc-m" value="50000" step="1000" min="1000"></label><label>На карте, см <input type="number" id="sc-cm" value="2" step="0.5" min="0"></label><output id="sc-out"></output></div><p class="muted small">1 см на карте = масштаб ÷ 100 метров. Ветер называют по тому, <b>откуда</b> он дует.</p></section>`;
@@ -532,7 +542,7 @@ function startView() {
   <p class="lead">Учебник для подготовки к экзамену оператора FPV. Здесь объясняется, почему дрон ведёт себя так, а не иначе: когда понятна причина, ответ не нужно зубрить — его можно вывести. Каждая глава построена вокруг вопросов, а рядом стоит стенд, на котором механизм можно покрутить руками.</p>
   <div class="stats"><div><b>${done} / ${total}</b><span>глав изучено</span></div><div><b>${graded} / ${all}</b><span>вопросов с самооценкой</span></div><div><b>${dueList().length}</b><span>повторений на сегодня</span></div><div><b id="stars2">★ ${starsTotal().got} / ${starsTotal().all}</b><span>звёзд за миссии</span></div></div>
   <section class="sec"><div class="sec-h"><h3>Как устроена каждая глава</h3></div><ol><li><b>«Вы здесь»</b>: полоска подсистем показывает, о какой части дрона глава.</li><li><b>Загадка.</b> Ответь до чтения, даже наугад, и запиши догадку. Разгадка — в конце главы.</li><li><b>Цели и новые слова.</b> Наведи на слово — появится определение из глоссария.</li><li><b>Физика по-школьному.</b> Законы главы: формула, что значит каждая буква, пример на числах, что это значит для дрона и вопрос «проверь себя».</li><li><b>Лаборатория.</b> Своя интерактивная схема в каждой главе и 4 задания со звёздами. Текущее задание и подсказка «как сделать» — в панели внизу экрана; задание засчитывается само, когда ты добился нужного результата.</li><li><b>Объяснение</b> с аналогиями (и строкой «где ломается»), выводами и ловушками.</li><li><b>Конец главы</b>: разгадка, итог в трёх строках, «Проверь себя» с ответами из Приложения Е.</li></ol></section>
-  <section class="sec"><div class="sec-h"><h3>Что учить в первую очередь</h3></div><p><span class="prio" data-prio="1">① экзамен</span> учи в первую очередь. <span class="prio" data-prio="2">② понимание</span> объясняет, почему так, и помогает вывести ответ. <span class="prio" data-prio="3">③ любопытным</span> можно пропустить при первом чтении.</p><p><b>Быстрый проход</b> (переключатель в шапке): только разделы ① и концы глав. Это займёт вечер.</p></section>
+  <section class="sec"><div class="sec-h"><h3>Что учить в первую очередь</h3></div><p><span class="prio" data-prio="1">① главное</span> учи в первую очередь: это нужно на срезе и в поле. <span class="prio" data-prio="2">② понимание</span> объясняет, почему так, и помогает вывести ответ. <span class="prio" data-prio="3">③ любопытным</span> свёрнуто — открой, если интересно. Формулы и опыты «откуда это» — в конце главы, в блоке «Физика: откуда это (по желанию)».</p><p><b>Быстрый проход</b> (переключатель в шапке): только разделы ① и концы глав. Это займёт вечер.</p></section>
   <section class="sec"><div class="sec-h"><h3>Цветные блоки</h3></div><div class="legend-blocks">${Object.entries(BLOCK).filter(([k]) => k !== "note").map(([k, v]) => `<aside class="blk" data-type="${k}"><div class="blk-h">${v}</div><p>${{ key: "Главная мысль главы.", analogy: "Знакомая вещь, похожая на механизм. Внизу — «где ломается»: где сходство заканчивается.", follows: "Только то, что выводится из объяснения выше. Закрой ладонью и выведи сам.", remember: "Факты, которые не выводятся, а просто есть: названия, числа, пункты меню.", trap: "Типичная ошибка на экзамене и в работе.", exam: "Где ключ теста расходится с физикой или документацией. Подробности — в Приложении Д.", safety: "Где ошибка может кого-то ранить или что-то сжечь.", myth: "Популярное заблуждение и почему оно неверно." }[k]}</p></aside>`).join("")}</div>
   <p>Метки у чисел: <span class="tag" data-tag="закон">закон</span> верно всегда · <span class="tag" data-tag="оценка">оценка</span> прикидка по паспортным числам или упрощённой модели · <span class="tag" data-tag="версия">зависит от версии</span> сверяй со своей прошивкой · <span class="tag" data-tag="пример">пример</span> условные числа.</p></section>
   <section class="sec"><div class="sec-h"><h3>Как учиться по книге</h3></div><p>Прочитал главу — закрой её, ответь на «Проверь себя» и оцени себя (2 — объяснил почему, 1 — верно без объяснения, 0 — неверно). Повтори через 1 день, через 3–4 дня и за неделю до экзамена; укажи дату экзамена слева — график посчитается сам. Глава 20 — всё вперемешку. Самопроверка и интервальное повторение — самые надёжные из изученных техник учёбы [19].</p></section>
@@ -668,11 +678,19 @@ function render() {
   mxCtl = null;
   const exp = ch ? EXPERIMENTS.find((e) => homeChapter(e) === ch.id) : null;
   if (exp && $("#mx")) {
-    try {
-      mxCtl = mountExperiment($("#mx"), exp, { book: BOOK, images, zoomer: attachZoom });
-    } catch (e) {
-      $("#mx").innerHTML = `<p class="muted">Опыт не запустился: ${esc(e.message)}</p>`;
-    }
+    // Опыт лежит в свёрнутом блоке: запускаем его, когда блок открыт (в скрытом блоке у сцены нулевой размер).
+    const mountMx = () => {
+      if (mxCtl || !$("#mx")) return;
+      try {
+        mxCtl = mountExperiment($("#mx"), exp, { book: BOOK, images, zoomer: attachZoom });
+      } catch (e) {
+        $("#mx").innerHTML = `<p class="muted">Опыт не запустился: ${esc(e.message)}</p>`;
+      }
+    };
+    const extra = $("#extra");
+    if (linked && extra) extra.open = true;
+    if (!extra || extra.open) mountMx();
+    else extra.addEventListener("toggle", () => extra.open && mountMx());
     if (linked) requestAnimationFrame(() => $("#mxsec") && $("#mxsec").scrollIntoView({ block: "start" }));
   }
   document.body.toggleAttribute("data-fast", !!S.fast);
@@ -745,6 +763,7 @@ function render() {
   // Ссылка «Объяснение» из вопросов среза открывает главу сразу на нужном разделе.
   const secEl = !ch || !render.sec ? null : render.sec === "#check" ? $("#check") : $$("#main section.sec").find((s) => s.querySelector("h3")?.textContent === render.sec);
   render.sec = null;
+  if (secEl && secEl.closest("details")) secEl.closest("details").open = true;
   if (secEl) secEl.scrollIntoView({ block: "start" });
   else if (render.keepLab && document.getElementById("labcard")) document.getElementById("labcard").scrollIntoView({ block: "start" });
   else if (!render.first) window.scrollTo(0, 0);
