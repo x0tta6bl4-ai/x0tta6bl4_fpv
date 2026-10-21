@@ -346,6 +346,7 @@ function interactiveHtml(ch) {
   const body = it.kind === "lab" ? `<div id="labroot" class="labroot"></div>` : `<section class="workspace"><div class="ws-fig"><div id="fig"></div><div class="metrics" id="metrics"></div><p class="fig-note" id="fignote"></p><div class="fig-info" id="figinfo"></div></div><aside class="ws-side" id="side"></aside></section>`;
   return `<section class="labcard" id="labcard" data-kind="${it.kind}">
     ${figsOf(ch).length > 1 ? `<div class="lab-tabs" role="tablist" aria-label="Стенды главы">${figsOf(ch).map((f) => { const ms = tabMod(f).meta.missions || []; const got = ms.filter((m) => S.miss[missKey(ch, m.id)]).length; const on = tabKey(f) === tabKey(activeFig(ch)); return `<button type="button" role="tab" aria-selected="${on}" data-figtab="${tabKey(f)}">${esc(f.tab || tabMod(f).meta.title)} <small>${got}/${ms.length}★</small></button>`; }).join("")}</div>` : ""}
+    ${ch.tabsHint && figsOf(ch).length > 1 ? `<p class="lab-tabs-hint">${esc(ch.tabsHint)}</p>` : ""}
     <div class="lab-head"><div><div class="eyebrow">Лаборатория главы ${ch.num}</div><h2>${esc(it.title)}</h2></div><div class="lab-tools"><span class="lab-score" id="labscore">${done} / ${it.missions.length} ★</span><button type="button" id="full" aria-pressed="false">На весь экран</button></div></div>
     ${introHtml(it)}
     ${body}
@@ -490,7 +491,7 @@ function missionDone(ch, id) {
     }
     clearTimeout(QUEST.t);
   }
-  if (!wasCurrent || done === it.missions.length) toast(done === it.missions.length ? `Лаборатория пройдена! ★ ${done} из ${it.missions.length}` : `★ Задание выполнено: ${m.text}`);
+  if (!wasCurrent || done === it.missions.length) toast(done === it.missions.length ? `Лаборатория пройдена! ★ ${done} из ${it.missions.length}` : `★ Задание ${done} из ${it.missions.length} выполнено`);
   const live = document.getElementById("announce");
   if (live) live.textContent = `Миссия выполнена: ${m.text}`;
 }

@@ -318,33 +318,46 @@ const MODE_LEAD = {
 };
 
 export function mount(root, ctx) {
-  root.innerHTML = `<div class="d3-stage"><canvas class="d3-canvas" tabindex="0" role="img" aria-label="Два радиомоста: синий — команды от пульта к приёмнику, оранжевый — картинка от видеопередатчика к очкам"></canvas>
+  root.innerHTML = `<div class="d3-stage" data-lab="path3d"><canvas class="d3-canvas" tabindex="0" role="img" aria-label="Два радиомоста: синий — команды от пульта к приёмнику, оранжевый — картинка от видеопередатчика к очкам"></canvas>
     <svg class="d3-leaders" aria-hidden="true"><path/></svg>
     <span class="d3-marker" hidden style="pointer-events:none"></span>
-    <p class="d3-hint">Крути пальцем · щипок — масштаб · касание — деталь</p></div>
+    <span class="p3-lane" data-lane="cmd" hidden>Команды: пульт → дрон</span>
+    <span class="p3-lane" data-lane="vid" hidden>Видео: дрон → очки</span>
+    <p class="d3-hint">Крути пальцем · поломка — кнопки ниже</p></div>
+    <div class="d3-bar" role="group" aria-label="Какой мост замолчал"><button type="button" class="lab-btn" data-sym="ok" aria-pressed="true">Оба моста</button><button type="button" class="lab-btn" data-sym="cmd" aria-pressed="false">Нет управления</button><button type="button" class="lab-btn" data-sym="vid" aria-pressed="false">Нет картинки</button></div>
     <p class="lab-read" style="display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center">
       <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:50%;background:#2f78f6;display:inline-block"></i> синий — управление</span>
       <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:50%;background:#f27814;display:inline-block"></i> оранжевый — видео</span>
     </p>
-    <div class="d3-bar" role="group" aria-label="Какой мост замолчал"><button type="button" class="lab-btn" data-sym="ok" aria-pressed="true">Оба моста</button><button type="button" class="lab-btn" data-sym="cmd" aria-pressed="false">Нет управления</button><button type="button" class="lab-btn" data-sym="vid" aria-pressed="false">Нет картинки</button></div>
-    <div class="d3-bar" role="group" aria-label="Ракурс"><button type="button" class="lab-btn" data-view="top">Сверху</button><button type="button" class="lab-btn" data-view="side">Сбоку</button><button type="button" class="lab-btn" data-view="home">Как вначале</button></div>
+    <div class="d3-bar p3-views" role="group" aria-label="Ракурс"><button type="button" class="lab-btn" data-view="top">Сверху</button><button type="button" class="lab-btn" data-view="side">Сбоку</button><button type="button" class="lab-btn" data-view="home" hidden>Как вначале</button></div>
     <div class="d3-parts" role="group" aria-label="Звенья мостов">${CHIPS.map((id) => `<button type="button" data-part="${id}" aria-pressed="false">${SHORT[id]}</button>`).join("")}</div>
     <p class="lab-read d3-info" aria-live="polite">${MODE_LEAD.ok}</p>`;
   const $ = (q) => root.querySelector(q);
   const canvas = $(".d3-canvas"), infoEl = $(".d3-info");
-  const s = { sel: null, act: null, mode: "ok", seen: new Set(), cmdColor: null, vidColor: null, fitted: false, refit: false };
+  const s = { sel: null, act: null, mode: "ok", seen: new Set(), cmdColor: null, vidColor: null, fitted: false, refit: false, accent: null, bg: [1, 1, 1] };
+  // Телефон: до первого действия под холстом только три кнопки симптома (обсуждение 003, K1). Ракурсы «Сверху / Сбоку»
+  // и список деталей — после первого симптома или касания детали; «Как вначале» — когда ракурс ушёл с домашнего.
+  // На широком экране места хватает — всё видно сразу.
+  const phone = !!(window.matchMedia && window.matchMedia("(max-width:700px)").matches);
+  const partsEl = $(".d3-parts"), topBtns = [...root.querySelectorAll('[data-view="top"],[data-view="side"]')], homeBtn = $('[data-view="home"]');
+  const reveal = () => { partsEl.hidden = false; topBtns.forEach((b) => (b.hidden = false)); };
+  if (phone) { partsEl.hidden = true; topBtns.forEach((b) => (b.hidden = true)); } else reveal();
+  const dead = (id) => (s.mode === "cmd" && CMD_PARTS.has(id)) || (s.mode === "vid" && VID_PARTS.has(id));
+  const chain = () => (s.mode === "cmd" ? CMD_PARTS : s.mode === "vid" ? VID_PARTS : null);
   let camTo = null, last = 0;
   let viewer;
   try { viewer = createViewer(canvas, { onPick: (id) => select(id, "tap"), onView: () => checkView() }); }
   catch (e) { viewer = null; }
   const setPressed = () => {
     root.querySelectorAll("[data-sym]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sym === s.mode)));
-    root.querySelectorAll("[data-part]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.part === s.sel)));
+    // K3: звенья вне цепочки симптома бледные, но нажимаются — по ним есть «почему не здесь».
+    const ch = chain();
+    root.querySelectorAll("[data-part]").forEach((b) => { b.setAttribute("aria-pressed", String(b.dataset.part === s.sel)); b.toggleAttribute("data-off", !!ch && !ch.has(b.dataset.part)); });
     root.dataset.mode = s.mode;
     root.dataset.sel = s.sel || "";
   };
   function note(id) {
-    if (s.mode === "cmd" && id === "fc") return " Сейчас молчит синий мост. Полётник команд по радио не ловит: они приходят проводом от приёмника.";
+    if (s.mode === "cmd" && id === "fc") return " Сейчас молчит синий мост. Полётник команд по радио не ловит: они приходят проводом от приёмника. Картинка есть, а стики молчат — камера не первая дверь. На столе без пропеллеров открой в Betaflight вкладку «Приёмник»: не видит полётник движения стиков — ищи в пульте, приёмнике и проводе до FC; видит — дело в арме, ESC, моторах и их питании.";
     if (s.mode === "cmd" && VID_PARTS.has(id)) return " Это звено видео, а оно как раз живо: оранжевые точки идут. Ищи синий мост.";
     if (s.mode === "vid" && id === "fc") return " Полётник только подписывает картинку. Эфир видео — оранжевый мост, он сейчас молчит.";
     if (s.mode === "vid" && CMD_PARTS.has(id)) return " Это звено управления, а оно живо: синие точки идут. Ищи оранжевый мост.";
@@ -366,6 +379,7 @@ export function mount(root, ctx) {
   }
   function select(id, how) {
     s.sel = id && PARTS[id] ? id : null;
+    if (s.sel && (how === "tap" || how === "chip")) reveal();
     if (viewer) viewer.look.sel = s.sel;
     if (s.sel) s.seen.add(s.sel);
     if (how === "tap" || how === "chip") s.act = s.sel;
@@ -385,7 +399,7 @@ export function mount(root, ctx) {
   }
   const onClick = (e) => {
     const sym = e.target.closest("[data-sym]");
-    if (sym) return setMode(sym.dataset.sym);
+    if (sym) { reveal(); return setMode(sym.dataset.sym); }
     const pb = e.target.closest("[data-part]");
     if (pb) return select(pb.dataset.part === s.sel ? null : pb.dataset.part, "chip");
     const vb = e.target.closest("[data-view]");
@@ -398,6 +412,7 @@ export function mount(root, ctx) {
   };
   root.addEventListener("click", onClick);
   if (!viewer) {
+    reveal(); // без 3D список звеньев — единственный способ выбрать деталь
     root.dataset.webgl = "0";
     $(".d3-stage").innerHTML = `<p class="lab-read">Этот браузер не показывает 3D. Звенья те же: синий мост — команды, оранжевый — картинка. Выбери их в списке.</p>`;
     return { destroy() { root.removeEventListener("click", onClick); } };
@@ -411,8 +426,12 @@ export function mount(root, ctx) {
   const theme = () => {
     const [r, g, b] = cssColor(root, "--anatomy-page", [1, 1, 1]);
     viewer.look.bg = [r, g, b];
-    viewer.look.hi = cssColor(root, "--accent", [0.2, 0.5, 1]);
+    s.accent = cssColor(root, "--accent", [0.2, 0.5, 1]);
+    s.bg = [r, g, b];
+    viewer.look.hi = s.accent;
     const built = build(r * 0.3 + g * 0.59 + b * 0.11 < 0.5);
+    // Цвета в build() общие по ссылке (один металл у пяти деталей): даём каждой детали свою копию и запоминаем исходный.
+    for (const p of built.parts) if (!p.lane) { p.base = p.color.slice(); p.color = p.base.slice(); }
     s.cmdColor = built.cmdColor;
     s.vidColor = built.vidColor;
     viewer.setParts(built.parts);
@@ -428,6 +447,11 @@ export function mount(root, ctx) {
     if (s.cmdColor) { s.cmdColor[0] = c[0]; s.cmdColor[1] = c[1]; s.cmdColor[2] = c[2]; }
     if (s.vidColor) { s.vidColor[0] = v[0]; s.vidColor[1] = v[1]; s.vidColor[2] = v[2]; }
     for (const p of viewer.parts) if (p.packet) p.hidden = p.lane === "cmd" ? !cmdOn : !vidOn;
+    // K3: детали вне цепочки симптома приглушены к фону, не скрыты (скрытая деталь не ловит касание).
+    const ch = chain();
+    for (const p of viewer.parts) if (p.base) { const k = ch && !ch.has(p.id) ? 0.6 : 0; for (let i = 0; i < 3; i++) p.color[i] = p.base[i] + (s.bg[i] - p.base[i]) * k; }
+    // K2: выбранная деталь замолчавшего моста подсвечивается его серым, а не акцентом — мост не «оживает».
+    viewer.look.hi = s.sel && dead(s.sel) ? (s.mode === "cmd" ? BLUE_DEAD : ORANGE_DEAD) : s.accent;
   };
   viewer.onFrame = () => {
     const now = performance.now(), dt = last ? Math.min((now - last) / 1000, 0.05) : 0.016;
@@ -462,10 +486,21 @@ export function mount(root, ctx) {
         const ly = Math.max(28, Math.min(rect.height - 28, y - 22));
         marker.style.left = lx + "px";
         marker.style.top = ly + "px";
-        marker.textContent = SHORT[s.sel] || PARTS[s.sel].name;
+        marker.textContent = s.sel === "beam_cmd" && dead(s.sel) ? "Мост команд — встал" : s.sel === "beam_vid" && dead(s.sel) ? "Мост видео — встал" : (SHORT[s.sel] || PARTS[s.sel].name) + (dead(s.sel) ? " · мост встал" : "");
         leader.setAttribute("d", `M${x},${y}L${lx},${ly}`);
       }
     }
+    // K4: подписи направлений у линий (на трети пути от начала моста), касание не ловят.
+    const rect = canvas.getBoundingClientRect();
+    for (const [lane, a, b] of [["cmd", CMD_A, CMD_B], ["vid", VID_A, VID_B]]) {
+      const el = root.querySelector(`.p3-lane[data-lane="${lane}"]`);
+      const [x, y, vis] = viewer.project([a[0] + (b[0] - a[0]) * 0.35, a[1] + (b[1] - a[1]) * 0.35 + 1.6, a[2] + (b[2] - a[2]) * 0.35]);
+      el.hidden = !vis || x < 30 || x > rect.width - 30 || y < 12 || y > rect.height - 12;
+      el.style.left = Math.max(70, Math.min(rect.width - 70, x)) + "px";
+      el.style.top = y + "px";
+      el.toggleAttribute("data-dead", s.mode === lane);
+    }
+    syncHome();
     root.dataset.yaw = viewer.view.yaw.toFixed(3);
     root.dataset.pitch = viewer.view.pitch.toFixed(3);
     root.dataset.zoom = viewer.view.zoom.toFixed(3);
@@ -476,6 +511,13 @@ export function mount(root, ctx) {
   function checkView() {
     root.dataset.yaw = viewer.view.yaw.toFixed(3);
     root.dataset.pitch = viewer.view.pitch.toFixed(3);
+    syncHome();
+  }
+  // «Как вначале» видна, только когда ракурс ушёл с домашнего: тогда она и нужна.
+  function syncHome() {
+    const v = viewer.view, dy = Math.atan2(Math.sin(v.yaw - VIEWS.home[0]), Math.cos(v.yaw - VIEWS.home[0]));
+    const away = Math.abs(dy) > 0.05 || Math.abs(v.pitch - VIEWS.home[1]) > 0.05 || Math.abs(v.zoom - 1) > 0.02;
+    if (homeBtn.hidden === away) homeBtn.hidden = !away;
   }
   viewer.invalidate();
   root.__p3 = {
@@ -487,6 +529,8 @@ export function mount(root, ctx) {
       const r = canvas.getBoundingClientRect();
       return [r.left + x, r.top + y];
     },
+    hi: () => viewer.look.hi.slice(),
+    accent: () => s.accent.slice(),
     packets() {
       const n = { cmd: 0, vid: 0 };
       for (const p of viewer.parts) if (p.packet && !p.hidden) n[p.lane]++;
