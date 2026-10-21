@@ -399,8 +399,8 @@ body.noscroll{overflow:hidden}
 .fc-hint{color:var(--anatomy-muted);margin:0;font-size:14px}
 .fc-btns{display:flex;gap:12px;width:100%}
 .fc-btns .lab-btn{flex:1;min-height:54px;font-size:16px;border-radius:12px;font-weight:600}
-.fc-btns .lab-btn.bad{background:color-mix(in srgb,var(--bad) 12%,var(--anatomy-card));border:1.5px solid color-mix(in srgb,var(--bad) 40%,transparent);color:var(--bad)}
-.fc-btns .lab-btn.good{background:color-mix(in srgb,var(--ok) 12%,var(--anatomy-card));border:1.5px solid color-mix(in srgb,var(--ok) 40%,transparent);color:var(--ok)}
+.fc-btns .lab-btn.bad{background:color-mix(in srgb,var(--bad) 12%,var(--anatomy-card));border:1.5px solid color-mix(in srgb,var(--bad) 40%,transparent);color:var(--anatomy-strong)}
+.fc-btns .lab-btn.good{background:color-mix(in srgb,var(--ok) 12%,var(--anatomy-card));border:1.5px solid color-mix(in srgb,var(--ok) 40%,transparent);color:var(--anatomy-strong)}
 .fc-prog{font:12.5px/1.4 var(--anatomy-mono);color:var(--anatomy-muted)}
 /* объяснение на пальцах */
 .kid{margin:18px 0;padding:16px 18px;border-radius:14px;background:color-mix(in srgb,var(--ok) 7%,var(--anatomy-card));box-shadow:0 0 0 1px color-mix(in srgb,var(--ok) 40%,transparent)}
