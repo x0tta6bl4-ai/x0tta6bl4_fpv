@@ -565,6 +565,7 @@ const srezList = (a) => (Array.isArray(a) ? `<ul>${a.map((x) => `<li>${esc(x)}</
 const srezBlk = (type, title, text) => (text ? `<aside class="blk" data-type="${type}"><div class="blk-h">${title}</div><p>${esc(text)}</p></aside>` : "");
 function srezGo(cv) {
   const ch = cv && cv.ch != null ? CHAPTERS.find((c) => c.id === String(cv.ch)) : null;
+  if (cv && cv.fix) return srezBlk("trap", "Учебник уточняет", cv.fix) + (ch ? `<p class="small">Подробнее: <a href="#${ch.id}" data-srz-sec="${esc(cv.sec || "")}">глава ${ch.num}${cv.sec ? ` · «${esc(cv.sec)}»` : ""}</a></p>` : "");
   if (!ch || !["full", "partial"].includes(cv.status)) return `<p class="muted small">В главах подробного разбора пока нет — ответ выше из опросника.</p>`;
   const where = cv.sec === "#check" ? "«Проверь себя»" : cv.sec ? `«${esc(cv.sec)}»` : "";
   return `<p class="small">${cv.status === "full" ? "Объяснение" : "Частично объяснено"}: <a href="#${ch.id}" data-srz-sec="${esc(cv.sec || "")}">глава ${ch.num}${where ? ` · ${where}` : ""}</a></p>`;

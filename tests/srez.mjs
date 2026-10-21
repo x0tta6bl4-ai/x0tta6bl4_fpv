@@ -27,12 +27,12 @@ const chText = new Map();
 for (const ch of CH) {
   const parts = [ch.title, ch.lead, ...(ch.goals || []), ch.summary, ch.riddle, ch.answer];
   for (const s of ch.sections || []) parts.push(s.title, s.body, ...(s.blocks || []).flatMap((b) => [b.title, b.text, b.breaks]));
-  for (const q of ch.questions || []) parts.push(q.q, q.a);
+  for (const q of ch.questions || []) parts.push(`${strip(q.q)} → ${strip(q.a)}`);
   const k = KIDS[ch.id];
-  if (k) parts.push(...(k.text || []), ...(k.laws || []).flatMap((l) => [l.t, l.f, ...(l.parts || []).flat(), l.ex, l.drone, ...(l.q || [])]));
+  if (k) parts.push(...(k.text || []), ...(k.laws || []).map((l) => [l.t, l.f, (l.parts || []).map((x) => x.join(" — ")).join("; "), l.ex, l.drone, l.q && l.q.join(" → ")].filter(Boolean).join(" | ")));
   chText.set(ch.id, parts.map(strip).join(" \n "));
 }
-const extra = [...Object.values(HINTS).flatMap((h) => [h.how, h.why]), ...AP.GLOSSARY.flat(), ...AP.PROCEDURES.flatMap((p) => [p.title, ...(p.items || [])]), AP.REFTABLES, ...AP.CORRECTIONS.map((c) => (typeof c === "string" ? c : JSON.stringify(c)))].map(strip).join(" \n ");
+const extra = [...Object.values(HINTS).flatMap((h) => [h.how, h.why]), ...AP.GLOSSARY.map((g) => g.join(" — ")), ...AP.PROCEDURES.flatMap((p) => [p.title, ...(p.items || [])]), AP.REFTABLES, ...AP.CORRECTIONS.map((c) => (typeof c === "string" ? c : JSON.stringify(c)))].map(strip).join(" \n ");
 const all = [...chText.values(), extra].join(" \n ");
 
 const cov = new Map(COV.items.map((c) => [String(c.n), c]));
@@ -42,8 +42,9 @@ rep(`у всех ${SREZ.items.length} вопросов есть запись в 
 const lost = [], badSec = [];
 for (const c of COV.items) {
   for (const w of c.where || []) {
-    const src = /^src\//.test(w.tag) ? strip(readFileSync(resolve(ROOT, w.tag), "utf8")) : /^(физика )?гл\d+/.test(w.tag) ? chText.get(w.tag.match(/гл(\d+)/)[1]) || "" : all;
-    if (!w.quote || !src.includes(strip(w.quote))) lost.push(`${c.n}: ${w.tag} «${String(w.quote).slice(0, 50)}»`);
+    // Сцены — исходный код: только схлопываем пробелы (strip съел бы сравнения вида a < b).
+    const src = /^src\//.test(w.tag) ? readFileSync(resolve(ROOT, w.tag), "utf8").replace(/\s+/g, " ") : /^(физика )?гл\d+/.test(w.tag) ? chText.get(w.tag.match(/гл(\d+)/)[1]) || "" : all;
+    if (!w.quote || !src.includes(/^src\//.test(w.tag) ? w.quote.replace(/\s+/g, " ") : strip(w.quote))) lost.push(`${c.n}: ${w.tag} «${String(w.quote).slice(0, 50)}»`);
   }
   const ch = c.ch != null ? CH.find((x) => x.id === String(c.ch)) : null;
   if (["full", "partial"].includes(c.status) && (!ch || (c.sec && c.sec !== "#check" && !(ch.sections || []).some((s) => s.title === c.sec)))) badSec.push(`${c.n}: гл ${c.ch} «${c.sec}»`);
