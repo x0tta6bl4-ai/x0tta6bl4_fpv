@@ -28,6 +28,7 @@ code{font-family:var(--anatomy-mono);font-size:.92em;background:var(--anatomy-ca
 .top select{max-width:360px}
 .switch{display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap}
 .switch input{width:auto}
+@media (max-width:700px){#theme{min-height:44px;padding:10px 14px}.top select{min-height:44px;font-size:16px}.switch{min-height:44px}.switch input{width:22px;height:22px;margin:0}}
 .layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:28px;max-width:1360px;margin:0 auto;padding-block:22px 60px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
 #toc{position:sticky;top:64px;align-self:start;max-height:calc(100vh - 80px);overflow:auto;padding-right:4px;font-size:13.5px}
 #toc nav a{display:grid;grid-template-columns:26px 1fr 16px;gap:6px;padding:5px 8px;border-radius:6px;text-decoration:none;color:var(--anatomy-text)}
