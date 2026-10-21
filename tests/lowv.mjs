@@ -49,6 +49,12 @@ rep("показанный пример доходит до исправлени�
 await act("lesson:guided");
 
 // Случай с подсказками: правила шагов, подсказка, неверное исправление, контроль
+// Что показывают мультиметр и OSD (первое число на каждом экране — общее напряжение).
+const instr = () => p.evaluate(() => {
+  const num = (sel) => { const m = (document.querySelector(sel)?.textContent || "").match(/\d+,\d/); return m ? m[0] : "—"; };
+  return { meter: num('[data-part="mets"]'), osd: num('[data-part="osds"]') };
+});
+const agree = []; // [шаг, мультиметр, OSD] — на каждом открытом шаге приборы обязаны совпадать
 async function solveCase(sc, { wrongFirst = false, useHelp = false, oldFix = null } = {}) {
   const steps = CASES.STEPS.map((s) => s.id);
   let sawGate = true, explained = false;
@@ -57,6 +63,7 @@ async function solveCase(sc, { wrongFirst = false, useHelp = false, oldFix = nul
     if (/Твой вывод/.test(before)) sawGate = false; // вывод виден до проверки
     if (useHelp && sid === "inspect") await act("help");
     await act("open");
+    if (sid === "voltage" || sid === "load") { const r = await instr(); agree.push([`${sc.id}:${sid}`, r.meter, r.osd]); }
     const tone = sc.evidence[sid][0];
     if (wrongFirst && sid === "voltage") { await act("i:here"); explained = /✗/.test(await panel()); }
     await act(`i:${EXPECT[tone]}`);
@@ -96,7 +103,7 @@ rep("новый случай сам — звезда", /3\s*\/\s*4/.test(await s
 await act("lesson:later");
 rep("повтор позже закрыт до перерыва", /откроется через/.test(await panel()), (await panel()).slice(0, 80));
 // Перерыв прошёл (в тесте — сдвиг отметки времени), повтор с новыми числами
-await p.evaluate(() => { const v = JSON.parse(localStorage.getItem("fpv-ch6-lowv") || "{}"); v.soloAt = Date.now() - 31 * 60000; localStorage.setItem("fpv-ch6-lowv", JSON.stringify(v)); });
+await p.evaluate(() => { const v = JSON.parse(localStorage.getItem("fpv-ch6-lowv") || "{}"); v.soloAt = Date.now() - 31 * 60000; v.seed = 1; v.laterSeed = 1; localStorage.setItem("fpv-ch6-lowv", JSON.stringify(v)); });
 await p.click('[data-figtab="battery"]'); await W(500); await p.click('[data-figtab="lowv"]'); await W(700);
 rep("после ухода с вкладки урок продолжается с этапа «Позже», а не с начала", /Позже|повтор/i.test(await panel()) && !/Симптом/.test(await panel()), (await panel()).slice(0, 60));
 // Повтор: seed 1 — температурный случай с новыми числами; шаги и исправления той же формы, что у B
@@ -104,6 +111,10 @@ const Lt = await solveCase(B);
 rep("повтор позже: неверное исправление объяснено", Lt.wrongFixExplained, "");
 await act("ctrl");
 rep("повтор позже — звезда, всего 4 из 4", /4\s*\/\s*4/.test(await score()), await score());
+const bad = agree.filter(([, m, o]) => m !== o || m === "—");
+rep("на шагах «приборы» и «нагрузка» мультиметр и OSD показывают одно и то же", agree.length >= 4 && !bad.length, JSON.stringify(bad.length ? bad : agree));
+const exB = B.example;
+rep("числа на приборах — из данных случая (покой и холодная нагрузка B)", agree.some(([k, m]) => k === `${B.id}:voltage` && m === String(exB.rest_V).replace(".", ",")) && agree.some(([k, m]) => k === `${B.id}:load` && m === String(exB.cold_load_V).replace(".", ",")), JSON.stringify(agree.filter(([k]) => k.startsWith(B.id))));
 await p.screenshot({ path: `${ROOT}/tests/out/lowv-390.png` });
 await b.close();
 const fail = res.filter((x) => !x).length;

@@ -196,11 +196,13 @@ export function render() {
 }
 
 // Что показывают приборы на текущем шаге (учебные данные случая).
+// Оба прибора всегда показывают одно и то же общее напряжение в одном состоянии (иначе «согласованы» на шаге ② — ложь):
+// до записи нагрузки — покой; на шаге ④ — холодная нагрузка; на сравнении и после ремонта — контрольная запись.
 function readings(sc, sid, solved) {
   const ex = sc.example;
   const set = solved && sc.cause_id === "cell_count" ? ex.cells_actual : ex.cells_configured;
-  const total = ex.measured_total_V ?? (sid === "load" ? ex.cold_load_V : sid === "compare" ? ex.control_load_V : ex.rest_V);
-  const osdTotal = ex.fc_total_V ?? (sid === "compare" && solved ? ex.control_load_V : ex.cold_load_V);
+  const total = ex.measured_total_V ?? (solved || sid === "compare" ? ex.control_load_V : sid === "load" ? ex.cold_load_V : ex.rest_V);
+  const osdTotal = ex.fc_total_V ?? total;
   const avg = osdTotal / set;
   return { total, osdTotal, set, avg, low: avg < ex.profile_warning_cell_V };
 }
@@ -221,9 +223,10 @@ function bfScreen(sc, sid, solved) {
   const line = (v, cls) => `<path class="${cls}" d="M${X0} ${y(rest).toFixed(1)}L${(X0 + 14).toFixed(1)} ${y(rest).toFixed(1)}L${(X0 + 18).toFixed(1)} ${y(v).toFixed(1)}L${X1} ${y(v).toFixed(1)}"/>`;
   let g = head(sid === "load" ? `Запись: ${ex.current_A} А` : `Сравнение при ${ex.current_A} А`) + `<path class="bf-track" d="M${X0} ${Y0}H${X1}"/>`;
   g += `<path class="lv-warn" d="M${X0} ${y(ex.profile_warning_cell_V).toFixed(1)}H${X1}"/>` + txt(X1, y(ex.profile_warning_cell_V) - 1.2, `${f1(ex.profile_warning_cell_V)} В/банку`, "bd-r", "end");
-  g += line(cold, "lv-cold") + txt(X0 + 20, y(cold) + 4.2, `холодно: ${f1(ex.cold_load_V)} В`, "bd-r");
-  if (sid === "compare") g += line(ctl, "lv-ctl") + txt(X0 + 20, y(ctl) - 1.6, `контроль: ${f1(ex.control_load_V)} В`, "bd-r");
-  return g + txt(X0, y(rest) - 1.6, `покой ${f1(ex.rest_V)} В`, "bd-r");
+  // Ось — вольты на банку; рядом с каждой линией — и на банку, и общее (что показывают приборы).
+  g += line(cold, "lv-cold") + txt(X0 + 20, y(cold) + 4.2, `холодно: ${f2(cold)} В/банку · ${f1(ex.cold_load_V)} В`, "bd-r");
+  if (sid === "compare") g += line(ctl, "lv-ctl") + txt(X0 + 20, y(ctl) - 1.6, `контроль: ${f2(ctl)} В/банку · ${f1(ex.control_load_V)} В`, "bd-r");
+  return g + txt(X0, y(rest) - 1.6, `покой ${f2(rest)} В/банку · ${f1(ex.rest_V)} В`, "bd-r");
 }
 function osdScreen(sc, sid, solved, entry, blink) {
   const w = MON.d - 6;
@@ -253,7 +256,14 @@ export function controller(root, built, state) {
   if (!String(state.prog || "") && saved.prog) Object.assign(state, { prog: saved.prog, stage: saved.stage || "entry", seed: saved.seed || 1, ph: "look", step: 0, open: 0, ans: "", log: "", help: 0, mistakes: 0 });
   const remember = (next) => store.set({ ...store.get(), prog: next.prog, stage: next.stage, seed: next.seed });
   const laterLeft = () => { const t = store.get().soloAt; return t ? Math.max(0, LATER_MIN - (Date.now() - t) / 60000) : LATER_MIN; };
-  const curStep = (st) => (scenarioOf(st) && st.ph === "look" && st.open ? STEPS[st.step].id : scenarioOf(st) && st.ph !== "look" ? scenarioOf(st).at : "");
+  // Какой шаг сейчас показывают приборы: открытая проверка; в показанном примере — текущий шаг (он открыт сразу);
+  // после находки — шаг причины.
+  const curStep = (st) => {
+    const sc = scenarioOf(st);
+    if (!sc) return "";
+    if (st.ph !== "look") return sc.at;
+    return st.open || sc.mode === "worked" ? STEPS[st.step].id : "";
+  };
   const solvedNow = (st) => st.ph === "solved";
   let recallText = "";
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -374,10 +384,12 @@ export function controller(root, built, state) {
     act(a, st, apply0) {
       const apply = (patch) => { remember({ ...st, ...patch }); return apply0(patch); };
       const sc = scenarioOf(st);
-      if (a === "restart") { const v = store.get(); delete v.soloAt; store.set(v); return apply({ ...SETUP, seed: Number(st.seed || 1) + 1, prog: "" }); }
+      if (a === "restart") { const v = store.get(); delete v.soloAt; delete v.laterSeed; store.set(v); return apply({ ...SETUP, seed: Number(st.seed || 1) + 1, prog: "" }); }
       if (a.startsWith("lesson:")) {
         const to = a.slice(7);
-        return apply({ stage: to, ph: "look", step: 0, open: 0, ans: "", log: "", help: 0, mistakes: 0 });
+        // Повтор позже берёт причину, выпавшую при закрытии самостоятельного случая: она может совпасть с прежней.
+        const seed = to === "later" ? store.get().laterSeed || Number(st.seed) : Number(st.seed);
+        return apply({ stage: to, ph: "look", step: 0, open: 0, ans: "", log: "", help: 0, mistakes: 0, seed });
       }
       if (a.startsWith("e:") && st.stage === "entry") {
         const c = CASES.ENTRY.choices.find((x) => x.id === a.slice(2));
@@ -418,7 +430,7 @@ export function controller(root, built, state) {
       }
       if (a === "ctrl" && st.ph === "ctrl") {
         const tag = sc.mode === "guided" ? "guided" : sc.mode === "transfer" ? "transfer" : "later";
-        if (tag === "transfer") { const v = store.get(); store.set({ ...v, soloAt: v.soloAt || Date.now() }); }
+        if (tag === "transfer") { const v = store.get(); store.set({ ...v, soloAt: v.soloAt || Date.now(), laterSeed: v.laterSeed || 1 + Math.floor(Math.random() * 1000) }); }
         return apply({ ph: "solved", ans: "", prog: addProg(st, tag) });
       }
     },
