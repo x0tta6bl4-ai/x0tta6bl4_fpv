@@ -1,6 +1,7 @@
 // Гл. 3. Дрон целиком в 3D: крутить пальцем, разобрать на этажи, нажать деталь — описание как у плоской схемы.
 // Модель собрана из простых фигур кодом (src/gl3d.mjs), размеры — типичный 5″: диагональ 225 мм, винты 5″, стек 30,5 мм.
-import { createViewer, Mesh, M4 } from "../gl3d.mjs";
+import { createViewer, M4 } from "../gl3d.mjs";
+import { buildDroneParts as build, MOTOR_POSITIONS as MOTORS, MOTOR_SPIN as SPIN } from "./drone-model.mjs";
 import { COMPONENTS } from "../figs/quad.mjs";
 
 export const meta = {
@@ -15,10 +16,6 @@ export const meta = {
 };
 
 const C = Object.fromEntries(COMPONENTS.map((c) => [c.id, c]));
-const R = 7.95; // половина диагонали 225 мм по осям X и Z, см
-const MOTORS = { fl: [-R, R], fr: [R, R], rl: [-R, -R], rr: [R, -R] };
-// Диагональные винты крутятся в одну сторону: так реактивные моменты пар гасят друг друга (гл. 2, гл. 5).
-const SPIN = { fl: "cw", rr: "cw", fr: "ccw", rl: "ccw" };
 const PLACE = { fl: "передний левый", fr: "передний правый", rl: "задний левый", rr: "задний правый" };
 const DIR = { cw: "по часовой стрелке", ccw: "против часовой стрелки" };
 
@@ -40,58 +37,6 @@ const PARTS = {
 const CHIPS = ["frame", "esc", "fc", "cap", "motor", "prop_fl", "prop_fr", "prop_rl", "prop_rr", "camera", "vtx", "rx", "ant_vtx", "ant_rx", "battery"];
 const SHORT = { frame: "Рама", esc: "ESC", fc: "Полётник FC", cap: "Конденсатор", motor: "Моторы", prop_fl: "Винт П-Л", prop_fr: "Винт П-П", prop_rl: "Винт З-Л", prop_rr: "Винт З-П", camera: "Камера", vtx: "VTX", rx: "Приёмник", ant_vtx: "Антенна видео", ant_rx: "Антенна RX", battery: "АКБ" };
 
-// Детали: сетка, цвет (светлая/тёмная тема), смещение при разборке. Одна деталь может состоять из нескольких кусков (рама).
-function build(dark) {
-  const carbon = dark ? [0.36, 0.37, 0.4] : [0.2, 0.21, 0.23];
-  const list = [];
-  const add = (id, mesh, color, off, center) => { const o = { id, mesh, color, off, center }; list.push(o); return o; };
-
-  const bottom = new Mesh().box(4.4, 0.5, 8.6, M4.t(0, 0, 0));
-  for (const [x, z] of Object.values(MOTORS)) {
-    const L = Math.hypot(x, z) - 1;
-    bottom.box(1.5, 0.5, L, M4.chain(M4.t(x / 2, 0, z / 2), M4.ry(Math.atan2(x, z))));
-    bottom.cyl(1.5, 0.5, 20, M4.t(x, 0, z));
-  }
-  for (const [x, z] of [[-1.6, -3.4], [1.6, -3.4], [-1.6, 3.4], [1.6, 3.4]]) bottom.tube([x, 0.25, z], [x, 2.85, z], 0.22, 8);
-  // Боковые пластины держат камеру за винты по бокам; передняя часть камеры и объектив выступают — сбоку виден наклон.
-  for (const x of [-1.35, 1.35]) bottom.box(0.25, 2.1, 1.4, M4.t(x, 1.25, 3.1));
-  add("frame", bottom, carbon, [0, 0, 0], [0, 0.3, 0]);
-  add("frame", new Mesh().box(3.8, 0.3, 7.6, M4.t(0, 3.0, 0)), carbon, [0, 6.5, 0], [0, 3, 0]);
-
-  const esc = new Mesh().box(3.6, 0.45, 3.6, M4.t(0, 0.9, 0));
-  for (const [x, z] of [[-0.9, -0.9], [0.9, -0.9], [-0.9, 0.9], [0.9, 0.9]]) esc.box(0.7, 0.25, 0.7, M4.t(x, 1.22, z));
-  add("esc", esc, [0.15, 0.36, 0.25], [0, 1.2, 0], [0, 0.9, 0]);
-  const fc = new Mesh().box(3.6, 0.4, 3.6, M4.t(0, 1.9, 0)).box(1.0, 0.25, 1.0, M4.t(0, 2.2, 0)).box(0.5, 0.2, 0.5, M4.t(1.0, 2.15, 1.0));
-  add("fc", fc, [0.16, 0.24, 0.46], [0, 2.8, 0], [0, 1.9, 0]);
-  add("cap", new Mesh().cyl(0.5, 1.8, 16, M4.chain(M4.t(0, 0.85, -2.6), M4.rz(Math.PI / 2))), [0.12, 0.14, 0.3], [0, 0.6, -2.5], [0, 0.85, -2.6]);
-
-  const motors = new Mesh();
-  for (const [x, z] of Object.values(MOTORS)) motors.lathe([[1.4, 0.25], [1.4, 1.55], [1.15, 1.8], [0.35, 1.9], [0.25, 2.25], [0, 2.25]], 24, M4.t(x, 0, z));
-  add("motor", motors, dark ? [0.72, 0.74, 0.78] : [0.58, 0.6, 0.64], [0, 1.3, 0], [R, 1.2, R]);
-
-  for (const k of Object.keys(MOTORS)) {
-    const [x, z] = MOTORS[k];
-    const tilt = SPIN[k] === "cw" ? -0.32 : 0.32;
-    const m = new Mesh().cyl(0.6, 0.6, 16, M4.t(0, 2.45, 0));
-    for (let b = 0; b < 3; b++) m.box(5.6, 0.12, 1.15, M4.chain(M4.ry((b * Math.PI * 2) / 3), M4.t(3.2, 2.5, 0), M4.rx(tilt)));
-    // Сетка винта — вокруг своей оси (начало координат); на место мотора её ставит model() вместе с вращением.
-    const pr = add(`prop_${k}`, m, dark ? [0.55, 0.62, 0.72] : [0.42, 0.5, 0.6], [0, 3, 0], [x, 2.5, z]);
-    pr.spin = SPIN[k];
-    pr.pivot = [x, z];
-  }
-  const cam = new Mesh().box(1.9, 1.9, 1.9).cyl(0.62, 0.9, 18, M4.chain(M4.t(0, 0, 1.3), M4.rx(Math.PI / 2)));
-  add("camera", new Mesh().push(cam.p, cam.n, cam.i, M4.chain(M4.t(0, 1.3, 3.7), M4.rx(-0.44))), [0.1, 0.1, 0.12], [0, 0.5, 3.5], [0, 1.5, 4.6]);
-  add("vtx", new Mesh().box(2.2, 0.35, 1.8, M4.t(0, 2.35, -3.0)), [0.34, 0.2, 0.44], [0, 3.5, -2.5], [0, 2.35, -3]);
-  add("rx", new Mesh().box(1.0, 0.25, 1.5, M4.t(1.75, 2.4, -3.0)), [0.42, 0.42, 0.46], [2, 3.5, -2.5], [1.75, 2.4, -3]);
-  const av = new Mesh().tube([0, 2.4, -3.9], [0, 4.3, -6.2], 0.2, 10).lathe([[0.01, -0.5], [0.8, -0.3], [0.9, 0], [0.8, 0.3], [0.01, 0.5]], 18, M4.chain(M4.t(0, 4.55, -6.5), M4.rx(0.7)));
-  add("ant_vtx", av, dark ? [0.86, 0.36, 0.3] : [0.72, 0.22, 0.18], [0, 3.5, -2.5], [0, 4.2, -6.2]);
-  const ar = new Mesh().tube([1.75, 2.35, -3.6], [3.4, 2.0, -5.6], 0.1, 8).tube([4.48, 2.0, -4.7], [2.32, 2.0, -6.5], 0.07, 6);
-  add("ant_rx", ar, dark ? [0.9, 0.9, 0.86] : [0.62, 0.62, 0.58], [2, 3.5, -2.5], [3.4, 2.0, -5.6]);
-  const bat = new Mesh().box(3.5, 3.2, 7.2, M4.t(0, 4.75, -0.3)).box(1.4, 0.6, 0.8, M4.t(0, 3.7, -4.3));
-  add("battery", bat, [0.86, 0.64, 0.18], [0, 9, 0], [0, 4.75, -0.3]);
-  return list;
-}
-
 // Цвет CSS-переменной → [r, g, b] 0..1 (через пробный элемент: переменные бывают color-mix и т.п.).
 function cssColor(root, v, fb) {
   const d = document.createElement("i");
@@ -105,14 +50,17 @@ function cssColor(root, v, fb) {
 const VIEWS = { top: [0.0001, 1.3], side: [Math.PI / 2, 0.08], under: [0.7, -1.1], home: [0.7, 0.42] };
 
 export function mount(root, ctx) {
-  root.innerHTML = `<div class="d3-stage"><canvas class="d3-canvas" role="img" aria-label="Трёхмерная модель FPV-дрона: рама, стек FC и ESC, моторы, винты, камера, видеопередатчик, приёмник, антенны, аккумулятор"></canvas>
-    <p class="d3-hint">Крути пальцем · два пальца — ближе или дальше · касание — деталь</p></div>
-    <div class="d3-bar" role="group" aria-label="Вид и разборка"><button type="button" class="lab-btn" data-act="explode" aria-pressed="false">Разобрать</button><button type="button" class="lab-btn" data-view="top">Сверху</button><button type="button" class="lab-btn" data-view="side">Сбоку</button><button type="button" class="lab-btn" data-view="under">Снизу</button><button type="button" class="lab-btn" data-view="home">Сброс</button></div>
+  root.innerHTML = `<div class="d3-stage"><canvas class="d3-canvas" tabindex="0" role="img" aria-label="Трёхмерная модель FPV-дрона: рама, стек FC и ESC, моторы, винты, камера, видеопередатчик, приёмник, антенны, аккумулятор"></canvas>
+    <svg class="d3-leaders" aria-hidden="true"><path/></svg>
+    <button type="button" class="d3-marker" data-act="focus" hidden aria-label="Рассмотреть выбранную деталь"></button>
+    <p class="d3-hint">Крути пальцем · щипок — масштаб · касание — деталь · с клавиатуры: стрелки, +/−</p></div>
+    <div class="d3-bar" role="group" aria-label="Вид и разборка"><button type="button" class="lab-btn" data-act="explode" aria-pressed="false">Разобрать</button><button type="button" class="lab-btn" data-view="top">Сверху</button><button type="button" class="lab-btn" data-view="side">Сбоку</button><button type="button" class="lab-btn" data-view="under">Снизу</button><button type="button" class="lab-btn" data-view="home">Сброс</button><button type="button" class="lab-btn" data-act="focus" disabled aria-pressed="false">К детали</button></div>
+    <label class="d3-explode">Разборка <input type="range" min="0" max="100" value="0" step="1" aria-label="Степень разборки"><output>0 %</output></label>
     <div class="d3-parts" role="group" aria-label="Детали">${CHIPS.map((id) => `<button type="button" data-part="${id}" aria-pressed="false">${SHORT[id]}</button>`).join("")}</div>
     <p class="lab-read d3-info" aria-live="polite">Нажми на деталь на модели или в списке — здесь появится, что это и зачем.</p>`;
   const $ = (q) => root.querySelector(q);
   const canvas = $(".d3-canvas"), infoEl = $(".d3-info");
-  const s = { sel: null, ex: 0, exTo: 0, seen: new Set(), spin: {} };
+  const s = { sel: null, ex: 0, exTo: 0, focus: false, seen: new Set(), spin: {} };
   let viewer;
   try {
     viewer = createViewer(canvas, { onPick: (id) => select(id, "tap"), onView: () => checkView() });
@@ -121,8 +69,21 @@ export function mount(root, ctx) {
   }
   if (!viewer) {
     $(".d3-stage").innerHTML = `<p class="lab-read">Этот браузер не показывает 3D (WebGL выключен или не поддерживается). Плоская схема — на вкладке «Состав FPV-дрона».</p>`;
-    return { destroy() {} };
+    $(".d3-bar").hidden = true;
+    $(".d3-explode").hidden = true;
+    const fallbackClick = (e) => {
+      const b = e.target.closest("[data-part]");
+      if (!b) return;
+      const id = b.dataset.part, part = PARTS[id];
+      root.querySelectorAll("[data-part]").forEach(el => el.setAttribute("aria-pressed", String(el === b)));
+      infoEl.textContent = `${part.name}. ${part.text} ${part.ref}`;
+      root.dataset.sel = id;
+    };
+    root.addEventListener("click", fallbackClick);
+    return { destroy() { root.removeEventListener("click", fallbackClick); } };
   }
+  viewer.view.radius = 18.5;
+  viewer.look.dimOthers = .18;
   const isDark = () => { const [r, g, b] = cssColor(root, "--anatomy-page", [1, 1, 1]); return r * 0.3 + g * 0.59 + b * 0.11 < 0.5; };
   let parts = [];
   const theme = () => {
@@ -152,12 +113,42 @@ export function mount(root, ctx) {
     last = now;
     let anim = false;
     if (s.ex !== s.exTo) {
+      const previous = s.ex;
       s.ex += Math.sign(s.exTo - s.ex) * Math.min(Math.abs(s.exTo - s.ex), dt * 1.8);
       anim = true;
+      if (previous < .95 && s.ex >= .95) checkMissions();
     }
     // Разобранный дрон выше: поднимаем точку, вокруг которой крутится камера, и чуть отодвигаемся.
-    viewer.view.target[1] = 1.5 + 4 * ease(s.ex);
-    viewer.view.radius = 13.5 + 3 * ease(s.ex);
+    for (const p of viewer.parts) p.hidden = !!p.assembledOnly && s.ex > 0.025;
+    const selected = parts.find(p => p.id === s.sel);
+    const focusRadius = { frame: 18.5, battery: 5.7, motor: 3, camera: 2.8, ant_vtx: 3.1, ant_rx: 3.1 };
+    const target = s.focus && selected ? selected.center.map((v, i) => v + selected.off[i] * ease(s.ex)) : [0, 1.5 + 4 * ease(s.ex), 0];
+    const bounds = [];
+    for(const [x,z] of Object.values(MOTORS)) for(let i=0;i<16;i++) {
+      const a=i*Math.PI/8; bounds.push([x+6.45*Math.cos(a),2.6+3*ease(s.ex),z+6.45*Math.sin(a)]);
+    }
+    for(const [x,z] of Object.values(MOTORS)) bounds.push([x,0,z]);
+    for(const x of [-1.9,1.9]) for(const y of [3,6.6]) for(const z of [-4,3.6]) bounds.push([x,y+9*ease(s.ex),z]);
+    bounds.push([0,5.3+3.5*ease(s.ex),-7.4-2.5*ease(s.ex)],[0,2.3+.5*ease(s.ex),5.5+3.5*ease(s.ex)]);
+    const fit = viewer.fitRadius(bounds);
+    const radius = s.focus && selected ? (s.sel.startsWith("prop_") ? 7.2 : focusRadius[s.sel] || 3.7) : fit;
+    const follow = 1 - Math.exp(-dt * 9);
+    for (let i=0;i<3;i++) { if (Math.abs(viewer.view.target[i]-target[i]) > .005) anim=true; viewer.view.target[i] += (target[i]-viewer.view.target[i])*follow; }
+    if (Math.abs(viewer.view.radius-radius) > .005) anim=true;
+    viewer.view.radius += (radius-viewer.view.radius)*follow;
+    const marker = $(".d3-marker");
+    const leader = $(".d3-leaders path");
+    marker.hidden = !selected; leader.setAttribute("d","");
+    if (selected) {
+      const point = selected.center.map((v,i) => v + selected.off[i] * ease(s.ex));
+      const [x,y,visible] = viewer.project(point), rect = canvas.getBoundingClientRect();
+      marker.hidden = !visible || x < 0 || x > rect.width || y < 0 || y > rect.height;
+      const lx=Math.max(58,Math.min(rect.width-58,x+(x>rect.width/2?-86:86)));
+      const ly=Math.max(44,Math.min(rect.height-40,y-26));
+      marker.style.left = `${lx}px`; marker.style.top = `${ly}px`;
+      if(!marker.hidden) leader.setAttribute("d",`M${x},${y}L${lx},${ly}`);
+      marker.textContent = SHORT[s.sel];
+    }
     if (camTo) {
       const v = viewer.view, k = 1 - Math.exp(-dt * 7);
       let dy = camTo[0] - v.yaw;
@@ -169,6 +160,7 @@ export function mount(root, ctx) {
     }
     // Выбранный винт показывает своё вращение (~1 оборот в 2 с); сверху по часовой — отрицательный угол вокруг оси Y.
     for (const p of parts) if (p.spin && p.id === s.sel) { p.angle += (p.spin === "cw" ? -1 : 1) * Math.PI * dt; anim = true; }
+    root.dataset.focused = String(s.focus);
     root.dataset.yaw = viewer.view.yaw.toFixed(3);
     root.dataset.pitch = viewer.view.pitch.toFixed(3);
     root.dataset.zoom = viewer.view.zoom.toFixed(3);
@@ -179,6 +171,8 @@ export function mount(root, ctx) {
   function select(id, how) {
     s.sel = id && PARTS[id] ? id : null;
     viewer.look.sel = s.sel;
+    if (!s.sel) s.focus = false;
+    for (const b of root.querySelectorAll('.d3-bar [data-act="focus"]')) { b.disabled = !s.sel; b.setAttribute("aria-pressed",String(s.focus)); }
     root.dataset.sel = s.sel || "";
     root.querySelectorAll("[data-part]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.part === s.sel)));
     if (!s.sel) infoEl.textContent = how === "tap" ? "Мимо детали — попробуй ещё раз или выбери в списке." : "Нажми на деталь на модели или в списке.";
@@ -201,27 +195,47 @@ export function mount(root, ctx) {
     checkMissions();
   }
   function checkMissions() {
-    if (s.sel === "fc" && s.exTo === 1) ctx.done("stack");
+    if (s.sel === "fc" && s.exTo === 1 && s.ex >= .95) ctx.done("stack");
     if (s.seen.has("prop_fl") && s.seen.has("prop_rr")) ctx.done("cw");
     if (s.sel === "camera" && sideView()) ctx.done("cam");
     if (s.seen.has("ant_vtx") && s.seen.has("ant_rx")) ctx.done("ants");
   }
-  root.addEventListener("click", (e) => {
+  const handleClick = (e) => {
     const pb = e.target.closest("[data-part]");
     if (pb) return select(pb.dataset.part === s.sel ? null : pb.dataset.part, "chip");
     const vb = e.target.closest("[data-view]");
-    if (vb) { camTo = VIEWS[vb.dataset.view]; if (vb.dataset.view === "home") viewer.view.zoom = 1; viewer.invalidate(); return; }
+    if (vb) { s.focus = false; root.querySelector('.d3-bar [data-act="focus"]').setAttribute("aria-pressed","false"); camTo = VIEWS[vb.dataset.view]; if (vb.dataset.view === "home") viewer.view.zoom = 1; viewer.invalidate(); return; }
+    const focus = e.target.closest('[data-act="focus"]');
+    if (focus && s.sel) {
+      s.focus = !s.focus; viewer.view.zoom = 1;
+      root.querySelector('.d3-bar [data-act="focus"]').setAttribute("aria-pressed",String(s.focus));
+      root.dataset.focused = String(s.focus); viewer.invalidate(); return;
+    }
     const xb = e.target.closest("[data-act='explode']");
     if (xb) {
       s.exTo = s.exTo ? 0 : 1;
       xb.setAttribute("aria-pressed", String(!!s.exTo));
       xb.textContent = s.exTo ? "Собрать" : "Разобрать";
       root.dataset.exploded = String(!!s.exTo);
+      $(".d3-explode input").value = String(s.exTo * 100);
+      $(".d3-explode output").textContent = `${Math.round(s.exTo * 100)} %`;
       if (s.sel) select(s.sel, "chip");
       checkMissions();
       viewer.invalidate();
     }
-  });
+  };
+  root.addEventListener("click",handleClick);
+  const explodeInput = $(".d3-explode input");
+  const slideExplode = () => {
+    s.exTo = Number(explodeInput.value) / 100;
+    $(".d3-explode output").textContent = `${Math.round(s.exTo * 100)} %`;
+    const btn = $('[data-act="explode"]');
+    btn.setAttribute("aria-pressed",String(s.exTo > 0)); btn.textContent = s.exTo > 0 ? "Собрать" : "Разобрать";
+    root.dataset.exploded = String(s.exTo > 0);
+    if(s.sel) select(s.sel,"chip");
+    viewer.invalidate();
+  };
+  explodeInput.addEventListener("input",slideExplode);
   // Для автотестов: экранная точка центра детали с учётом разборки.
   root.__d3 = {
     viewer,
@@ -236,6 +250,8 @@ export function mount(root, ctx) {
   };
   return {
     destroy() {
+      root.removeEventListener("click",handleClick);
+      explodeInput.removeEventListener("input",slideExplode);
       mo.disconnect();
       if (mq && mq.removeEventListener) mq.removeEventListener("change", theme);
       viewer.destroy();

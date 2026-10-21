@@ -1328,4 +1328,17 @@ table.t{max-width:100%;-webkit-overflow-scrolling:touch}
 .lv-th{font:600 10px var(--anatomy-mono);fill:var(--anatomy-strong);paint-order:stroke;stroke:var(--anatomy-page);stroke-width:2.5px}
 .lv-warn{stroke:var(--warn);stroke-width:.5;stroke-dasharray:1.6 1.2;fill:none}
 .lv-cold{stroke:var(--bad);stroke-width:1;fill:none}.lv-ctl{stroke:var(--ok);stroke-width:1;fill:none}
+/* Подробная 3D-модель главы 3: выбирается одна деталь, подпись следует за ней. */
+.d3-stage{background:radial-gradient(ellipse at 50% 48%,color-mix(in srgb,var(--accent) 5%,var(--anatomy-page)),var(--anatomy-page) 75%);border:1px solid var(--anatomy-faint);border-radius:16px;overflow:hidden}
+.d3-canvas:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
+.d3-marker{position:absolute;z-index:2;transform:translate(-50%,-100%);max-width:180px;min-height:44px;padding:8px 14px;border:1px solid var(--accent);border-radius:10px;background:var(--anatomy-card);color:var(--anatomy-strong);font:600 13px var(--anatomy-sans);box-shadow:0 4px 14px color-mix(in srgb,var(--anatomy-strong) 12%,transparent);cursor:pointer}
+.d3-leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}.d3-leaders path{fill:none;stroke:var(--accent);stroke-width:1}
+.d3-marker[hidden],.d3-bar[hidden],.d3-explode[hidden]{display:none}
+.d3-explode{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;margin:0 0 8px;color:var(--anatomy-strong)}
+.d3-explode input{flex:1;min-width:110px;min-height:44px;accent-color:var(--accent)}
+.d3-explode output{min-width:44px;text-align:right;font-family:var(--anatomy-mono)}
+.d3-bar button,.d3-parts button{min-height:44px;min-width:44px}
+.d3-bar button:disabled{opacity:.45;cursor:default}
+.d3-info{padding:12px 14px;border-radius:12px;background:var(--anatomy-card);border-left:3px solid var(--accent);line-height:1.55}
+@media(max-width:700px){.d3-hint{font-size:11px;padding:0 12px;line-height:1.4}.d3-marker{max-width:150px;font-size:12px}.d3-bar{gap:5px}.d3-bar .lab-btn{padding:8px 10px;font-size:13px}}
 .lv-instr{margin:6px 0 10px;padding:8px 10px;border-radius:8px;background:var(--anatomy-page);box-shadow:inset 0 0 0 1px var(--anatomy-faint);font:13px/1.5 var(--anatomy-mono);color:var(--anatomy-strong)}
