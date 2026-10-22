@@ -89,6 +89,12 @@ async function phone(w, h, deep) {
     rep(tag, "K6: точка внутри тоста — касание проходит сквозь него", hit.under === "сквозь", JSON.stringify(hit));
     await tapAt([hit.x, hit.y]);
     rep(tag, "K6: кнопка «Нет управления» сразу после звезды срабатывает без скрытия тоста", (await D()).mode === "cmd", `mode ${(await D()).mode}`);
+    // Вводная режима не отправляет «не в полётнике»: по сводке 003 полётник — развилка (ревью Grok 030)
+    const selNow = (await D()).sel;
+    if (selNow) await p.click(`[data-part="${selNow}"]`); // снять выбор — под кнопками вводная режима
+    await W(p, 150);
+    const lead = await p.evaluate(() => document.querySelector(".d3-info").textContent);
+    rep(tag, "вводная «Нет управления» не исключает полётник, а называет развилку", !/не в полётнике/.test(lead) && /развилка/.test(lead), lead.slice(0, 120));
     // K3: полётник бледный, но нажимается и объясняет развилку; задание он не закрывает
     const off = await p.evaluate(() => ({ fc: document.querySelector('[data-part="fc"]').hasAttribute("data-off"), rx: document.querySelector('[data-part="rx"]').hasAttribute("data-off"), cam: document.querySelector('[data-part="camera"]').hasAttribute("data-off") }));
     rep(tag, "K3: в режиме «Нет управления» полётник и камера бледные, приёмник — нет", off.fc && off.cam && !off.rx, JSON.stringify(off));
