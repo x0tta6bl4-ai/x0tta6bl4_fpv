@@ -287,6 +287,114 @@ function build(dark) {
   add("camera", new Mesh().tube([12.05, 2.5, 0], [8.95, 2.55, 0], 0.08, 6), C.wire, [12.7, 2.55, cz]);
   add("camera", new Mesh().cyl(0.32, 0.08, 12, M4.chain(camM, M4.t(1.28, 0, 0), M4.rz(-Math.PI / 2))), C.glass, [12.7, 2.55, cz]);
 
+  // Мелкая геометрия остаётся в существующих группах выбора деталей.
+  // Размеры условные: модель объясняет устройство, не заменяет сборочный чертёж.
+  const bolt = (mesh, x, y, z, r = 0.12) => {
+    mesh.cyl(r, 0.1, 6, M4.t(x, y, z));
+    mesh.box(r * 1.2, 0.015, r * 0.22, M4.t(x, y + 0.058, z));
+  };
+  const ring = (mesh, outer, inner, height, matrix) => mesh.lathe([
+    [inner, -height / 2], [outer, -height / 2], [outer, height / 2],
+    [inner, height / 2], [inner, -height / 2],
+  ], 20, matrix);
+
+  // Пульт: гнёзда карданов, насечки ручек, энкодеры, кнопки и рёбра рукоятей.
+  const gimbals = new Mesh(), knobs = new Mesh();
+  for (const z of [-6.15, -4.65]) {
+    ring(gimbals, 0.92, 0.60, 0.12, M4.t(-13.5, 2.13, z));
+    for (let i = 0; i < 4; i++) {
+      const angle = i * Math.PI / 2;
+      bolt(gimbals, -13.5 + Math.cos(angle) * 0.74, 2.23, z + Math.sin(angle) * 0.74, 0.055);
+    }
+    for (let i = 0; i < 3; i++) ring(knobs, 0.45, 0.40, 0.035, M4.t(-13.5, 3.32 + i * 0.08, z));
+  }
+  add("radio", gimbals, C.bezel, [-15.2, 1.5, -5.4]);
+  add("radio", knobs, C.metal, [-15.2, 1.5, -5.4]);
+  const encoderTX = new Mesh(), trimTX = new Mesh();
+  for (const z of [-6.75, -4.05]) {
+    encoderTX.cyl(0.18, 0.16, 12, M4.t(-16.7, 1.96, z));
+    trimTX.box(0.12, 0.035, 0.14, M4.t(-16.7, 2.055, z));
+  }
+  for (let i = 0; i < 3; i++) trimTX.box(0.15, 0.08, 0.25, M4.t(-17.65, 1.87, -5.8 + i * 0.4));
+  add("radio", encoderTX, C.metal, [-15.2, 1.5, -5.4]);
+  add("radio", trimTX, C.bezel, [-15.2, 1.5, -5.4]);
+  const gripTX = new Mesh();
+  for (const z of [-7.25, -3.55]) for (let i = 0; i < 5; i++) gripTX.box(0.07, 0.04, 0.8, M4.t(-15.9 + i * 0.22, 2.44, z));
+  add("radio", gripTX, C.bezel, [-15.2, 1.5, -5.4]);
+
+  // Очки: мягкие окуляры, переносица, колёсики фокуса, вентиляция и антенный разъём.
+  const ocularRims = new Mesh(), gogglesDetails = new Mesh();
+  for (const z of [4.55, 7.05]) {
+    ring(ocularRims, 1.0, 0.72, 0.16, M4.chain(M4.t(-11.45, 1.52, z), M4.rz(-Math.PI / 2)));
+    gogglesDetails.cyl(0.24, 0.14, 14, M4.t(-13.2, 2.52, z));
+  }
+  ocularRims.box(0.4, 0.3, 0.6, M4.t(-11.65, 1.1, 5.8));
+  for (let i = 0; i < 6; i++) ocularRims.box(0.12, 0.045, 0.7, M4.t(-14.3 + i * 0.27, 2.47, 5.8));
+  add("goggles", ocularRims, C.bezel, [-13.4, 1.7, 5.8]);
+  add("goggles", gogglesDetails, C.metal, [-13.4, 1.7, 5.8]);
+  add("gant", new Mesh().cyl(0.29, 0.22, 6, M4.t(-12.05, 2.75, 5.8)), C.gold, VID_B);
+
+  // Рама: верхние боковины оставляют электронику открытой для касания.
+  const rails = new Mesh(), fasteners = new Mesh();
+  for (const z of [-1.68, 1.68]) {
+    rails.box(4.0, 0.18, 0.28, M4.t(cx, 2.35, z));
+    for (const x of [cx - 1.65, cx + 1.65]) {
+      fasteners.cyl(0.12, 0.34, 10, M4.t(x, 2.2, z));
+      bolt(fasteners, x, 2.48, z);
+    }
+  }
+  add("frame", rails, C.carbon, [cx, cy, cz]);
+  add("frame", fasteners, C.metal, [cx, cy, cz]);
+  const motorVents = new Mesh(), motorHardware = new Mesh();
+  for (const [x,z] of motors) {
+    ring(motorHardware, 0.65, 0.35, 0.05, M4.t(x, cy + 0.85, z));
+    bolt(motorHardware, x, cy + 1.46, z, 0.18);
+    for (let i = 0; i < 8; i++) {
+      const angle = i * Math.PI / 4;
+      motorVents.box(0.13, 0.28, 0.05, M4.chain(M4.t(x + Math.sin(angle) * 0.90, cy + 0.60, z + Math.cos(angle) * 0.90), M4.ry(angle)));
+    }
+  }
+  add("frame", motorVents, C.bezel, [cx, cy, cz]);
+  add("frame", motorHardware, C.motor, [cx, cy + 0.5, cz]);
+
+  // Полётник: стойки стека, разъём USB, отдельные компоненты и контактные площадки.
+  const fcHardware = new Mesh(), fcComponents = new Mesh(), pads = new Mesh();
+  for (const dx of [-1.1,1.1]) for (const dz of [-1.1,1.1]) {
+    fcHardware.cyl(0.11, 0.3, 10, M4.t(cx+dx,2.35,dz));
+    bolt(fcHardware,cx+dx,2.64,dz,0.10);
+  }
+  fcHardware.box(0.44,0.22,0.6,M4.t(cx+1.4,2.63,0));
+  fcComponents.box(0.07,0.1,0.35,M4.t(cx+1.64,2.64,0));
+  for (let i=0;i<5;i++) {
+    pads.box(0.22,0.035,0.14,M4.t(cx-0.7+i*0.35,2.58,1.26));
+    fcComponents.box(0.22,0.14,0.13,M4.t(cx-0.65+i*0.3,2.65,-0.85));
+  }
+  add("fc",fcHardware,C.metal,[cx,2.52,cz]);
+  add("fc",fcComponents,C.chip,[cx,2.52,cz]);
+  add("fc",pads,C.gold,[cx,2.52,cz]);
+  const rxComponents=new Mesh().box(0.46,0.12,0.45,M4.t(5.18,3.04,-2.65));
+  const rxPads=new Mesh();
+  for(let i=0;i<4;i++) rxPads.box(0.12,0.045,0.16,M4.t(5.0+i*0.3,2.92,-3.08));
+  add("rx",rxComponents,C.chip,rxAt); add("rx",rxPads,C.gold,rxAt);
+  add("rxant",new Mesh().box(0.45,0.32,0.5,M4.t(4.8,7.82,-5.6)),C.bezel,CMD_B);
+  // Три фазных провода к каждому мотору: видимая связь мотор–силовая часть.
+  const phaseWires=new Mesh();
+  for(const [x,z] of motors) for(let i=0;i<3;i++) {
+    const offset=(i-1)*0.12;
+    phaseWires.tube([cx+(x-cx)*0.27,2.27,z*0.27+offset],[x-(x-cx)*0.12,2.25,z-z*0.12+offset],0.035,6);
+  }
+  add("frame",phaseWires,C.wire,[cx,cy,cz]);
+  // Ремни аккумулятора и силовой кабель к XT-разъёму.
+  const straps=new Mesh();
+  for(const x of [6.0,8.4]) {
+    straps.box(0.28,0.06,2.25,M4.t(x,1.76,0));
+    for(const z of [-1.1,1.1]) straps.box(0.28,1.42,0.055,M4.t(x,1.02,z));
+  }
+  add("battery",straps,C.bezel,[7.2,1.05,cz]);
+  const power=new Mesh().tube([5.2,1.45,0.4],[4.5,1.5,0.4],0.07,8);
+  power.tube([4.5,1.5,0.4],[4.65,1.15,0],0.07,8);
+  add("battery",power,C.batt,[7.2,1.05,cz]);
+
   const cmdColor = BLUE.slice();
   const vidColor = ORANGE.slice();
   add("beam_cmd", new Mesh().tube(CMD_A, CMD_B, 0.28, 8), cmdColor, mid(CMD_A, CMD_B), { lane: "cmd" });
@@ -313,7 +421,7 @@ let clock = 0;
 
 const MODE_LEAD = {
   ok: "Оба моста живы. Синие точки бегут от пульта к дрону — это команды. Оранжевые бегут от VTX к очкам — это картинка. Погаси один мост и посмотри, какой поток встал.",
-  cmd: "Синий мост замолчал: пакеты команд не летят, оранжевые идут. В очках картинка есть, дрон стики не слышит. Ищи в управлении, не в камере и не в полётнике.",
+  cmd: "Синий мост замолчал: пакеты команд не летят, оранжевые идут. В очках картинка есть, дрон стики не слышит. Камера — не первая дверь: ищи в управлении. Полётник — развилка: видит ли он стики (нажми его — расскажет, как проверить).",
   vid: "Оранжевый мост замолчал: картинка не летит, синие пакеты идут. Команды до борта доходят. Ищи в видео: камера, VTX, антенна, очки.",
 };
 

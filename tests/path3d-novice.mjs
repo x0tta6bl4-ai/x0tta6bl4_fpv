@@ -89,6 +89,12 @@ async function phone(w, h, deep) {
     rep(tag, "K6: точка внутри тоста — касание проходит сквозь него", hit.under === "сквозь", JSON.stringify(hit));
     await tapAt([hit.x, hit.y]);
     rep(tag, "K6: кнопка «Нет управления» сразу после звезды срабатывает без скрытия тоста", (await D()).mode === "cmd", `mode ${(await D()).mode}`);
+    // Вводная режима не отправляет «не в полётнике»: по сводке 003 полётник — развилка (ревью Grok 030)
+    const selNow = (await D()).sel;
+    if (selNow) await p.click(`[data-part="${selNow}"]`); // снять выбор — под кнопками вводная режима
+    await W(p, 150);
+    const lead = await p.evaluate(() => document.querySelector(".d3-info").textContent);
+    rep(tag, "вводная «Нет управления» не исключает полётник, а называет развилку", !/не в полётнике/.test(lead) && /развилка/.test(lead), lead.slice(0, 120));
     // K3: полётник бледный, но нажимается и объясняет развилку; задание он не закрывает
     const off = await p.evaluate(() => ({ fc: document.querySelector('[data-part="fc"]').hasAttribute("data-off"), rx: document.querySelector('[data-part="rx"]').hasAttribute("data-off"), cam: document.querySelector('[data-part="camera"]').hasAttribute("data-off") }));
     rep(tag, "K3: в режиме «Нет управления» полётник и камера бледные, приёмник — нет", off.fc && off.cam && !off.rx, JSON.stringify(off));
@@ -120,6 +126,44 @@ await phone(412, 915, false);
   await p.click('[data-figtab="lab:path3d"]'); await W(p, 800);
   const d = await p.evaluate(() => ({ parts: !document.querySelector(".d3-parts").hidden, top: !document.querySelector('[data-view="top"]').hidden }));
   rep("1280", "на широком экране детали и ракурсы видны сразу", d.parts && d.top, JSON.stringify(d));
+  await ctx.close();
+}
+
+// Детализация 029: геометрия не закрывает цели касания на телефонах в обеих темах.
+for (const width of [360, 390, 412]) for (const theme of ["light", "dark"]) {
+  const ctx = await b.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true, colorScheme: theme });
+  const p = await ctx.newPage();
+  p.on("pageerror", e => errs.push(e.message));
+  await p.goto(U);
+  await p.evaluate(t => document.documentElement.dataset.theme = t, theme);
+  await p.click('[data-figtab="lab:path3d"]'); await W(p, 900);
+  await p.locator(".d3-canvas").scrollIntoViewIfNeeded();
+  await W(p, 250);
+  await p.locator(".d3-stage").screenshot({ path: resolve(ROOT, `tests/out/path3d-detail-${width}-${theme}.png`) });
+  for (const id of ["beam_cmd", "beam_vid", "rx", "vtx"]) {
+    const at = await p.evaluate(id => document.querySelector("#labroot").__p3.at(id), id);
+    await p.touchscreen.tap(...at); await W(p, 150);
+    const selected = await p.locator("#labroot").getAttribute("data-sel");
+    rep(`${width}/${theme}`, `детализация не перекрывает ${id}`, selected === id, `sel ${selected}`);
+  }
+  rep(`${width}/${theme}`, "нет горизонтального переполнения", await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await ctx.close();
+}
+// Без WebGL список остаётся доступным, все три задания можно выполнить.
+{
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  await ctx.addInitScript(() => {
+    const get = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type, ...args) { return /webgl/i.test(type) ? null : get.call(this, type, ...args); };
+  });
+  const p = await ctx.newPage();
+  p.on("pageerror", e => errs.push(e.message));
+  await p.goto(U); await p.click('[data-figtab="lab:path3d"]');
+  rep("без WebGL", "пояснение и список доступны", await p.locator("#labroot").getAttribute("data-webgl") === "0" && await p.locator(".d3-parts").isVisible() && /не показывает 3D/.test(await p.locator(".d3-stage").innerText()));
+  for (const id of ["beam_cmd", "beam_vid"]) await p.click(`[data-part="${id}"]`);
+  await p.click('[data-sym="cmd"]'); await p.click('[data-part="rx"]');
+  await p.click('[data-sym="vid"]'); await p.click('[data-part="vtx"]');
+  rep("без WebGL", "описание и все три задания работают через список", /Видеопередатчик/.test(await p.locator(".d3-info").innerText()) && await p.locator('#missions li.ok').count() === 3);
   await ctx.close();
 }
 
