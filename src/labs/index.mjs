@@ -16,5 +16,6 @@ import * as quiz from "./quiz.mjs";
 import * as drone3d from "./drone3d.mjs";
 import * as charge from "./charge.mjs";
 import * as path3d from "./path3d.mjs";
+import * as first from "./first.mjs";
 
-export const LABS = { water, fly, energy, waves, bind, lq, video, jam, solder, bf, detective, gonogo, map, quiz, drone3d, charge, path3d };
+export const LABS = { water, fly, energy, waves, bind, lq, video, jam, solder, bf, detective, gonogo, map, quiz, drone3d, charge, path3d, first };

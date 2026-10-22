@@ -196,6 +196,7 @@ details.sec-more[open]>summary,details.extra[open]>summary{margin:0 -14px;border
 .srz-modes{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
 .srz-modes button{min-height:44px;padding:8px 14px;border-radius:10px;font-size:14px;font-weight:500}
 .srz-modes button[aria-pressed="true"]{background:var(--anatomy-card);box-shadow:0 0 0 2px var(--accent);color:var(--anatomy-strong)}
+.srz-modes a.lab-btn{display:inline-flex;align-items:center;background:var(--anatomy-card);box-shadow:0 0 0 1px var(--anatomy-faint);color:var(--anatomy-strong);text-decoration:none;font-size:14px}
 .srz-exam-card{background:var(--anatomy-card);border:1px solid var(--anatomy-faint);border-radius:14px;padding:18px 20px;margin:16px 0}
 .srz-miss-item{padding:12px 0;border-bottom:1px solid var(--anatomy-faint)}
 .srz-miss-item b{color:var(--anatomy-strong);display:block;margin-bottom:4px}
@@ -419,6 +420,24 @@ body.noscroll{overflow:hidden}
 .fc-a{font-size:16px;color:var(--anatomy-strong);margin:0;padding-top:10px;border-top:1px dashed var(--anatomy-faint)}
 .fc-hint{color:var(--anatomy-muted);margin:0;font-size:14px}
 .fc-btns{display:flex;gap:12px;width:100%}
+/* Гл. 20 «Что первым?» (src/labs/first.mjs) */
+.fa{display:grid;gap:12px}
+.fa-topics{display:flex;flex-wrap:wrap;gap:8px}.fa-topics .lab-btn{flex:1 1 140px}
+.fa-lead{margin:0}
+.fa-card{background:var(--anatomy-page);box-shadow:0 0 0 1px var(--anatomy-mid);border-radius:16px;padding:16px;display:grid;gap:12px}
+.fa-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.fa-time{position:relative;flex:0 0 96px;height:22px;border-radius:11px;background:var(--anatomy-card);box-shadow:0 0 0 1px var(--anatomy-faint);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.fa-time i{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--warn) 45%,transparent)}
+.fa-time b{position:relative;font-size:12.5px;font-variant-numeric:tabular-nums}
+.fa-q{font-size:17px;font-weight:600;margin:0}
+.fa-opts{display:grid;gap:8px}
+.fa-opt{text-align:left}
+.fa-opt:disabled{opacity:.7}
+.fa-opt.ok,.fa-opt.bad{opacity:1;color:var(--anatomy-strong)}
+.fa-opt.ok{background:color-mix(in srgb,var(--ok) 14%,var(--anatomy-card));box-shadow:0 0 0 1.5px var(--ok)}
+.fa-opt.bad{background:color-mix(in srgb,var(--bad) 14%,var(--anatomy-card));box-shadow:0 0 0 1.5px var(--bad)}
+.fa-res p{margin:0 0 8px}
+.fa-ok{color:var(--ok)}.fa-bad{color:var(--bad)}
 .fc-btns .lab-btn{flex:1;min-height:54px;font-size:16px;border-radius:12px;font-weight:600}
 .fc-btns .lab-btn.bad{background:color-mix(in srgb,var(--bad) 12%,var(--anatomy-card));border:1.5px solid color-mix(in srgb,var(--bad) 40%,transparent);color:var(--anatomy-strong)}
 .fc-btns .lab-btn.good{background:color-mix(in srgb,var(--ok) 12%,var(--anatomy-card));border:1.5px solid color-mix(in srgb,var(--ok) 40%,transparent);color:var(--anatomy-strong)}

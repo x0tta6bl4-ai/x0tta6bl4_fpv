@@ -15,7 +15,7 @@
 npm install
 npx playwright install chromium   # браузер для автотестов (один раз)
 npm run build                     # → dist/fpv-anatomy-v4.html
-npm test                          # сборка + 19 автотестов (~15 мин)
+npm test                          # сборка + 20 автотестов (~15 мин)
 ```
 
 ## Документы

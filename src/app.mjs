@@ -27,6 +27,7 @@ import { CHAPTERS_B } from "../data/chapters-b.mjs";
 import { CHAPTERS_C } from "../data/chapters-c.mjs";
 import { GLOSSARY, CORRECTIONS, CLI, PROCEDURES, VERSIONS, SOURCES, REFTABLES } from "../data/appendix.mjs";
 import { LABS } from "./labs/index.mjs";
+import { markDue } from "./srs.mjs";
 import { KIDS } from "../data/kids.mjs";
 import { HINTS } from "../data/hints.mjs";
 import { INTROS } from "../data/intros.mjs";
@@ -36,6 +37,8 @@ import { attachZoom } from "./zoom.mjs";
 import { mountNotes } from "./notes.mjs";
 import SREZ from "../docs/content/srez.json";
 import SREZ_COV from "../docs/content/srez-coverage.json";
+import FIRST_ACTION from "../docs/content/first-action.json";
+const FIRST_N = FIRST_ACTION.length;
 import { shuffle } from "./labkit.mjs";
 
 const FIGS = { quad, path, thrust, battery, pid, radio, failsafe, link, pair, goggles, antenna, jamfield, flighttime, bench, bfdesk, flyfield, waterworks, preflight, workshop, navdesk, armcase, lowv };
@@ -615,6 +618,7 @@ function srezHtml() {
   return `<div class="srz-modes" role="tablist" aria-label="Режимы страницы">
     <button type="button" class="lab-btn" id="srz-mode-catalog" aria-pressed="true">📖 Каталог вопросов (${SREZ.items.length})</button>
     <button type="button" class="lab-btn" id="srz-mode-exam" aria-pressed="false">🎯 Пробный срез (20 вопросов)</button>
+    <a class="lab-btn" href="#20" data-go-tab="lab:first">🧭 Что сделаешь первым? (${FIRST_N} ситуаций)</a>
   </div>
   <div id="srz-catalog-view">
     <p>Все вопросы опросника курса: ${SREZ.items.length} (номера из таблицы «вопросы для контроля», ситуации С и теория Т от инструктора). Сначала ответь сам, потом открой ответ. Ссылка под ответом ведёт в главу, где это объяснено подробно. Объяснено в главах: <b>${explained} из ${SREZ.items.length}</b>.</p>
@@ -980,6 +984,14 @@ function bindOnce() {
 }
 
 function bind(ch, a) {
+  // Ссылка на вкладку стенда другой главы (прил. «И» → гл. 20 «Что первым?»): вкладка выбирается до перехода.
+  $$("#main [data-go-tab]").forEach((link) => link.addEventListener("click", () => {
+    const to = link.hash.slice(1);
+    S.figTab = { ...(S.figTab || {}), [to]: link.dataset.goTab };
+    QUEST.ch = "";
+    render.keepLab = true;
+    save();
+  }));
   // Ссылки расчётов работают и из главы, и внутри самой шпаргалки.
   $$("#main [data-srz-sec]").forEach((link) => link.addEventListener("click", (event) => {
     render.sec = link.dataset.srzSec || null;
@@ -1176,11 +1188,7 @@ function bind(ch, a) {
       $("#exam-act-bad")?.addEventListener("click", () => {
         exam.missed.push(it);
         // Ошибка пробного среза идёт в повтор колоды «Срез» (гл. 20): вопрос станет «к повтору сегодня».
-        try {
-          const sc = JSON.parse(localStorage.getItem("fpv_srez_sched") || "{}");
-          sc[`srez:${it.n}`] = { step: 0, interval: 0, due: Date.now(), last: Date.now() };
-          localStorage.setItem("fpv_srez_sched", JSON.stringify(sc));
-        } catch (e) {}
+        markDue([it.n]);
         nextExamCard();
       });
     };
