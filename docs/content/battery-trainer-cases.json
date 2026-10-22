@@ -1,0 +1,697 @@
+{
+  "schemaVersion": 1,
+  "status": "research acceptance fixtures; not implemented trainer",
+  "sourceDate": "2026-10-22",
+  "allCasesAreSynthetic": true,
+  "notes": [
+    "physicalTruth never supplies unobserved UI answers",
+    "Current, temperature and capacity values in synthetic passports are scenario constraints, not universal recommendations",
+    "Nominal Wh/V is distinct from present measured voltage",
+    "B03 and B04 intentionally have identical availableEvidence"
+  ],
+  "cases": [
+    {
+      "id": "B01",
+      "title": "Читаемая известная батарея",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "LiPo 4S 1500 mAh",
+        "source": "Синтетический паспорт, связанный с экземпляром B01",
+        "confirmed": {
+          "chemistry": "LiPo",
+          "series": 4,
+          "capacity_mAh": 1500,
+          "endVoltagePerCell_V": 4.2,
+          "maxChargeCurrent_A": 1.5,
+          "chargeTemperatureRange_C": [
+            10,
+            40
+          ]
+        }
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "charge",
+        "reason": "Параметры подтверждены; осмотр, подключения, настройка и контроль обязательны",
+        "recipe": {
+          "task": "Balance Charge",
+          "series": 4,
+          "endVoltagePerCell_V": 4.2,
+          "courseTargetRate_C": 0.5,
+          "targetCurrent_A": 0.75,
+          "chargerCurrentStep_A": 0.1,
+          "preferredCurrentNotAboveTarget_A": 0.7
+        }
+      }
+    },
+    {
+      "id": "B02",
+      "title": "Тип стёрт, профиль подтверждён",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "4S 1500 mAh / 4.35 V max per cell",
+        "source": "Синтетический паспорт, надёжно связанный с этим экземпляром",
+        "confirmed": {
+          "chemistry": "LiHV",
+          "series": 4,
+          "capacity_mAh": 1500,
+          "endVoltagePerCell_V": 4.35,
+          "maxChargeCurrent_A": 1.5,
+          "chargeTemperatureRange_C": [
+            10,
+            40
+          ]
+        }
+      },
+      "physicalTruth": {
+        "chemistry": "LiHV",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.35
+      },
+      "expected": {
+        "outcome": "charge",
+        "reason": "Достоверный профиль допускает 4,35 В; нельзя узнавать тип по обёртке",
+        "recipe": {
+          "task": "Balance Charge",
+          "series": 4,
+          "endVoltagePerCell_V": 4.35,
+          "courseTargetRate_C": 0.5,
+          "targetCurrent_A": 0.75,
+          "chargerCurrentStep_A": 0.1,
+          "preferredCurrentNotAboveTarget_A": 0.7
+        }
+      }
+    },
+    {
+      "id": "B03",
+      "title": "Полностью безымянная батарея",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": null,
+        "source": null,
+        "confirmed": {}
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "decline",
+        "reason": "Не подтверждены химия, ёмкость и допустимые параметры заряда"
+      }
+    },
+    {
+      "id": "B04",
+      "title": "Неотличимая по наблюдениям LiHV",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": null,
+        "source": null,
+        "confirmed": {}
+      },
+      "physicalTruth": {
+        "chemistry": "LiHV",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.35
+      },
+      "expected": {
+        "outcome": "decline",
+        "reason": "Те же наблюдения, что в B03; скрытая химия не должна менять ответ интерфейса"
+      }
+    },
+    {
+      "id": "B05",
+      "title": "Ёмкость и разрешённый ток неизвестны",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "LiPo 4S",
+        "source": "Известен только тип и S",
+        "confirmed": {
+          "chemistry": "LiPo",
+          "series": 4,
+          "endVoltagePerCell_V": 4.2
+        }
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "decline",
+        "reason": "Нет ни прямой ёмкости, ни пары номинальная энергия/номинальное напряжение, ни подтверждённого зарядного тока"
+      }
+    },
+    {
+      "id": "B06",
+      "title": "Повреждённый экземпляр",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "При осмотре видна вздутая оболочка",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "LiPo 4S 1500 mAh",
+        "source": "Синтетический паспорт, связанный с экземпляром B01",
+        "confirmed": {
+          "chemistry": "LiPo",
+          "series": 4,
+          "capacity_mAh": 1500,
+          "endVoltagePerCell_V": 4.2,
+          "maxChargeCurrent_A": 1.5,
+          "chargeTemperatureRange_C": [
+            10,
+            40
+          ]
+        },
+        "damaged": true
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "decline_before_connect",
+        "reason": "Маркировка не отменяет обнаруженное повреждение"
+      }
+    },
+    {
+      "id": "B07",
+      "title": "Нет балансира",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "LiPo 4S 1500 mAh",
+        "source": "Синтетический паспорт, связанный с экземпляром B01",
+        "confirmed": {
+          "chemistry": "LiPo",
+          "series": 4,
+          "capacity_mAh": 1500,
+          "endVoltagePerCell_V": 4.2,
+          "maxChargeCurrent_A": 1.5,
+          "chargeTemperatureRange_C": [
+            10,
+            40
+          ]
+        },
+        "initialConnections": {
+          "main": true,
+          "balance": false
+        }
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "fix_then_charge",
+        "reason": "Необходимо штатное балансировочное подключение",
+        "recipe": {
+          "task": "Balance Charge",
+          "series": 4,
+          "endVoltagePerCell_V": 4.2,
+          "courseTargetRate_C": 0.5,
+          "targetCurrent_A": 0.75,
+          "chargerCurrentStep_A": 0.1,
+          "preferredCurrentNotAboveTarget_A": 0.7
+        },
+        "requiredFix": "connect_balance_according_to_charger_profile"
+      }
+    },
+    {
+      "id": "B08",
+      "title": "Конфликт S",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "LiPo 4S 1500 mAh",
+        "source": "Синтетический паспорт, связанный с экземпляром B01",
+        "confirmed": {
+          "chemistry": "LiPo",
+          "series": 4,
+          "capacity_mAh": 1500,
+          "endVoltagePerCell_V": 4.2,
+          "maxChargeCurrent_A": 1.5,
+          "chargeTemperatureRange_C": [
+            10,
+            40
+          ]
+        },
+        "configuredSeries": 6
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "fix_then_charge",
+        "reason": "Выбрано 6S, а измерения и подтверждённая маркировка соответствуют 4S",
+        "recipe": {
+          "task": "Balance Charge",
+          "series": 4,
+          "endVoltagePerCell_V": 4.2,
+          "courseTargetRate_C": 0.5,
+          "targetCurrent_A": 0.75,
+          "chargerCurrentStep_A": 0.1,
+          "preferredCurrentNotAboveTarget_A": 0.7
+        },
+        "requiredFix": "reconcile_connection_and_series_then_remeasure"
+      }
+    },
+    {
+      "id": "B09",
+      "title": "Оставшийся профиль HV",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "LiPo 4S 1500 mAh",
+        "source": "Синтетический паспорт, связанный с экземпляром B01",
+        "confirmed": {
+          "chemistry": "LiPo",
+          "series": 4,
+          "capacity_mAh": 1500,
+          "endVoltagePerCell_V": 4.2,
+          "maxChargeCurrent_A": 1.5,
+          "chargeTemperatureRange_C": [
+            10,
+            40
+          ]
+        },
+        "configuredEndVoltagePerCell_V": 4.35
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "fix_then_charge",
+        "reason": "Настройка выше подтверждённого предела 4,20 В",
+        "recipe": {
+          "task": "Balance Charge",
+          "series": 4,
+          "endVoltagePerCell_V": 4.2,
+          "courseTargetRate_C": 0.5,
+          "targetCurrent_A": 0.75,
+          "chargerCurrentStep_A": 0.1,
+          "preferredCurrentNotAboveTarget_A": 0.7
+        },
+        "requiredFix": "select_confirmed_profile_before_start"
+      }
+    },
+    {
+      "id": "B10",
+      "title": "Зарядник не поддерживает нужный профиль",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "Известный профиль 4.45 V/cell",
+        "source": "Синтетический паспорт этого экземпляра",
+        "confirmed": {
+          "chemistry": "HV-4.45",
+          "series": 4,
+          "capacity_mAh": 1500,
+          "endVoltagePerCell_V": 4.45,
+          "maxChargeCurrent_A": 1.5,
+          "chargeTemperatureRange_C": [
+            10,
+            40
+          ]
+        },
+        "chargerCapabilities": {
+          "supportedEndVoltagesPerCell_V": [
+            4.1,
+            4.2,
+            4.35
+          ]
+        }
+      },
+      "physicalTruth": {
+        "chemistry": "HV-4.45",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.45
+      },
+      "expected": {
+        "outcome": "choose_compatible_charger",
+        "reason": "Эта учебная конфигурация прибора не поддерживает подтверждённый предел"
+      }
+    },
+    {
+      "id": "B11",
+      "title": "Название LiIon не определяет фактический профиль",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "Подтверждённая Li-ion 4S 4500 mAh",
+        "source": "Синтетический паспорт сборки, профиль элементов сверяется с Molicel P45B S5",
+        "confirmed": {
+          "chemistry": "LiIon",
+          "series": 4,
+          "capacity_mAh": 4500,
+          "endVoltagePerCell_V": 4.2,
+          "maxChargeCurrent_A": 4.5
+        },
+        "chargerDefaultLiIonEndVoltagePerCell_V": 4.1
+      },
+      "physicalTruth": {
+        "chemistry": "LiIon",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 4500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "verify_profile",
+        "reason": "4,10 В ниже требуемой в деле полной зарядки 4,20 В; это не пример перезаряда. Нужен поддерживаемый паспортный профиль, не смена названия химии наугад"
+      }
+    },
+    {
+      "id": "B12",
+      "title": "Контроль после запуска",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "LiPo 4S 1500 mAh",
+        "source": "Синтетический паспорт, связанный с экземпляром B01",
+        "confirmed": {
+          "chemistry": "LiPo",
+          "series": 4,
+          "capacity_mAh": 1500,
+          "endVoltagePerCell_V": 4.2,
+          "maxChargeCurrent_A": 1.5,
+          "chargeTemperatureRange_C": [
+            10,
+            40
+          ]
+        },
+        "laterEvent": "Выраженный ненормальный нагрев, предусмотренный учебным сценарием"
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "stop",
+        "reason": "Запуск не завершает задачу, при ненормальном нагреве требуется остановка",
+        "recipe": {
+          "task": "Balance Charge",
+          "series": 4,
+          "endVoltagePerCell_V": 4.2,
+          "courseTargetRate_C": 0.5,
+          "targetCurrent_A": 0.75,
+          "chargerCurrentStep_A": 0.1,
+          "preferredCurrentNotAboveTarget_A": 0.7
+        }
+      }
+    },
+    {
+      "id": "B13",
+      "title": "Ёмкость вычисляется, тип пока нет",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 7,
+        "cellVoltages_V": [
+          3.75,
+          3.76,
+          3.77,
+          3.75,
+          3.76,
+          3.77
+        ],
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "22.2 V nominal; 133.2 Wh",
+        "nominalVoltage_V": 22.2,
+        "nominalEnergy_Wh": 133.2,
+        "source": "Подлинность сохранившихся номинальных величин задана условием дела",
+        "confirmed": {}
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 6,
+        "parallel": 1,
+        "capacity_mAh": 6000,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "derive_then_decline",
+        "reason": "Из Wh и номинальных V установлена номинальная ёмкость, но химия и предел заряда ещё не подтверждены",
+        "derived": {
+          "series": 6,
+          "capacity_mAh": 6000
+        },
+        "formula": "capacity_mAh = nominalEnergy_Wh / nominalVoltage_V * 1000"
+      }
+    },
+    {
+      "id": "B14",
+      "title": "Восстановленная ёмкость и подтверждённый профиль",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 7,
+        "cellVoltages_V": [
+          3.75,
+          3.76,
+          3.77,
+          3.75,
+          3.76,
+          3.77
+        ],
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "22.2 V nominal; 133.2 Wh",
+        "nominalVoltage_V": 22.2,
+        "nominalEnergy_Wh": 133.2,
+        "source": "Сохранившиеся Wh/V + достоверный паспорт, связанный с конкретным экземпляром",
+        "confirmed": {
+          "chemistry": "LiPo",
+          "series": 6,
+          "endVoltagePerCell_V": 4.2,
+          "maxChargeCurrent_A": 6,
+          "chargeTemperatureRange_C": [
+            10,
+            40
+          ]
+        }
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 6,
+        "parallel": 1,
+        "capacity_mAh": 6000,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "derive_then_charge",
+        "reason": "Ёмкость вычисляется из номинальных Wh/V, профиль и допустимый ток отдельно подтверждены",
+        "derived": {
+          "capacity_mAh": 6000
+        },
+        "recipe": {
+          "task": "Balance Charge",
+          "series": 6,
+          "endVoltagePerCell_V": 4.2,
+          "courseTargetRate_C": 0.5,
+          "targetCurrent_A": 3
+        }
+      }
+    },
+    {
+      "id": "B15",
+      "title": "Ватты не являются ватт-часами",
+      "synthetic": true,
+      "availableEvidence": {
+        "appearance": "Прямоугольная сборка в плёнке, повреждений при осмотре нет",
+        "balanceWireCount": 5,
+        "cellVoltages_V": [
+          3.76,
+          3.77,
+          3.75,
+          3.76
+        ],
+        "voltageMeaning": "measured_now",
+        "powerLead": "XT60",
+        "temperature_C": 22,
+        "labelText": "150 W",
+        "power_W": 150,
+        "measuredPackVoltage_V": 15,
+        "source": null,
+        "confirmed": {}
+      },
+      "physicalTruth": {
+        "chemistry": "LiPo",
+        "series": 4,
+        "parallel": 1,
+        "capacity_mAh": 1500,
+        "endVoltagePerCell_V": 4.2
+      },
+      "expected": {
+        "outcome": "decline",
+        "reason": "P/V даёт ток при этой рабочей точке, а не Ah. Номинальную ёмкость из этих данных не восстановить",
+        "derived": {
+          "currentAtStatedOperatingPoint_A": 10
+        },
+        "forbiddenDerivedFields": [
+          "capacity_mAh",
+          "nominalVoltage_V",
+          "chemistry"
+        ]
+      }
+    }
+  ]
+}

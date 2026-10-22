@@ -507,6 +507,7 @@ function chapterView(ch) {
   return `<article class="chapter" data-ch="${ch.id}">
   <div class="eyebrow">${ch.num === 20 ? "Глава 20" : `Глава ${ch.num}`} · с. ${ch.pages[0]}–${ch.pages[1]} · ${esc(ch.part)}</div>
   <h1>${esc(ch.title)}</h1>
+  ${ch.fieldChecklist && ch.fieldChecklist.length ? `<div class="ch-fast-nav"><a href="#field-card" class="field-card-jump" role="button">📋 Чеклист на поле</a></div>` : ""}
   ${ch.here && ch.here.length ? hereStrip(ch) : ""}
   ${ch.lead ? `<p class="lead">${tags(ch.lead)}</p>` : ""}
   ${ch.riddle ? `<section class="riddle"><div class="eyebrow">Загадка</div><p class="riddle-t">${esc(ch.riddle)}</p><p class="muted small">Ответь до чтения, даже наугад. Разгадка — в конце главы.</p><textarea rows="2" id="guess" placeholder="Моя догадка…">${esc(S.guess[ch.id] || "")}</textarea></section>` : ""}
@@ -517,6 +518,21 @@ function chapterView(ch) {
   ${ch.corrections ? `<p class="lab-note"><b>Уточнение лаборатории.</b> ${esc(ch.corrections.replace(/^Уточнение( лаборатории)?: /, ""))}</p>` : ""}
   ${ch.answer ? `<section class="solution"><div class="eyebrow">Разгадка</div><p class="muted small" id="myguess">${S.guess[ch.id] ? `Твоя догадка: «${esc(S.guess[ch.id])}»` : "Ты не записал догадку — ничего страшного."}</p><button type="button" class="ghost" id="reveal" aria-expanded="false">Открыть разгадку</button><p class="answer" hidden>${esc(ch.answer)}</p></section>` : ""}
   ${ch.summary ? `<section class="summary"><div class="eyebrow">Итог</div><p>${esc(ch.summary)}</p></section>` : ""}
+  ${ch.fieldChecklist && ch.fieldChecklist.length ? `
+  <section class="field-card" id="field-card" aria-label="Чеклист пилота на поле">
+    <div class="field-card-h">
+      <span class="field-card-badge">В поле</span>
+      <h3>Чеклист пилота на поле</h3>
+    </div>
+    <ul class="field-card-list">
+      ${ch.fieldChecklist.map((it) => `
+        <li class="field-card-item">
+          <span class="field-card-icon" aria-hidden="true">${esc(it.icon)}</span>
+          <span class="field-card-rule">${tags(it.rule)}</span>
+        </li>
+      `).join("")}
+    </ul>
+  </section>` : ""}
   ${questionsHtml(ch)}
   ${repeatHtml(ch)}
   ${extraHtml(ch)}
@@ -887,6 +903,13 @@ function bindOnce() {
     }
   }, true);
   main.addEventListener("click", (e) => {
+    const jmp = e.target.closest(".field-card-jump");
+    if (jmp) {
+      e.preventDefault();
+      const card = $("#field-card");
+      if (card) card.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
     const ch = CUR;
     // Вкладка стенда главы: перерисовываем главу и остаёмся у лаборатории.
     const ft = e.target.closest("[data-figtab]");
