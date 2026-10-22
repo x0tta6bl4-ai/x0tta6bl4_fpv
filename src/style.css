@@ -429,7 +429,7 @@ body.noscroll{overflow:hidden}
 .fa-time{position:relative;flex:0 0 96px;height:22px;border-radius:11px;background:var(--anatomy-card);box-shadow:0 0 0 1px var(--anatomy-faint);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .fa-time i{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--warn) 45%,transparent)}
 .fa-time b{position:relative;font-size:12.5px;font-variant-numeric:tabular-nums}
-.fa-q{font-size:17px;font-weight:600;margin:0}
+.fa-q{font-size:17px;font-weight:600;margin:0;color:var(--anatomy-strong)}
 .fa-opts{display:grid;gap:8px}
 .fa-opt{text-align:left}
 .fa-opt:disabled{opacity:.7}

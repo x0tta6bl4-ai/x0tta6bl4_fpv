@@ -121,7 +121,7 @@ export function mount(root, ctx) {
     }
     const c = s.cur;
     const place = PLACES.find(([pl]) => pl === c.place)?.[1] || "";
-    const head = `<div class="fa-head"><span class="eyebrow">${esc(place)} · ${s.topic === "mix" ? `${s.round.n + (s.mode === "card" ? 1 : 0)} из ${MIX_N}` : `осталось ${s.queue.length + (s.mode === "card" ? 1 : 0)}`}</span>${c.seconds ? `<span class="fa-time" aria-hidden="true"><i style="width:${s.mode === "card" ? (s.left / c.seconds) * 100 : 0}%"></i><b>${s.mode === "card" ? Math.ceil(s.left) + " с" : ""}</b></span>` : `<span class="muted small">без таймера</span>`}</div>`;
+    const head = `<div class="fa-head"><span class="eyebrow">${esc(place)} · ${s.topic === "mix" ? `${s.round.n + (s.mode === "card" ? 1 : 0)} из ${MIX_N}` : `осталось ${s.queue.length + (s.mode === "card" ? 1 : 0)}`}</span>${c.seconds && s.mode === "card" ? `<span class="fa-time" aria-hidden="true"><i style="width:${(s.left / c.seconds) * 100}%"></i><b>${Math.ceil(s.left)} с</b></span>` : c.seconds ? "" : `<span class="muted small">без таймера</span>`}</div>`;
     const opts = s.order.map((i) => {
       const o = c.options[i];
       const st = s.mode === "shown" ? (o.correct ? " ok" : i === s.pick ? " bad" : "") : "";
