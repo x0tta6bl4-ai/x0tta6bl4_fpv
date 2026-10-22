@@ -1,7 +1,7 @@
 // Гл. 6, вкладка «Подготовь к зарядке»: ученик сам устанавливает параметры батареи (осмотр, наклейка, паспорт,
 // измерение банок, расчёт по Вт·ч), подключает силовой провод и балансир, настраивает зарядник и запускает зарядку —
 // или обоснованно отказывается. Дела и критерии — исследование GPT `docs/content/battery-trainer-research.md`
-// и `docs/content/battery-trainer-cases.json` (карточки 031, 032). Первая версия: B01–B09 и B13–B15.
+// и `docs/content/battery-trainer-cases.json` (карточки 031, 032, 035): дела B01–B15.
 // Скрытая модель (`physicalTruth`) в интерфейс до решения не попадает: ответы строятся только по собранным уликам.
 import CASES from "../../docs/content/battery-trainer-cases.json";
 
@@ -14,10 +14,12 @@ export const meta = {
     { id: "fix", text: "Найди ошибку подключения или настройки до запуска (B07, B08 или B09) и заряди без опасной попытки" },
     { id: "wh", text: "Ёмкость стёрта, но есть Вт·ч и вольты (B13 или B14): вычисли ёмкость и прими решение" },
     { id: "damaged", text: "Повреждённая батарея (B06): останови работу до подключения" },
+    { id: "profile", text: "Профиля батареи нет у зарядника (B10 или B11): не подгоняй химию ради напряжения" },
+    { id: "heat", text: "B12: зарядка запущена верно — дальше контролируй и действуй по показаниям" },
   ],
 };
 
-const ORDER = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B13", "B14", "B15"];
+const ORDER = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15"];
 const BY = Object.fromEntries(CASES.cases.map((c) => [c.id, c]));
 // Шаблоны учебного зарядника: конечное напряжение на банку задаёт выбранный тип (как на приборах вида D200neo, S2).
 const TYPES = { LiPo: 4.2, LiHV: 4.35, LiIon: 4.1 };
@@ -27,12 +29,15 @@ const REASONS = {
   chem: "Химия и предел заряда не подтверждены",
   cap: "Ёмкость и допустимый ток не подтверждены",
   damaged: "Батарея повреждена",
+  charger: "Этот зарядник не даёт подтверждённый профиль",
 };
+const PROFILE_CASES = ["choose_compatible_charger", "verify_profile"];
 // Что ученик видит до решения: ситуация без подсказки. Названия дел в JSON выдают ответ («…LiHV», «Нет балансира»,
 // «Конфликт S») — их показываем только в разборе после решения.
 const SITU = {
   B01: "Батарея с наклейкой — подготовь к зарядке", B07: "Батарея с наклейкой — подготовь к зарядке", B08: "Батарея с наклейкой — подготовь к зарядке", B09: "Батарея с наклейкой — подготовь к зарядке",
   B02: "Наклейка частично стёрта", B03: "Батарея без наклейки", B04: "Батарея без наклейки", B05: "На наклейке только тип и число банок",
+  B12: "Батарея с наклейкой — подготовь к зарядке", B10: "Батарея с наклейкой и паспортом", B11: "Сборка Li-ion с паспортом",
   B06: "Батарея из ящика после полётов", B13: "Наклейка стёрта, остались вольты и Вт·ч", B14: "Наклейка стёрта, остались вольты и Вт·ч", B15: "Наклейка стёрта, осталась надпись «150 W»",
 };
 const ru = (v, d = 2) => Number(v).toFixed(d).replace(".", ",");
@@ -116,6 +121,7 @@ export function mount(root, ctx) {
     // Зарядник
     const target = k.cap ? Math.round((k.cap[0] / 1000) * 0.5 * 100) / 100 : null;
     $(".ct-charger").innerHTML = `<div class="ct-screen" aria-live="polite">${conn.main && conn.balance && s.seen.measured ? `Банок: ${ev.cellVoltages_V.length} · ` : ""}${set.type} ${set.s}S · ${TASKS[set.task]} · ${ru(TYPES[set.type])} В/банку · ${ru(set.a, 1)} А</div>
+      <p class="muted small ct-caps">Профили этого зарядника: ${Object.entries(TYPES).map(([t, v]) => `${t} — ${ru(v)} В`).join(" · ")} на банку.</p>
       <div class="ct-set"><span>Тип</span>${Object.keys(TYPES).map((t) => `<button type="button" data-type="${t}" aria-pressed="${set.type === t}">${t}</button>`).join("")}</div>
       <div class="ct-set"><span>Банок</span><button type="button" data-s="-1" aria-label="Меньше банок">−</button><b>${set.s}S</b><button type="button" data-s="1" aria-label="Больше банок">+</button></div>
       <div class="ct-set"><span>Задача</span>${Object.entries(TASKS).map(([t, n]) => `<button type="button" data-task="${t}" aria-pressed="${set.task === t}">${n}</button>`).join("")}</div>
@@ -152,6 +158,11 @@ export function mount(root, ctx) {
     if (!k.chem || !k.endV) return crit("Химия и предел заряда не подтверждены. По напряжению банок LiPo и LiHV не различить — запуск наугад опасен.");
     if (!k.cap || !k.maxA) return crit(`Ёмкость${!k.maxA ? " и допустимый ток" : ""} не подтверждены${s.ev.nominalEnergy_Wh && !s.seen.derived ? " (ёмкость можно вычислить по Вт·ч и вольтам с наклейки)" : ""} — ток зарядки рассчитать не из чего.`);
     if (set.s !== k.series?.[0] || set.s !== k.measuredS) return crit(`На заряднике ${set.s}S, а банок ${k.measuredS} по балансиру и ${k.series?.[0]} по паспорту. Конфликт не исправляют сменой типа — выставь ${k.measuredS}S и проверь подключение.`);
+    // Профиля с паспортным пределом у этого зарядника нет (B10: 4,45 В; B11: шаблон LiIon — 4,10 В при паспортных 4,20).
+    const endV = k.endV[0], tmpl = TYPES[k.chem[0]];
+    if (!Object.values(TYPES).some((x) => Math.abs(x - endV) < 1e-9) || (tmpl !== undefined && Math.abs(tmpl - endV) > 1e-9))
+      return soft(`По паспорту нужен ${k.chem[0]} с пределом ${ru(endV)} В на банку, а у этого зарядника ${tmpl !== undefined ? `шаблон ${k.chem[0]} — ${ru(tmpl)} В` : `нет профиля ${ru(endV)} В`}. Подбирать другую химию ради нужного напряжения нельзя: нужен совместимый прибор или профиль с паспортным пределом.`);
+    if (k.chem[0] in TYPES && set.type !== k.chem[0] && TYPES[set.type] <= endV + 1e-9) return soft(`Тип на заряднике (${set.type}) не совпадает с химией по паспорту (${k.chem[0]}). Ставь тип по паспорту, а не по похожему напряжению.`);
     const v = TYPES[set.type];
     if (v > k.endV[0] + 1e-9) return crit(`Выбраны ${ru(v)} В на банку (${set.type}), а подтверждённый предел этой батареи — ${ru(k.endV[0])} В. Это перезаряд.`);
     if (v < k.endV[0] - 1e-9) return soft(`Выбраны ${ru(v)} В на банку — ниже подтверждённых ${ru(k.endV[0])} В: батарея недозарядится. Выбери профиль по паспорту.`);
@@ -171,17 +182,19 @@ export function mount(root, ctx) {
     s.phase = "charging";
     const endV = known().endV[0];
     const cells = s.ev.cellVoltages_V.slice();
-    s.run = { t: 0, cells, endV };
+    s.run = { t: 0, cells, endV, temp: 23, heat: false };
     s.msg = "<b>Зарядка запущена.</b> Смотри банки на экране зарядника.";
     timer = setInterval(() => {
       s.run.t += 1;
       s.run.cells = s.run.cells.map((v) => Math.min(endV, v + (endV - v) * 0.18));
+      // B12: по сценарию дела батарея начинает ненормально греться (учебная модель, не прогноз реального изделия).
+      if (s.c.expected.outcome === "stop" && s.run.t >= 2) { s.run.heat = true; s.run.temp = Math.min(62, s.run.temp + 7); }
       $(".ct-run").innerHTML = runHtml();
     }, 400);
     draw();
     $(".ct-run").innerHTML = runHtml();
   }
-  const runHtml = () => s.phase !== "charging" ? "" : `<div class="ct-screen">Банки: ${s.run.cells.map((v) => ru(v)).join(" · ")} В · ${ru(s.set.a, 1)} А · 23 °C · <span class="muted">ускорено</span></div><div class="lab-row"><button type="button" class="lab-btn good" data-act="control">Проверил: банки ровные, температура норма</button><button type="button" class="lab-btn" data-act="stop">Остановить</button></div>`;
+  const runHtml = () => s.phase !== "charging" ? "" : `<div class="ct-screen">Банки: ${s.run.cells.map((v) => ru(v)).join(" · ")} В · ${ru(s.set.a, 1)} А · ${s.run.heat ? `<b class="ct-hot">${s.run.temp} °C ↑ батарея греется</b>` : `${s.run.temp} °C`} · <span class="muted">ускорено</span></div><div class="lab-row"><button type="button" class="lab-btn good" data-act="control">Проверил: банки ровные, температура норма</button><button type="button" class="lab-btn" data-act="stop">Остановить</button></div>`;
   function finishCharge() {
     clearInterval(timer);
     s.phase = "done";
@@ -195,7 +208,7 @@ export function mount(root, ctx) {
   }
   function decline(reason) {
     const exp = s.c.expected.outcome, id = s.id;
-    const declineCase = ["decline", "decline_before_connect", "derive_then_decline"].includes(exp);
+    const declineCase = ["decline", "decline_before_connect", "derive_then_decline", ...PROFILE_CASES].includes(exp);
     if (!declineCase) return say(`<b>✗ Отказ без причины.</b> В этом деле параметры подтверждены${["B07", "B08", "B09"].includes(id) ? ": ошибку подключения или настройки надо исправить, а не бросать батарею" : ""}. Задача не завершена.`);
     if (!s.seen.look) return say("<b>✗ Рано.</b> Сначала осмотри батарею: отказ должен опираться на улику.");
     if (reason === "damaged") {
@@ -206,6 +219,8 @@ export function mount(root, ctx) {
       const k = known();
       if (reason === "chem" && k.chem) return say("<b>✗ Причина не та.</b> Химия как раз подтверждена — посмотри, чего не хватает.");
       if (reason === "cap" && (k.cap && k.maxA)) return say("<b>✗ Причина не та.</b> Ёмкость и ток установлены.");
+      if (reason === "charger" && !PROFILE_CASES.includes(exp)) return say("<b>✗ Причина не та.</b> Дело не в заряднике: не хватает сведений о самой батарее.");
+      if (PROFILE_CASES.includes(exp) && reason !== "charger") return say("<b>✗ Причина не та.</b> Сведения о батарее подтверждены — посмотри, что умеет зарядник.");
       if (id === "B13" && !s.seen.derived) return say("<b>✗ Не всё установлено.</b> Ёмкость здесь можно вычислить по Вт·ч и вольтам с наклейки — сделай это, а потом решай.");
     }
     s.phase = "done";
@@ -213,6 +228,7 @@ export function mount(root, ctx) {
     if ((id === "B03" || id === "B04") && reason === "chem") ctx.done("unknown");
     if (id === "B13" && s.seen.derived) ctx.done("wh");
     if (id === "B06" && reason === "damaged" && !s.connectedEver) ctx.done("damaged");
+    if (PROFILE_CASES.includes(exp) && reason === "charger" && !s.critical) ctx.done("profile");
     const reveal = id === "B03" || id === "B04" ? ` <span class="muted small">Разбор: внутри была ${s.c.physicalTruth.chemistry} — по осмотру и напряжениям это не узнать, поэтому ответ одинаковый.</span>` : "";
     const late = id === "B06" && s.connectedEver ? " Но батарею уже подключали — повреждённую не подключают вовсе." : "";
     say(`<b>✓ Верно: не заряжаем.</b> ${s.c.expected.reason}.${late}${reveal}`);
@@ -251,7 +267,13 @@ export function mount(root, ctx) {
     if (act === "start") return start();
     if (act === "decline") { $(".ct-reasons").hidden = false; $(".ct-reasons").innerHTML = `<p class="small">Почему не заряжаем?</p>${Object.entries(REASONS).map(([k, t]) => `<button type="button" class="lab-btn" data-reason="${k}">${t}</button>`).join("")}`; return; }
     if (b.dataset.reason) return decline(b.dataset.reason);
+    if (act === "control" && s.run?.heat) return say("<b>✗ Температура не в норме:</b> батарея быстро греется. Так зарядку не продолжают — останови.");
     if (act === "control") { if (s.run && s.run.t >= 2) return finishCharge(); return say("Подожди пару секунд: контроль — по показаниям, а не сразу после кнопки."); }
+    if (act === "stop" && s.run?.heat) {
+      clearInterval(timer); s.phase = "done"; $(".ct-run").innerHTML = "";
+      if (!s.critical) ctx.done("heat");
+      return say(`<b>✓ Верно: остановил.</b> ${s.c.expected.reason}. С нагревшейся батареей дальше не работают, пока причину не проверят.${s.critical ? " Была опасная попытка запуска — это учебный разбор." : ""}`);
+    }
     if (act === "stop") { clearInterval(timer); s.phase = "work"; $(".ct-run").innerHTML = ""; return say("Зарядка остановлена. Проверь настройки и запусти снова."); }
   });
   load("B01");
