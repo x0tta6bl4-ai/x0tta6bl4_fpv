@@ -107,6 +107,27 @@ rep("B13: ёмкость установлена, химия нет — отка�
 await caseGo("B15"); await act("look"); await act("label"); await act("passport"); await act("derivePower");
 rep("B15: 150 Вт ÷ 15 В = 10 А, ёмкость не установлена", /10 А/.test(await txt(".ct-calc")) && /Ёмкость\s*не установлено/.test(await txt(".ct-known")));
 
+// B10/B11: профиля нет у зарядника — не подгонять химию; B12: нагрев во время зарядки — остановить
+await caseGo("B10"); await gather(); await setS(4); await setA(0.7); await p.click('.ct [data-type="LiHV"]');
+await act("start");
+rep("B10: запуск с ближайшим LiHV 4,35 В не проходит — у зарядника нет профиля 4,45 В", /нет профиля 4,45 В/.test(await msg()), (await msg()).slice(0, 100));
+await act("decline"); await p.click('.ct [data-reason="chem"]'); await W(60);
+rep("B10: причина «химия не подтверждена» отклонена", /Причина не та/.test(await msg()));
+await p.click('.ct [data-reason="charger"]'); await W(60);
+rep("B10: «зарядник не даёт подтверждённый профиль» — задание «профиль»", await done("profile"), (await msg()).slice(0, 80));
+await caseGo("B11"); await gather(); await setS(4); await setA(2.2); await p.click('.ct [data-type="LiPo"]');
+await act("start");
+rep("B11: LiPo ради 4,20 В не проходит — шаблон LiIon этого зарядника 4,10 В", /шаблон LiIon — 4,10 В/.test(await msg()), (await msg()).slice(0, 100));
+await caseGo("B03"); await gather(); await act("decline"); await p.click('.ct [data-reason="charger"]'); await W(60);
+rep("B03: причина «зарядник» отклонена — не хватает сведений о батарее", /Дело не в заряднике/.test(await msg()));
+await caseGo("B12"); await gather(); await setS(4); await setA(0.7);
+await act("start"); await W(1400);
+const hot = await txt(".ct-run");
+await act("control");
+rep("B12: при нагреве «проверил: норма» не закрывает дело", /греется/.test(hot) && /Температура не в норме/.test(await msg()) && !(await done("heat")), hot.slice(0, 80));
+await act("stop");
+rep("B12: остановка при нагреве — дело закрыто, задание «нагрев»", await done("heat") && /остановил/.test(await msg()));
+
 const sw = await p.evaluate(() => document.documentElement.scrollWidth);
 const small = await p.evaluate(() => [...document.querySelectorAll(".ct button")].filter((x) => x.offsetParent && x.getBoundingClientRect().height < 43.5).map((x) => x.textContent.trim().slice(0, 20)));
 rep("вкладка не шире экрана, кнопки не ниже 44 px", sw <= 390 && !small.length, `scrollWidth ${sw}, мелкие: ${small.join(", ")}`);

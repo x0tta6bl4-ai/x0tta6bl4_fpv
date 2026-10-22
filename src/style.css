@@ -1438,3 +1438,4 @@ table.t{max-width:100%;-webkit-overflow-scrolling:touch}
 .ct-wire.thin{stroke-width:.8}
 .ct-wire.on{stroke:var(--accent);stroke-dasharray:none}
 
+.ct-hot{color:var(--bad)}
