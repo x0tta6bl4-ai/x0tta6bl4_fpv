@@ -37,10 +37,14 @@ const PROFILE_CASES = ["choose_compatible_charger", "verify_profile"];
 const SITU = {
   B01: "Батарея с наклейкой — подготовь к зарядке", B07: "Батарея с наклейкой — подготовь к зарядке", B08: "Батарея с наклейкой — подготовь к зарядке", B09: "Батарея с наклейкой — подготовь к зарядке",
   B02: "Наклейка частично стёрта", B03: "Батарея без наклейки", B04: "Батарея без наклейки", B05: "На наклейке только тип и число банок",
-  B12: "Батарея с наклейкой — подготовь к зарядке", B10: "Батарея с наклейкой и паспортом", B11: "Сборка Li-ion с паспортом",
+  B12: "Батарея с наклейкой — подготовь к зарядке", B10: "Батарея с наклейкой и паспортом", B11: "Батарея с наклейкой и паспортом",
   B06: "Батарея из ящика после полётов", B13: "Наклейка стёрта, остались вольты и Вт·ч", B14: "Наклейка стёрта, остались вольты и Вт·ч", B15: "Наклейка стёрта, осталась надпись «150 W»",
 };
 const ru = (v, d = 2) => Number(v).toFixed(d).replace(".", ",");
+// Химия для экрана: внутреннее имя профиля без шаблона («HV-4.45») — словами, как на наклейке.
+const chemName = (c) => (c in TYPES ? c : /^HV-/.test(c) ? "HV" : c);
+// Паспорт для экрана: служебная привязка «к экземпляру B01» в общих данных дел — чужое имя дела, его не показываем.
+const srcText = (t) => t.replace(/,? связанный с экземпляром B\d+/, " этого экземпляра");
 
 export function mount(root, ctx) {
   root.innerHTML = `<div class="ct">
@@ -73,7 +77,7 @@ export function mount(root, ctx) {
     const k = {};
     const cf = s.ev.confirmed || {};
     if (s.seen.passport && s.seen.label) {
-      if (cf.chemistry) k.chem = [cf.chemistry, "паспорт"];
+      if (cf.chemistry) k.chem = [chemName(cf.chemistry), "паспорт", cf.chemistry];
       if (cf.series) k.series = [cf.series, "паспорт"];
       if (cf.capacity_mAh) k.cap = [cf.capacity_mAh, "паспорт"];
       if (cf.endVoltagePerCell_V) k.endV = [cf.endVoltagePerCell_V, "паспорт"];
@@ -101,7 +105,7 @@ export function mount(root, ctx) {
     const ev1 = [];
     if (s.seen.look) ev1.push(`<li><b>Осмотр:</b> ${ev.appearance}${ev.damaged ? " — <b>повреждение</b>" : ""}.</li>`);
     if (s.seen.label) ev1.push(`<li><b>Наклейка:</b> ${ev.labelText ? `«${ev.labelText}»` : "наклейки нет"}.</li>`);
-    if (s.seen.passport) ev1.push(`<li><b>Паспорт:</b> ${ev.source && Object.keys(ev.confirmed || {}).length ? ev.source : "паспорта, связанного с этой батареей, нет"}.</li>`);
+    if (s.seen.passport) ev1.push(`<li><b>Паспорт:</b> ${ev.source && Object.keys(ev.confirmed || {}).length ? srcText(ev.source) : "паспорта, связанного с этой батареей, нет"}.</li>`);
     $(".ct-ev").innerHTML = ev1.length ? `<ul>${ev1.join("")}</ul>` : "";
     // Что установлено
     const k = known();
@@ -159,10 +163,10 @@ export function mount(root, ctx) {
     if (!k.cap || !k.maxA) return crit(`Ёмкость${!k.maxA ? " и допустимый ток" : ""} не подтверждены${s.ev.nominalEnergy_Wh && !s.seen.derived ? " (ёмкость можно вычислить по Вт·ч и вольтам с наклейки)" : ""} — ток зарядки рассчитать не из чего.`);
     if (set.s !== k.series?.[0] || set.s !== k.measuredS) return crit(`На заряднике ${set.s}S, а банок ${k.measuredS} по балансиру и ${k.series?.[0]} по паспорту. Конфликт не исправляют сменой типа — выставь ${k.measuredS}S и проверь подключение.`);
     // Профиля с паспортным пределом у этого зарядника нет (B10: 4,45 В; B11: шаблон LiIon — 4,10 В при паспортных 4,20).
-    const endV = k.endV[0], tmpl = TYPES[k.chem[0]];
+    const endV = k.endV[0], chem = k.chem[2], tmpl = TYPES[chem];
     if (!Object.values(TYPES).some((x) => Math.abs(x - endV) < 1e-9) || (tmpl !== undefined && Math.abs(tmpl - endV) > 1e-9))
-      return soft(`По паспорту нужен ${k.chem[0]} с пределом ${ru(endV)} В на банку, а у этого зарядника ${tmpl !== undefined ? `шаблон ${k.chem[0]} — ${ru(tmpl)} В` : `нет профиля ${ru(endV)} В`}. Подбирать другую химию ради нужного напряжения нельзя: нужен совместимый прибор или профиль с паспортным пределом.`);
-    if (k.chem[0] in TYPES && set.type !== k.chem[0] && TYPES[set.type] <= endV + 1e-9) return soft(`Тип на заряднике (${set.type}) не совпадает с химией по паспорту (${k.chem[0]}). Ставь тип по паспорту, а не по похожему напряжению.`);
+      return soft(`По паспорту нужен ${k.chem[0]} с пределом ${ru(endV)} В на банку, а у этого зарядника ${tmpl !== undefined ? `шаблон ${chem} — ${ru(tmpl)} В` : `нет профиля ${ru(endV)} В`}. Подбирать другую химию ради нужного напряжения нельзя: нужен совместимый прибор или профиль с паспортным пределом.`);
+    if (chem in TYPES && set.type !== chem && TYPES[set.type] <= endV + 1e-9) return soft(`Тип на заряднике (${set.type}) не совпадает с химией по паспорту (${chem}). Ставь тип по паспорту, а не по похожему напряжению.`);
     const v = TYPES[set.type];
     if (v > k.endV[0] + 1e-9) return crit(`Выбраны ${ru(v)} В на банку (${set.type}), а подтверждённый предел этой батареи — ${ru(k.endV[0])} В. Это перезаряд.`);
     if (v < k.endV[0] - 1e-9) return soft(`Выбраны ${ru(v)} В на банку — ниже подтверждённых ${ru(k.endV[0])} В: батарея недозарядится. Выбери профиль по паспорту.`);
@@ -201,9 +205,9 @@ export function mount(root, ctx) {
     $(".ct-run").innerHTML = "";
     const clean = !s.critical;
     const id = s.id;
-    if (id === "B01") ctx.done("example");
+    if (clean && id === "B01") ctx.done("example");
     if (clean && ["B07", "B08", "B09"].includes(id)) ctx.done("fix");
-    if (id === "B14" && s.seen.derived) ctx.done("wh");
+    if (clean && id === "B14" && s.seen.derived) ctx.done("wh");
     say(`<b>✓ Дело закрыто:</b> ${s.c.expected.reason}.${clean ? "" : " Была опасная попытка — это учебный разбор; чистый зачёт — в следующем деле."}`);
   }
   function decline(reason) {
@@ -221,17 +225,19 @@ export function mount(root, ctx) {
       if (reason === "cap" && (k.cap && k.maxA)) return say("<b>✗ Причина не та.</b> Ёмкость и ток установлены.");
       if (reason === "charger" && !PROFILE_CASES.includes(exp)) return say("<b>✗ Причина не та.</b> Дело не в заряднике: не хватает сведений о самой батарее.");
       if (PROFILE_CASES.includes(exp) && reason !== "charger") return say("<b>✗ Причина не та.</b> Сведения о батарее подтверждены — посмотри, что умеет зарядник.");
+      if ((id === "B03" || id === "B04") && reason === "cap") return say("<b>Не главная причина.</b> Ёмкость тоже неизвестна, но даже с ней заряжать нельзя: чего ещё не хватает, чтобы выбрать профиль?");
       if (id === "B13" && !s.seen.derived) return say("<b>✗ Не всё установлено.</b> Ёмкость здесь можно вычислить по Вт·ч и вольтам с наклейки — сделай это, а потом решай.");
     }
     s.phase = "done";
     $(".ct-reasons").hidden = true;
-    if ((id === "B03" || id === "B04") && reason === "chem") ctx.done("unknown");
-    if (id === "B13" && s.seen.derived) ctx.done("wh");
+    if ((id === "B03" || id === "B04") && reason === "chem" && !s.critical) ctx.done("unknown");
+    if (id === "B13" && s.seen.derived && !s.critical) ctx.done("wh");
     if (id === "B06" && reason === "damaged" && !s.connectedEver) ctx.done("damaged");
     if (PROFILE_CASES.includes(exp) && reason === "charger" && !s.critical) ctx.done("profile");
     const reveal = id === "B03" || id === "B04" ? ` <span class="muted small">Разбор: внутри была ${s.c.physicalTruth.chemistry} — по осмотру и напряжениям это не узнать, поэтому ответ одинаковый.</span>` : "";
     const late = id === "B06" && s.connectedEver ? " Но батарею уже подключали — повреждённую не подключают вовсе." : "";
-    say(`<b>✓ Верно: не заряжаем.</b> ${s.c.expected.reason}.${late}${reveal}`);
+    const study = s.critical && id !== "B06" ? " Была опасная попытка запуска — это учебный разбор; чистый зачёт — в следующем деле." : "";
+    say(`<b>✓ Верно: не заряжаем.</b> ${s.c.expected.reason}.${late}${study}${reveal}`);
   }
 
   root.addEventListener("click", (e) => {
