@@ -3,7 +3,7 @@
 - Исполнитель: gpt
 - Статус: на ревью
 - Ветка: gpt/first-action-notes
-- PR: —
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/60
 - Основание: `docs/reviews/2026-10-22-first-action.md` (ревью 036).
 
 ## Что сделать (`docs/content/first-action.json`)
