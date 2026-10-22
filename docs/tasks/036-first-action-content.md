@@ -3,7 +3,7 @@
 - Исполнитель: gpt
 - Статус: на ревью
 - Ветка: gpt/first-action-content
-- PR: —
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/58
 - Основание: решение 001 (пункт C3 «решение под давлением времени»), отчёт `docs/research/skills-and-memory.md`
   (пары «признак → первое действие», правило P0-5 «если — то»), опросник `docs/content/srez.json` (С1–С40).
   Движок делает Claude (карточка 037), он читает только этот файл.
