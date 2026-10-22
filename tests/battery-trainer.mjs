@@ -3,7 +3,8 @@
 // «безопасного» тока без ёмкости; B06 — стоп до подключения; B07 — балансир обязателен; B08/B09 — конфликт S и
 // профиль HV ловятся до запуска, опасная попытка не даёт чистого зачёта; ток 0,5C с округлением; B13/B14 — ёмкость
 // по Вт·ч и вольтам; B15 — ватты не ватт-часы; смена дела сбрасывает подключения. Плюс старый стенд «Батарея»:
-// звезда за пойманную ошибку LiHV до 4,20 В, а не за перезаряд.
+// звезда за пойманную ошибку LiHV до 4,20 В, а не за перезаряд. Ревью 034: после опасной попытки в деле — разбор без
+// звезды (B01, B03, B10, B12); «ёмкость» у B03/B04 — не главная причина; B11 без химии в заголовке; B08; проход B14.
 import { chromium } from "playwright";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -142,6 +143,56 @@ await p.evaluate(() => { const x = [...document.querySelectorAll("button")].find
 await W(1200);
 const hv = await p.evaluate(() => ({ conf: !!document.querySelector("#quest [data-conf]"), done: !!document.querySelector('#missions li[data-m="hv"].ok') }));
 rep("стенд «Батарея»: режим сменили после перезаряда — звезды нет", !hv.conf && !hv.done, JSON.stringify(hv));
+
+// Ревью 034 (карточка 038): после опасной попытки в том же деле — только учебный разбор, без звезды. Звёзды выше
+// уже получены, поэтому — чистый профиль ученика в новом контексте.
+const ctx2 = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+const p2 = await ctx2.newPage();
+p2.on("pageerror", (e) => errs.push(e.message));
+p2.on("console", (m) => m.type() === "error" && errs.push(m.text()));
+await p2.goto(U); await p2.waitForTimeout(900);
+await p2.click('[data-figtab="lab:charge"]'); await p2.waitForTimeout(600);
+const W2 = (ms) => p2.waitForTimeout(ms);
+const act2 = async (a) => { await p2.click(`.ct [data-act="${a}"]`); await W2(60); };
+const case2 = async (id) => { await p2.click(`.ct [data-case="${id}"]`); await W2(80); };
+const txt2 = (sel) => p2.$eval(`.ct ${sel}`, (e) => e.textContent.replace(/\s+/g, " ").trim());
+const msg2 = () => txt2(".ct-msg");
+const done2 = (m) => p2.evaluate((m) => !!document.querySelector(`#missions li[data-m="${m}"]`)?.classList.contains("ok"), m);
+const setS2 = async (n) => { for (let i = 0; i < 8; i++) await p2.click('.ct [data-s="-1"]'); for (let i = 1; i < n; i++) await p2.click('.ct [data-s="1"]'); };
+const setA2 = async (a) => { const cur = Number((await txt2(".ct-a")).replace(",", ".").replace(/[^\d.]/g, "")); const n = Math.round((a - cur) * 10); for (let i = 0; i < Math.abs(n); i++) await p2.click(`.ct [data-a="${n > 0 ? 1 : -1}"]`); };
+const gather2 = async () => { for (const a of ["look", "label", "passport", "main", "balance", "measure"]) await act2(a); };
+
+await gather2(); await setS2(4); await setA2(0.7); await p2.click('.ct [data-type="LiHV"]'); await act2("start");
+await p2.click('.ct [data-type="LiPo"]'); await act2("start"); await W2(1000); await act2("control");
+rep("B01: после опасной попытки (LiHV) дело — учебный разбор, звезды «пример» нет", /учебный разбор/.test(await msg2()) && !(await done2("example")), (await msg2()).slice(0, 100));
+await case2("B03"); await gather2(); await p2.click('.ct [data-type="LiHV"]'); await setS2(4); await act2("start");
+await act2("decline"); await p2.click('.ct [data-reason="chem"]'); await W2(60);
+rep("B03: угаданный запуск, затем отказ «химия» — разбор без звезды", /Верно: не заряжаем/.test(await msg2()) && /учебный разбор/.test(await msg2()) && !(await done2("unknown")), (await msg2()).slice(0, 100));
+await case2("B04"); await gather2(); await act2("decline"); await p2.click('.ct [data-reason="cap"]'); await W2(60);
+const m4 = await msg2();
+rep("B04: причина «ёмкость» — правда, но не главная: дело не закрыто, химия не раскрыта", /Не главная причина/.test(m4) && !/LiHV|LiPo|Верно/.test(m4) && !!(await p2.$('.ct [data-reason="chem"]')), m4.slice(0, 100));
+await case2("B11");
+rep("B11: заголовок до наклейки и паспорта не называет химию", !/Li-?ion/i.test(await txt2(".ct-title")), await txt2(".ct-title"));
+await case2("B10"); await gather2(); await act2("start");
+const m10 = await msg2();
+await setS2(4); await act2("start");
+const m10b = await msg2();
+await act2("decline"); await p2.click('.ct [data-reason="charger"]'); await W2(60);
+rep("B10: запуск с 1S — опасная попытка; отказ «зарядник» после неё без звезды «профиль»", /Опасная попытка/.test(m10) && /учебный разбор/.test(await msg2()) && !(await done2("profile")), m10.slice(0, 80));
+rep("B10: химия — как на наклейке, без внутреннего имени «HV-4.45»", !/HV-4/.test(m10b + (await txt2(".ct-known"))) && /нет профиля 4,45 В/.test(m10b), m10b.slice(0, 100));
+await case2("B12"); await gather2(); await setA2(0.7); await act2("start");
+await setS2(4); await act2("start"); await W2(1400); await act2("stop");
+rep("B12: после опасной попытки остановка при нагреве — разбор без звезды «нагрев»", /остановил/.test(await msg2()) && /учебный разбор/.test(await msg2()) && !(await done2("heat")), (await msg2()).slice(0, 100));
+await case2("B08"); await gather2();
+const ev8 = await txt2(".ct-ev");
+await setA2(0.7); await act2("start");
+rep("B08: на заряднике остался 6S при 4 банках — запуск остановлен до зарядки", /6S, а банок 4/.test(await msg2()) && !(await p2.$(".ct-run .ct-screen")), (await msg2()).slice(0, 100));
+rep("B08: паспорт не называет чужое дело", !/B0\d|B1\d/.test(ev8), ev8.slice(0, 120));
+await case2("B14"); await gather2(); await act2("deriveWh"); await act2("start");
+await case2("B14"); await gather2(); await act2("deriveWh"); await setS2(6); await setA2(3);
+await act2("start"); await W2(1000); await act2("control");
+rep("B14: 133,2 Вт·ч ÷ 22,2 В = 6000 мА·ч, 6S, 3 А — зарядка проконтролирована, задание «Вт·ч»", /Дело закрыто/.test(await msg2()) && (await done2("wh")), (await msg2()).slice(0, 100));
+await ctx2.close();
 
 await b.close();
 const fail = res.filter((x) => !x).length;
