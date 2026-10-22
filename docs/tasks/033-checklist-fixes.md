@@ -3,7 +3,7 @@
 - Исполнитель: gpt
 - Статус: на ревью
 - Ветка: gpt/checklist-fixes
-- PR: —
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/56
 - Основание: `docs/reviews/2026-10-21-round3.md` (карточка 030). Блокирующих нет, но строки расходятся со срезом.
 
 ## Что сделать (`fieldChecklist` в `data/chapters-*.mjs`)
