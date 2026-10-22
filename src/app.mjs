@@ -1155,6 +1155,7 @@ function bind(ch, a) {
               <div class="eyebrow">${it.own ? "Ответ инструктора" : "Ответ как в таблице"}</div>
               ${srezList(it.a)}
               ${srezBlk("note", "Уточнение", it.note)}
+              ${cov.get(String(it.n))?.fix ? srezBlk("trap", "Учебник уточняет", cov.get(String(it.n)).fix) : ""}
             </div>
             <div class="fc-btns">
               <button type="button" class="lab-btn bad" id="exam-act-bad">✗ Не знал / Ошибся</button>
@@ -1174,6 +1175,12 @@ function bind(ch, a) {
       });
       $("#exam-act-bad")?.addEventListener("click", () => {
         exam.missed.push(it);
+        // Ошибка пробного среза идёт в повтор колоды «Срез» (гл. 20): вопрос станет «к повтору сегодня».
+        try {
+          const sc = JSON.parse(localStorage.getItem("fpv_srez_sched") || "{}");
+          sc[`srez:${it.n}`] = { step: 0, interval: 0, due: Date.now(), last: Date.now() };
+          localStorage.setItem("fpv_srez_sched", JSON.stringify(sc));
+        } catch (e) {}
         nextExamCard();
       });
     };
