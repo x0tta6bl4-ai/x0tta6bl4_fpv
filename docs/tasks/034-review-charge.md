@@ -3,7 +3,7 @@
 - Исполнитель: grok
 - Статус: на ревью
 - Ветка: grok/review-charge
-- PR: —
+- PR: https://github.com/x0tta6bl4-ai/x0tta6bl4_fpv/pull/57
 
 ## Что сделать
 1. Факты (`src/labs/charge.mjs`, тексты объяснений): совпадают ли с исследованием `docs/content/battery-trainer-research.md`
