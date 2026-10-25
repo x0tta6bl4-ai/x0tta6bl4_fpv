@@ -499,10 +499,21 @@ function missionDone(ch, id) {
 // ── Экран главы ──
 let figCtl = null;
 let labCtl = null;
+// Загадка до чтения (без «Главного») или в «Подробнее» (глава с `core`).
+const riddleHtml = (ch) => (ch.riddle ? `<section class="riddle"><div class="eyebrow">Загадка</div><p class="riddle-t">${esc(ch.riddle)}</p><p class="muted small">Ответь до чтения, даже наугад. Разгадка — в конце главы.</p><textarea rows="2" id="guess" placeholder="Моя догадка…">${esc(S.guess[ch.id] || "")}</textarea></section>` : "");
+// Пилот обсуждения 004: у главы с полем `core` открыто короткое «Главное», стенд — сразу после него, весь прежний
+// текст — в свёрнутом «Подробнее». `?pilot=a` в адресе показывает главу как раньше (вариант «до» для живого замера).
+// `window.__FPV_TEST_CORE` — только для теста движка, пока текста нет в данных.
+const PILOT_A = typeof location !== "undefined" && /[?&]pilot=a(&|$)/.test(location.search);
+function coreOf(ch) {
+  if (PILOT_A) return "";
+  return ch.core || (typeof window !== "undefined" && window.__FPV_TEST_CORE && window.__FPV_TEST_CORE[ch.id]) || "";
+}
 function chapterView(ch) {
   const ci = CHAPTERS.indexOf(ch);
   const prev = ci > 0 ? CHAPTERS[ci - 1] : null;
   const next = ci < CHAPTERS.length - 1 ? CHAPTERS[ci + 1] : APPX[0];
+  const core = coreOf(ch);
   const figIndex = activeFig(ch) ? FIG_ORDER.indexOf(activeFig(ch).id) + 1 : 0;
   return `<article class="chapter" data-ch="${ch.id}">
   <div class="eyebrow">${ch.num === 20 ? "Глава 20" : `Глава ${ch.num}`} · с. ${ch.pages[0]}–${ch.pages[1]} · ${esc(ch.part)}</div>
@@ -510,13 +521,14 @@ function chapterView(ch) {
   ${ch.fieldChecklist && ch.fieldChecklist.length ? `<div class="ch-fast-nav"><a href="#field-card" class="field-card-jump" role="button">📋 Чеклист на поле</a></div>` : ""}
   ${ch.here && ch.here.length ? hereStrip(ch) : ""}
   ${ch.lead ? `<p class="lead">${tags(ch.lead)}</p>` : ""}
-  ${ch.riddle ? `<section class="riddle"><div class="eyebrow">Загадка</div><p class="riddle-t">${esc(ch.riddle)}</p><p class="muted small">Ответь до чтения, даже наугад. Разгадка — в конце главы.</p><textarea rows="2" id="guess" placeholder="Моя догадка…">${esc(S.guess[ch.id] || "")}</textarea></section>` : ""}
+  ${core ? "" : riddleHtml(ch)}
   ${ch.goals ? `<div class="goals"><div><div class="eyebrow">После главы ты сможешь</div><ul>${ch.goals.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div>${ch.words ? `<div><div class="eyebrow">Новые слова</div><p class="words">${ch.words.map((w) => `<span class="word" tabindex="0" title="${esc(glossaryOf(w))}">${esc(w)}</span>`).join("")}</p></div>` : ""}</div>` : ""}
-  ${ch.standAfter === undefined ? interactiveHtml(ch) : ""}
+  ${core ? `<section class="core" id="core"><div class="eyebrow">Главное</div>${tags(core)}</section>${interactiveHtml(ch)}<details class="more" id="more"><summary>Подробнее: весь текст главы</summary>${riddleHtml(ch)}` : ch.standAfter === undefined ? interactiveHtml(ch) : ""}
   ${ch.calc === "scale" ? scaleCalc() : ""}
-  ${(ch.sections || []).map((sec, i) => sectionHtml(sec) + (ch.standAfter === i ? interactiveHtml(ch) : "")).join("")}
+  ${(ch.sections || []).map((sec, i) => sectionHtml(sec) + (!core && ch.standAfter === i ? interactiveHtml(ch) : "")).join("")}
   ${ch.corrections ? `<p class="lab-note"><b>Уточнение лаборатории.</b> ${esc(ch.corrections.replace(/^Уточнение( лаборатории)?: /, ""))}</p>` : ""}
   ${ch.answer ? `<section class="solution"><div class="eyebrow">Разгадка</div><p class="muted small" id="myguess">${S.guess[ch.id] ? `Твоя догадка: «${esc(S.guess[ch.id])}»` : "Ты не записал догадку — ничего страшного."}</p><button type="button" class="ghost" id="reveal" aria-expanded="false">Открыть разгадку</button><p class="answer" hidden>${esc(ch.answer)}</p></section>` : ""}
+  ${core ? "</details>" : ""}
   ${ch.summary ? `<section class="summary"><div class="eyebrow">Итог</div><p>${esc(ch.summary)}</p></section>` : ""}
   ${ch.fieldChecklist && ch.fieldChecklist.length ? `
   <section class="field-card" id="field-card" aria-label="Чеклист пилота на поле">
@@ -783,7 +795,7 @@ function render() {
   // Ссылка «Объяснение» из вопросов среза открывает главу сразу на нужном разделе.
   const secEl = !ch || !render.sec ? null : render.sec === "#check" ? $("#check") : $$("#main section.sec").find((s) => s.querySelector("h3")?.textContent === render.sec);
   render.sec = null;
-  if (secEl && secEl.closest("details")) secEl.closest("details").open = true;
+  for (let el = secEl && secEl.parentElement; el; el = el.parentElement) if (el.tagName === "DETAILS") el.open = true;
   if (secEl) secEl.scrollIntoView({ block: "start" });
   else if (render.keepLab && document.getElementById("labcard")) document.getElementById("labcard").scrollIntoView({ block: "start" });
   else if (!render.first) window.scrollTo(0, 0);
