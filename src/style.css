@@ -186,11 +186,13 @@ ol.qs{padding-left:22px}
 .gloss dt{font-weight:600;color:var(--anatomy-strong)}.gloss dd{margin:0}
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
 /* свёрнутое по умолчанию: разделы ③ и блок «Физика: откуда это» в конце главы */
-details.sec-more,details.extra{margin:14px 0;border-radius:10px;box-shadow:0 0 0 1px var(--anatomy-faint);background:var(--anatomy-card)}
-details.sec-more>summary,details.extra>summary{cursor:pointer;min-height:44px;padding:11px 14px;font-weight:500;color:var(--anatomy-strong);overflow-wrap:anywhere}
+details.sec-more,details.extra,details.more{margin:14px 0;border-radius:10px;box-shadow:0 0 0 1px var(--anatomy-faint);background:var(--anatomy-card)}
+details.sec-more>summary,details.extra>summary,details.more>summary{cursor:pointer;min-height:44px;padding:11px 14px;font-weight:500;color:var(--anatomy-strong);overflow-wrap:anywhere}
 details.sec-more>summary{font-size:14px}
-details.sec-more[open],details.extra[open]{padding:0 14px 6px}
-details.sec-more[open]>summary,details.extra[open]>summary{margin:0 -14px;border-bottom:1px solid var(--anatomy-faint)}
+details.sec-more[open],details.extra[open],details.more[open]{padding:0 14px 6px}
+details.sec-more[open]>summary,details.extra[open]>summary,details.more[open]>summary{margin:0 -14px;border-bottom:1px solid var(--anatomy-faint)}
+/* Пилот 004: «Главное» главы — обычный текст без рамок, сразу после целей */
+.core{margin:18px 0}.core>.eyebrow{margin-bottom:6px}
 .filters button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:8px 13px;font-size:13.5px;border-radius:8px}
 #srzq{min-height:44px;padding:9px 12px;font-size:14.5px;border-radius:8px;margin-bottom:12px}
 .srz-modes{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
