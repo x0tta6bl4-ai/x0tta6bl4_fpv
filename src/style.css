@@ -118,6 +118,7 @@ ul.ck{list-style:none;padding:0;margin:4px 0 12px}ul.ck li{margin:3px 0}ul.ck la
 .ws-side{background:var(--anatomy-card);box-shadow:0 0 0 1px var(--anatomy-faint);border-radius:10px;padding:14px;align-self:start;font-size:14px}
 .ctl-head{font:400 19px/1.2 var(--serif);color:var(--anatomy-strong);margin-bottom:6px}
 .ctl{display:grid;gap:5px;margin:12px 0}
+.ctl.ctl-off{display:none}.ctl-all{min-height:44px;margin:6px 0 2px;width:100%;text-align:left}
 .ctl>span{display:flex;justify-content:space-between;gap:8px;color:var(--anatomy-strong);font-size:13px}
 .ctl output{font-family:var(--anatomy-mono);color:var(--anatomy-muted)}
 .ctl.check{grid-template-columns:auto 1fr;align-items:center}
