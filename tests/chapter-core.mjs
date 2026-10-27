@@ -1,4 +1,4 @@
-// Пилот обсуждения 004 (карточки 042, 045): у главы с полем `core` стенд — первым («схема сначала», решение владельца
+// Пилот обсуждения 004 (карточки 042, 045; у стенда гл. 10 в панели только ручки задания — meta.focus): у главы с полем `core` стенд — первым («схема сначала», решение владельца
 // 27.10), под ним «Главное» свёрнуто по темам (открыто только предупреждение), весь прежний текст — в свёрнутом
 // «Подробнее»; `?pilot=b` — «Главное» текстом целиком и стенд после него; `?pilot=a` — глава как раньше (вариант «до»). Движок проверяется
 // на гл. 11 с временным «Главным» через window.__FPV_TEST_CORE (без него гл. 11 не меняется); гл. 10 — на настоящем
@@ -99,6 +99,12 @@ const coreTxt = await p.evaluate(() => document.querySelector("#core")?.innerTex
 const miss = frags.filter(([, f]) => !coreTxt.includes(f.replace(/\s+/g, " ").replace(/…$/, "").slice(0, 60)));
 rep("гл. 10: после касания тем фрагмент «Главного» из карты 21/21 на экране у каждого вопроса", frags.length >= 21 && !miss.length, `${frags.length} строк карты; нет: ${miss.map(([q]) => q.slice(0, 12)).join("; ")}`);
 rep("гл. 10: 390 px — не шире экрана", L.sw <= 390, `scrollWidth ${L.sw}`);
+// Стенд гл. 10 (meta.focus, совет «базовый режим»): в панели только ручки текущего задания, остальные — по кнопке
+const ctl = () => p.evaluate(() => ({ vis: [...document.querySelectorAll("#side .ctl")].filter((x) => getComputedStyle(x).display !== "none").length, all: document.querySelectorAll("#side .ctl").length, hint: document.querySelectorAll("#side .ctl.ctl-hint").length, btn: !!document.querySelector("#side .ctl-all:not([hidden])") }));
+const c0 = await ctl();
+await p.click("#side .ctl-all"); await p.waitForTimeout(150);
+const c1 = await ctl();
+rep("стенд гл. 10: видны только ручки задания, «Показать все настройки» открывает остальные", c0.all > 4 && c0.vis === c0.hint && c0.vis > 0 && c0.vis < c0.all && c0.btn && c1.vis === c1.all, JSON.stringify({ c0, c1 }));
 await p.context().close();
 p = await page(null);
 await p.goto(A + "#10"); await p.waitForTimeout(900);

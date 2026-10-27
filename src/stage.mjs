@@ -150,7 +150,21 @@ export function mountFigure(host, fig, { number = 1, preset = {}, sidebar, metri
       if (box) box.classList.add("ctl-hint");
       if (val !== undefined) { const b = sidebar.querySelector(`[data-seg="${id}"][data-value="${val}"]`); if (b) b.classList.add("seg-hint"); }
     }
+    // meta.focus: в панели только ручки текущего задания (совет «базовый режим», 27.10); остальные — по кнопке.
+    if (fig.meta.focus) {
+      const boxes = [...sidebar.querySelectorAll(".ctl")];
+      const on = touchIds.length > 0 && !showAll;
+      let off = 0;
+      for (const box of boxes) { const hide = on && !box.classList.contains("ctl-hint"); box.classList.toggle("ctl-off", hide); if (hide) off++; }
+      const btn = sidebar.querySelector(".ctl-all");
+      if (btn) {
+        btn.hidden = !touchIds.length || (!showAll && !off);
+        btn.textContent = showAll ? "Только нужное для задания" : `Показать все настройки (+${off})`;
+        btn.setAttribute("aria-expanded", String(showAll));
+      }
+    }
   }
+  let showAll = false;
   // ── Подписи ──
   let tagEls = [], tagAt = 0, focusIdx = -1;
   function buildTags() {
@@ -557,7 +571,7 @@ export function mountFigure(host, fig, { number = 1, preset = {}, sidebar, metri
   if (sidebar) {
     // Стенд-разбор (meta.proc): вместо ползунков — своя панель шагов с кнопками (ctl.panel / ctl.act).
     const visibleCtl = (fig.controls || []).some((c) => c.type !== "hidden");
-    sidebar.innerHTML = `${fig.meta.proc ? `<div class="fig-proc" data-ctl="proc" aria-live="polite"></div>` : ""}${visibleCtl ? `<div class="ctl-head">Условия опыта</div>${controlsHtml()}` : ""}${fig.meta.try && !(fig.meta.missions || []).length ? `<div class="ctl-try"><b>Попробуй</b><ul>${fig.meta.try.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}`;
+    sidebar.innerHTML = `${fig.meta.proc ? `<div class="fig-proc" data-ctl="proc" aria-live="polite"></div>` : ""}${visibleCtl ? `<div class="ctl-head">Условия опыта</div>${controlsHtml()}${fig.meta.focus ? `<button type="button" class="ghost ctl-all" hidden aria-expanded="false"></button>` : ""}` : ""}${fig.meta.try && !(fig.meta.missions || []).length ? `<div class="ctl-try"><b>Попробуй</b><ul>${fig.meta.try.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}`;
     procEl = sidebar.querySelector(".fig-proc");
     if (procEl)
       procEl.addEventListener("click", (e) => {
@@ -568,6 +582,11 @@ export function mountFigure(host, fig, { number = 1, preset = {}, sidebar, metri
         placeTags();
       });
     mountSticks();
+    sidebar.addEventListener("click", (e) => {
+      if (!e.target.closest(".ctl-all")) return;
+      showAll = !showAll;
+      applyLook();
+    });
     sidebar.addEventListener("input", (e) => {
       const el = e.target.closest("[data-ctl]");
       if (!el) return;
