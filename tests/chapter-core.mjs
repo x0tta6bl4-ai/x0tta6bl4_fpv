@@ -1,7 +1,8 @@
-// Пилот обсуждения 004 (карточка 042): у главы с полем `core` открыто «Главное», стенд — сразу после него, весь прежний
-// текст — в свёрнутом «Подробнее»; `?pilot=a` — глава как раньше (вариант «до» для живого замера). Движок проверяется
+// Пилот обсуждения 004 (карточки 042, 045): у главы с полем `core` стенд — первым («схема сначала», решение владельца
+// 27.10), под ним «Главное» свёрнуто по темам (открыто только предупреждение), весь прежний текст — в свёрнутом
+// «Подробнее»; `?pilot=b` — «Главное» текстом целиком и стенд после него; `?pilot=a` — глава как раньше (вариант «до»). Движок проверяется
 // на гл. 11 с временным «Главным» через window.__FPV_TEST_CORE (без него гл. 11 не меняется); гл. 10 — на настоящем
-// тексте карточки 041: «Главное» видно и отвечает на вопросы её карты 21/21.
+// тексте карточки 041: темы «Главного» в одно касание и вместе отвечают на вопросы её карты 21/21.
 import { chromium } from "playwright";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -28,7 +29,9 @@ const layout = (p) => p.evaluate(() => {
   return {
     core: !!core, coreText: core ? core.textContent.trim() : "", coreVisible: !!(r && r.height > 0 && core.offsetParent),
     more: !!more, moreOpen: !!(more && more.open), secs: secs.length, secsInMore: secs.filter((s) => more && more.contains(s)).length,
-    labAfterCore: before(core, lab), labBeforeMore: before(lab, more), riddleInMore: !!(more && more.querySelector(".riddle")),
+    labAfterCore: before(core, lab), labBeforeMore: before(lab, more), labBeforeCore: before(lab, core), coreBeforeMore: before(core, more),
+    topics: document.querySelectorAll("#core details.core-topic").length, topicsOpen: document.querySelectorAll("#core details.core-topic[open]").length,
+    warn: [...document.querySelectorAll("#core .core-warn")].map((e) => e.textContent.trim()).join(" | "), riddleInMore: !!(more && more.querySelector(".riddle")),
     riddleOutside: !!document.querySelector("#main .riddle") && !(more && more.querySelector(".riddle")),
     checkOutside: !!document.querySelector("#check") && !(more && more.contains(document.querySelector("#check"))),
     summaryOutside: !!document.querySelector("#main .summary") && !(more && more.contains(document.querySelector("#main .summary"))),
@@ -44,13 +47,16 @@ rep("без `core` гл. 11 не меняется: нет «Главного» �
 await p.context().close();
 
 // 2. С «Главным»
-const CORE = { 11: "<p><b>Тест движка.</b> LQ — доля дошедших пакетов.</p>" };
+const CORE = { 11: "<p><b>Тест движка: без винтов.</b></p><p><b>Что такое LQ</b></p><p>LQ — доля дошедших пакетов.</p>" };
 p = await page(CORE);
 await p.goto(FILE + "#11"); await p.waitForTimeout(900);
 L = await layout(p);
-rep("«Главное» видно сразу, без раскрытия", L.core && L.coreVisible && /Тест движка/.test(L.coreText), L.coreText.slice(0, 40));
+rep("«Главное» на экране: темы свёрнуты, предупреждение открыто", L.core && L.coreVisible && L.topics === 1 && L.topicsOpen === 0 && /без винтов/.test(L.warn), JSON.stringify({ topics: L.topics, warn: L.warn }));
 rep("весь прежний текст — в свёрнутом «Подробнее»", L.more && !L.moreOpen && L.secs > 0 && L.secsInMore === L.secs, `${L.secsInMore}/${L.secs}`);
-rep("стенд — сразу после «Главного», до «Подробнее» (П3)", L.labAfterCore && L.labBeforeMore);
+rep("схема сначала: стенд первым, под ним «Главное», потом «Подробнее»", L.labBeforeCore && L.coreBeforeMore);
+await p.click("#core details.core-topic > summary"); await p.waitForTimeout(150);
+const topicTxt = await p.evaluate(() => document.querySelector("#core").innerText);
+rep("касание темы открывает её текст", /доля дошедших пакетов/.test(topicTxt), topicTxt.slice(0, 60));
 rep("загадка — в «Подробнее»; итог, полевой чеклист и «Проверь себя» — снаружи", L.riddleInMore && L.summaryOutside && L.checkOutside);
 rep("390 px: не шире экрана", L.sw <= 390, `scrollWidth ${L.sw}`);
 const labOk = await p.evaluate(() => !!document.querySelector("#labcard #missions li, #labcard #quest"));
@@ -65,7 +71,14 @@ if (link) {
 } else rep("ссылка «Объяснение» из прил. «И» раскрывает «Подробнее» и показывает раздел", false, "в прил. «И» нет ссылки на раздел гл. 11");
 await p.context().close();
 
-// 3. Вариант «до»: ?pilot=a
+// 3. Запасной вид ?pilot=b: «Главное» текстом целиком, стенд после него
+p = await page(CORE);
+await p.goto(FILE.replace(/(\.html)$/, "$1?pilot=b") + "#11"); await p.waitForTimeout(900);
+L = await layout(p);
+rep("?pilot=b — «Главное» текстом целиком, стенд после него, прежний текст в «Подробнее»", L.core && L.topics === 0 && /доля дошедших пакетов/.test(L.coreText) && L.labAfterCore && L.labBeforeMore && L.secsInMore === L.secs);
+await p.context().close();
+
+// 4. Вариант «до»: ?pilot=a
 p = await page(CORE);
 const A = FILE.replace(/(\.html)$/, "$1?pilot=a");
 await p.goto(A + "#11"); await p.waitForTimeout(900);
@@ -73,17 +86,18 @@ L = await layout(p);
 rep("?pilot=a — глава как раньше: нет «Главного», разделы открыты, загадка наверху", !L.core && !L.more && L.secsInMore === 0 && L.riddleOutside);
 await p.context().close();
 
-// 4. Гл. 10 на настоящем «Главном» (карточка 041): видно сразу, прежний текст свёрнут, каждый фрагмент карты 21/21 —
-// в видимом «Главном»; ?pilot=a — прежний вид
+// 5. Гл. 10 на настоящем «Главном» (карточка 041): стенд первым, темы свёрнуты, прежний текст свёрнут; после касания
+// тем каждый фрагмент карты 21/21 на экране; ?pilot=a — прежний вид
 const MAP = readFileSync(resolve(ROOT, "docs/content/ch10-core-map.md"), "utf8");
 const frags = [...MAP.split("## Матрица")[0].matchAll(/^\| ([^|]+?) \|.*\| «([^»]+)»[^|]*\|\s*$/gm)].map((m) => [m[1].trim(), m[2]]);
 p = await page(null);
 await p.goto(FILE + "#10"); await p.waitForTimeout(900);
 L = await layout(p);
-rep("гл. 10: настоящее «Главное» видно, весь прежний текст свёрнут, стенд после «Главного»", L.core && L.coreVisible && L.more && !L.moreOpen && L.secsInMore === L.secs && L.labAfterCore && L.labBeforeMore, `${L.coreText.length} знаков`);
+rep("гл. 10: стенд первым, «Главное» по темам свёрнуто, весь прежний текст свёрнут", L.core && L.coreVisible && L.topics >= 5 && L.topicsOpen === 0 && L.more && !L.moreOpen && L.secsInMore === L.secs && L.labBeforeCore && L.coreBeforeMore, `тем ${L.topics}; предупреждение: ${L.warn}`);
+await p.evaluate(() => document.querySelectorAll("#core details.core-topic > summary").forEach((s) => s.click())); await p.waitForTimeout(200);
 const coreTxt = await p.evaluate(() => document.querySelector("#core")?.innerText.replace(/\s+/g, " ") || "");
 const miss = frags.filter(([, f]) => !coreTxt.includes(f.replace(/\s+/g, " ").replace(/…$/, "").slice(0, 60)));
-rep("гл. 10: фрагмент «Главного» из карты 21/21 есть на экране у каждого вопроса", frags.length >= 21 && !miss.length, `${frags.length} строк карты; нет: ${miss.map(([q]) => q.slice(0, 12)).join("; ")}`);
+rep("гл. 10: после касания тем фрагмент «Главного» из карты 21/21 на экране у каждого вопроса", frags.length >= 21 && !miss.length, `${frags.length} строк карты; нет: ${miss.map(([q]) => q.slice(0, 12)).join("; ")}`);
 rep("гл. 10: 390 px — не шире экрана", L.sw <= 390, `scrollWidth ${L.sw}`);
 await p.context().close();
 p = await page(null);
