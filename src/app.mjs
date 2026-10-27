@@ -505,6 +505,25 @@ const riddleHtml = (ch) => (ch.riddle ? `<section class="riddle"><div class="eye
 // текст — в свёрнутом «Подробнее». `?pilot=a` в адресе показывает главу как раньше (вариант «до» для живого замера).
 // `window.__FPV_TEST_CORE` — только для теста движка, пока текста нет в данных.
 const PILOT_A = typeof location !== "undefined" && /[?&]pilot=a(&|$)/.test(location.search);
+// Прототип «схема сначала» (`?pilot=c`): стенд — первым, «Главное» под ним свёрнуто по темам; открыт только жирный
+// абзац-предупреждение (безопасность). Текст тот же, что в `core`, — показывается по касанию темы.
+const PILOT_C = typeof location !== "undefined" && /[?&]pilot=c(&|$)/.test(location.search);
+function coreAccordion(core) {
+  const out = [];
+  for (const p of core.split(/(?=<p><b>[^<]+<\/b><\/p>)/)) {
+    const m = p.match(/^<p><b>([^<]+)<\/b><\/p>([\s\S]*)$/);
+    if (!m) { out.push({ html: p }); continue; }
+    // Жирная строка с точкой — предупреждение, не тема: остаётся открытой, текст после неё — к предыдущей теме.
+    if (/[.!]$/.test(m[1].trim())) {
+      const last = out.filter((x) => x.title).pop();
+      out.push({ warn: m[1] });
+      if (last) last.html += m[2]; else out.push({ html: m[2] });
+      continue;
+    }
+    out.push({ title: m[1], html: m[2] });
+  }
+  return out.map((x) => (x.warn ? `<p class="core-warn"><b>${x.warn}</b></p>` : x.title ? `<details class="core-topic"><summary>${x.title}</summary>${tags(x.html)}</details>` : tags(x.html))).join("");
+}
 function coreOf(ch) {
   if (PILOT_A) return "";
   return ch.core || (typeof window !== "undefined" && window.__FPV_TEST_CORE && window.__FPV_TEST_CORE[ch.id]) || "";
@@ -523,7 +542,7 @@ function chapterView(ch) {
   ${ch.lead ? `<p class="lead">${tags(ch.lead)}</p>` : ""}
   ${core ? "" : riddleHtml(ch)}
   ${ch.goals ? `<div class="goals"><div><div class="eyebrow">После главы ты сможешь</div><ul>${ch.goals.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div>${ch.words ? `<div><div class="eyebrow">Новые слова</div><p class="words">${ch.words.map((w) => `<span class="word" tabindex="0" title="${esc(glossaryOf(w))}">${esc(w)}</span>`).join("")}</p></div>` : ""}</div>` : ""}
-  ${core ? `<section class="core" id="core"><div class="eyebrow">Главное</div>${tags(core)}</section>${interactiveHtml(ch)}<details class="more" id="more"><summary>Подробнее: весь текст главы</summary>${riddleHtml(ch)}` : ch.standAfter === undefined ? interactiveHtml(ch) : ""}
+  ${core ? `${PILOT_C ? `${interactiveHtml(ch)}<section class="core core-acc" id="core"><div class="eyebrow">Главное — коснись темы</div>${coreAccordion(core)}</section>` : `<section class="core" id="core"><div class="eyebrow">Главное</div>${tags(core)}</section>${interactiveHtml(ch)}`}<details class="more" id="more"><summary>Подробнее: весь текст главы</summary>${riddleHtml(ch)}` : ch.standAfter === undefined ? interactiveHtml(ch) : ""}
   ${ch.calc === "scale" ? scaleCalc() : ""}
   ${(ch.sections || []).map((sec, i) => sectionHtml(sec) + (!core && ch.standAfter === i ? interactiveHtml(ch) : "")).join("")}
   ${ch.corrections ? `<p class="lab-note"><b>Уточнение лаборатории.</b> ${esc(ch.corrections.replace(/^Уточнение( лаборатории)?: /, ""))}</p>` : ""}
